@@ -555,7 +555,150 @@ flowchart TB
 
 ---
 
-### 1.6 Các điểm chưa rõ cần xác nhận với khách hàng
+### 1.6 Business Requirements (Yêu cầu nghiệp vụ)
+
+Các yêu cầu nghiệp vụ (Business Requirements) được xác định từ mô tả yêu cầu khách hàng, phân nhóm theo lĩnh vực nghiệp vụ.
+
+---
+
+#### 1.6.1 Quản lý tài khoản & Xác thực
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-001 | Đăng ký tài khoản khách hàng | Hệ thống phải cho phép khách hàng tự đăng ký tài khoản bằng thông tin cá nhân (họ tên, email, số điện thoại, mật khẩu). Tài khoản phải được xác thực trước khi sử dụng dịch vụ. |
+| BR-002 | Đăng ký tài khoản tài xế | Hệ thống phải cho phép tài xế tự đăng ký tài khoản hoặc được nhân viên vận hành tạo tài khoản. Hồ sơ tài xế phải bao gồm thông tin bằng lái và phương tiện, và phải được duyệt trước khi hoạt động. |
+| BR-003 | Đăng nhập hệ thống | Hệ thống phải xác thực người dùng (khách hàng, tài xế, nhân viên vận hành) trước khi cho phép truy cập các chức năng yêu cầu tài khoản. Mỗi nhóm người dùng chỉ được truy cập chức năng phù hợp với vai trò. |
+| BR-004 | Cập nhật thông tin cá nhân | Khách hàng và tài xế phải có khả năng cập nhật thông tin cá nhân của mình bất kỳ lúc nào sau khi đăng nhập (họ tên, số điện thoại, ảnh đại diện). |
+
+---
+
+#### 1.6.2 Đặt xe & Quản lý chuyến đi
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-005 | Tạo yêu cầu đặt xe | Khách hàng phải có thể đặt xe bằng cách nhập điểm đón, điểm đến và lựa chọn loại xe mong muốn. Hệ thống phải hiển thị cước phí ước tính trước khi khách hàng xác nhận đặt xe. |
+| BR-006 | Lựa chọn loại xe | Hệ thống phải hỗ trợ ít nhất 3 loại xe (Sedan 4 chỗ, SUV 7 chỗ, Van 16 chỗ) với mức giá khác nhau. Khách hàng được chọn loại xe phù hợp nhu cầu khi đặt xe. |
+| BR-007 | Theo dõi trạng thái chuyến đi | Sau khi đặt xe, khách hàng phải biết được hệ thống đang tìm tài xế, tài xế nào đã nhận chuyến, thời gian dự kiến tài xế đến, và trạng thái hiện tại của chuyến đi (đang đến đón, đã đón, đang di chuyển, hoàn thành). |
+| BR-008 | Theo dõi vị trí tài xế real-time | Khách hàng phải có thể xem vị trí tài xế trên bản đồ theo thời gian thực sau khi có tài xế nhận chuyến, bao gồm thời gian dự kiến tài xế đến điểm đón. |
+| BR-009 | Xem thông tin tài xế | Khi có tài xế nhận chuyến, khách hàng phải xem được thông tin tài xế gồm: tên, số điện thoại, ảnh, biển số xe, loại xe và đánh giá trung bình. |
+| BR-010 | Hủy chuyến đi | Khách hàng phải có khả năng hủy chuyến đi. Chính sách hủy chuyến phải được quy định rõ ràng (MVP: miễn phí trước khi tài xế đến điểm đón). |
+| BR-011 | Xem lịch sử chuyến đi | Khách hàng phải có thể xem lịch sử tất cả chuyến đi đã thực hiện, bao gồm chi tiết từng chuyến: điểm đón/trả, khoảng cách, thời gian, cước phí, tài xế và trạng thái. |
+| BR-012 | Quy trình chuyến đi hoàn chỉnh | Hệ thống phải hỗ trợ đầy đủ quy trình chuyến đi: Khách đặt xe → Hệ thống tìm tài xế → Tài xế nhận chuyến → Tài xế đến điểm đón → Đón khách → Di chuyển đến điểm đến → Hoàn thành → Tính cước → Thanh toán → Đánh giá. |
+
+---
+
+#### 1.6.3 Quản lý tài xế & Phương tiện
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-013 | Cập nhật hồ sơ tài xế | Tài xế phải có khả năng cập nhật hồ sơ cá nhân và thông tin phương tiện (biển số, hãng xe, model, màu sắc, loại xe, số ghế) sau khi đăng nhập. |
+| BR-014 | Quản lý trạng thái hoạt động | Tài xế phải có thể chuyển sang trạng thái sẵn sàng nhận chuyến khi đang làm việc và chuyển về trạng thái offline khi nghỉ. Hệ thống chỉ gửi yêu cầu chuyến đến tài xế đang ở trạng thái sẵn sàng. |
+| BR-015 | Cập nhật vị trí tài xế | Hệ thống phải lưu thông tin vị trí GPS của tài xế khi đang ở trạng thái sẵn sàng hoặc đang thực hiện chuyến, để hỗ trợ tìm tài xế gần khách hàng và dự kiến thời gian đến. |
+| BR-016 | Duyệt hồ sơ tài xế | Nhân viên vận hành hoặc Admin phải duyệt hồ sơ tài xế mới đăng ký trước khi tài xế được phép hoạt động trên hệ thống. |
+| BR-017 | Quản lý phương tiện | Mỗi tài xế phải đăng ký ít nhất một phương tiện. Thông tin phương tiện phải được xác minh bao gồm: biển số xe, loại xe, hình ảnh xe. |
+
+---
+
+#### 1.6.4 Tìm & Phân công tài xế
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-018 | Tự động tìm tài xế phù hợp | Khi khách hàng tạo chuyến đi, hệ thống phải tự động xác định các tài xế phù hợp dựa trên: vị trí hiện tại (trong bán kính cho phép), trạng thái sẵn sàng, loại xe phù hợp, và các tiêu chí vận hành khác. |
+| BR-019 | Ưu tiên tài xế gần nhất | Hệ thống phải ưu tiên gửi yêu cầu chuyến cho tài xế gần khách hàng nhất trước, sau đó xét thêm tiêu chí phụ (rating, số chuyến hoàn thành) nếu có nhiều tài xế cùng khoảng cách. |
+| BR-020 | Cơ chế retry khi tài xế từ chối | Nếu tài xế được đề xuất không phản hồi hoặc từ chối chuyến, hệ thống phải tiếp tục tìm tài xế khác mà không yêu cầu khách hàng tạo lại yêu cầu. Tối đa thử 5 tài xế (cấu hình được). |
+| BR-021 | Giới hạn thời gian phản hồi | Tài xế phải phản hồi (chấp nhận hoặc từ chối) yêu cầu chuyến trong khoảng thời gian quy định (mặc định 30 giây). Hết thời gian mà không phản hồi được xem như từ chối. |
+| BR-022 | Thông báo không tìm được tài xế | Trong trường hợp không tìm được tài xế nào sau khi đã thử hết danh sách, khách hàng phải được thông báo rõ ràng rằng hiện tại không có tài xế phù hợp. |
+| BR-023 | Cập nhật trạng thái bởi tài xế | Trong quá trình thực hiện chuyến, tài xế phải cập nhật trạng thái theo từng bước: đã đến điểm đón → đã đón khách → đang di chuyển → hoàn thành chuyến. Mỗi trạng thái được ghi nhận thời gian. |
+
+---
+
+#### 1.6.5 Tính cước & Thanh toán
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-024 | Tính cước tự động | Sau khi chuyến đi hoàn thành, hệ thống phải tự động xác định số tiền khách hàng phải trả dựa trên loại dịch vụ (loại xe), khoảng cách thực tế và thời gian di chuyển. |
+| BR-025 | Cước phí ước tính | Hệ thống phải hiển thị cước phí ước tính cho khách hàng trước khi xác nhận đặt xe, dựa trên loại xe, khoảng cách ước tính từ điểm đón đến điểm đến. |
+| BR-026 | Cấu hình bảng giá | Bảng giá (giá cơ bản, đơn giá/km, đơn giá/phút) phải có thể cấu hình theo từng loại xe mà không cần sửa mã nguồn. Doanh nghiệp có thể điều chỉnh giá khi cần. |
+| BR-027 | Hỗ trợ nhiều phương thức thanh toán | Khách hàng phải có thể thanh toán bằng tiền mặt hoặc phương thức thanh toán điện tử. Hệ thống phải có khả năng tích hợp thêm phương thức thanh toán mới trong tương lai. |
+| BR-028 | Tích hợp cổng thanh toán bên ngoài | Doanh nghiệp muốn tích hợp với nhà cung cấp thanh toán bên ngoài cho thanh toán điện tử. Thông tin nhạy cảm của thẻ hoặc tài khoản thanh toán KHÔNG được lưu trực tiếp trong hệ thống CAB. |
+| BR-029 | Xử lý thanh toán thất bại | Nếu giao dịch thanh toán điện tử thất bại, hệ thống phải thông báo cho khách hàng và cho phép xử lý lại (retry hoặc chuyển sang phương thức khác) theo chính sách của doanh nghiệp. |
+| BR-030 | Xem chi tiết thanh toán | Khách hàng phải xem được chi tiết cước phí sau chuyến: cước cơ bản, phí theo km, phí theo thời gian, tổng cộng, phương thức thanh toán, trạng thái thanh toán. |
+
+---
+
+#### 1.6.6 Thông báo
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-031 | Thông báo cho khách hàng | Khách hàng phải nhận được thông báo tại các thời điểm quan trọng: yêu cầu đặt xe được tiếp nhận, có tài xế nhận chuyến, tài xế đến điểm đón, chuyến hoàn thành, kết quả thanh toán, và khi không tìm được tài xế. |
+| BR-032 | Thông báo cho tài xế | Tài xế phải nhận được thông báo khi có chuyến mới phù hợp cần nhận, khi chuyến bị hủy bởi khách hàng, và các thay đổi liên quan đến chuyến đang thực hiện. |
+| BR-033 | Khả năng mở rộng kênh thông báo | Hệ thống thông báo phải được thiết kế linh hoạt để doanh nghiệp có thể bổ sung thêm các kênh thông báo mới (SMS, Push Notification) trong tương lai mà không phải thay đổi toàn bộ hệ thống. |
+
+---
+
+#### 1.6.7 Đánh giá & Phản hồi
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-034 | Đánh giá tài xế sau chuyến | Khách hàng phải có khả năng đánh giá tài xế (1–5 sao) và viết nhận xét sau khi hoàn thành chuyến đi. Điểm đánh giá phải được tổng hợp thành rating trung bình hiển thị trên hồ sơ tài xế. |
+| BR-035 | Xem lịch sử đánh giá | Tài xế phải xem được các đánh giá mà khách hàng đã để lại, bao gồm điểm số và nhận xét, để cải thiện chất lượng dịch vụ. |
+
+---
+
+#### 1.6.8 Quản trị & Báo cáo
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-036 | Giao diện quản trị tập trung | Doanh nghiệp phải có một giao diện quản trị (dashboard) để nhân viên vận hành và quản trị viên quản lý khách hàng, tài xế, phương tiện và chuyến đi từ một nơi duy nhất. |
+| BR-037 | Giám sát chuyến đi | Nhân viên vận hành phải có thể xem các chuyến đang diễn ra, kiểm tra trạng thái tài xế, và hỗ trợ xử lý các trường hợp chuyến bị lỗi hoặc có vấn đề. |
+| BR-038 | Tra cứu lịch sử giao dịch | Nhân viên vận hành phải có thể tra cứu lịch sử giao dịch thanh toán theo khách hàng, tài xế, khoảng thời gian hoặc trạng thái giao dịch. |
+| BR-039 | Phân quyền quản trị | Một số chức năng quản trị phải được phân quyền: nhân viên vận hành thông thường (Operator) không được thực hiện các thao tác nhạy cảm (xóa dữ liệu, thay đổi cấu hình, phân quyền). Chỉ Admin mới có toàn quyền. |
+| BR-040 | Báo cáo vận hành | Ban lãnh đạo phải có báo cáo về: số lượng chuyến (theo ngày/tuần/tháng), doanh thu, tỷ lệ chuyến hoàn thành, tỷ lệ hủy, và hiệu quả hoạt động của từng tài xế. |
+
+---
+
+#### 1.6.9 Bảo mật, Hiệu năng & Kiến trúc
+
+| Ký hiệu | Tên | Diễn giải |
+|----------|-----|-----------|
+| BR-041 | Xác thực bắt buộc | Khách hàng và tài xế phải được xác thực trước khi sử dụng các chức năng yêu cầu tài khoản. Các thao tác quản trị phải được kiểm soát quyền truy cập theo vai trò. |
+| BR-042 | Bảo vệ dữ liệu | Thông tin cá nhân, thông tin phương tiện, dữ liệu vị trí và dữ liệu giao dịch phải được bảo vệ. Mật khẩu phải được mã hóa. Thông tin thanh toán nhạy cảm không được lưu trong hệ thống. |
+| BR-043 | Ghi log thao tác quan trọng | Doanh nghiệp cần lưu vết (audit log) các thao tác quan trọng (tạo/hủy chuyến, thanh toán, khóa tài khoản, thay đổi quyền) để phục vụ kiểm tra khi có sự cố. |
+| BR-044 | Hoạt động ổn định và cách ly lỗi | Hệ thống phải hoạt động ổn định vào các thời điểm nhu cầu tăng cao. Lỗi xảy ra ở chức năng thanh toán hoặc thông báo KHÔNG được làm toàn bộ hệ thống đặt xe ngừng hoạt động. Các thành phần phải có khả năng mở rộng độc lập khi tải tăng. |
+| BR-045 | Kiến trúc linh hoạt và triển khai từng phần | Hệ thống phải có kiến trúc đủ linh hoạt để trong tương lai có thể bổ sung loại dịch vụ mới, thêm phương thức thanh toán, thêm nhà cung cấp thông báo hoặc thay đổi thành phần kỹ thuật mà không phải xây dựng lại toàn bộ. Các chức năng mới phải có thể triển khai từng phần mà hạn chế ảnh hưởng đến các chức năng đang hoạt động. |
+
+---
+
+#### 1.6.10 Tổng hợp Business Requirements
+
+```mermaid
+pie title Phân bổ Business Requirements theo lĩnh vực
+    "Đặt xe & Chuyến đi (8)" : 8
+    "Tính cước & Thanh toán (7)" : 7
+    "Tìm & Phân công tài xế (6)" : 6
+    "Quản trị & Báo cáo (5)" : 5
+    "Tài khoản & Xác thực (4)" : 4
+    "Tài xế & Phương tiện (5)" : 5
+    "Bảo mật & Kiến trúc (5)" : 5
+    "Thông báo (3)" : 3
+    "Đánh giá (2)" : 2
+```
+
+**Ma trận truy xuất Business Requirements → Business Goals:**
+
+| Business Requirement | Business Goal liên quan |
+|---------------------|------------------------|
+| BR-001 → BR-004 | BG-01 (Chuyển đổi số), BG-12 (Bảo mật) |
+| BR-005 → BR-012 | BG-01 (Chuyển đổi số), BG-05 (Minh bạch trạng thái), BG-13 (UX) |
+| BR-013 → BR-017 | BG-07 (Quản lý tài xế & phương tiện) |
+| BR-018 → BR-023 | BG-04 (Tự động phân công tài xế), BG-01 (Chuyển đổi số) |
+| BR-024 → BR-030 | BG-06 (Tính cước tự động), BG-03 (Tăng doanh thu) |
+| BR-031 → BR-033 | BG-08 (Thông báo kịp thời), BG-11 (Kiến trúc linh hoạt) |
+| BR-034 → BR-035 | BG-05 (Minh bạch trạng thái), BG-13 (UX) |
+| BR-036 → BR-040 | BG-09 (Công cụ quản trị), BG-10 (Báo cáo vận hành) |
+| BR-041 → BR-045 | BG-11 (Kiến trúc linh hoạt), BG-12 (Bảo mật), BG-02 (Mở rộng quy mô) |
+
+### 1.7 Các điểm chưa rõ cần xác nhận với khách hàng
 
 Dựa trên mô tả yêu cầu, doanh nghiệp **chưa chốt** các vấn đề sau. Business Analyst cần làm rõ trước khi phát triển:
 
