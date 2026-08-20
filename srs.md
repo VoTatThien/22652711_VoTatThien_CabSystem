@@ -21,6 +21,10 @@
    - 1.6 [Business Requirements (Yêu cầu nghiệp vụ)](#16-business-requirements-yêu-cầu-nghiệp-vụ)
    - 1.7 [Business Processes (Quy trình nghiệp vụ)](#17-business-processes-quy-trình-nghiệp-vụ)
    - 1.8 [Các điểm chưa rõ cần xác nhận](#18-các-điểm-chưa-rõ-cần-xác-nhận-với-khách-hàng)
+2. [Giai đoạn 2 – Phân rã yêu cầu chức năng (Functional Requirements Decomposition)](#giai-đoạn-2--phân-rã-yêu-cầu-chức-năng-functional-requirements-decomposition)
+   - 2.1 [Cây phân rã chức năng (Functional Decomposition Tree)](#21-cây-phân-rã-chức-năng-functional-decomposition-tree)
+   - 2.2 [Bảng phân rã chi tiết yêu cầu chức năng theo từng phân hệ](#22-bảng-phân-rã-chi-tiết-yêu-cầu-chức-năng-theo-từng-phân-hệ)
+   - 2.3 [Ma trận liên kết chức năng và tác nhân (Function-Actor Matrix)](#23-ma-trận-liên-kết-chức-năng-và-tác-nhân-function-actor-matrix)
 
 ---
 
@@ -991,6 +995,263 @@ Dựa trên mô tả yêu cầu, doanh nghiệp **chưa chốt** các vấn đ�
 
 ---
 
+## Giai đoạn 2 – Phân rã yêu cầu chức năng (Functional Requirements Decomposition)
+
+Phân rã yêu cầu chức năng (Functional Decomposition) là kỹ thuật phân tách hệ thống cấp cao thành các phân hệ (L1), nhóm chức năng (L2), và các yêu cầu chức năng chi tiết ở mức nguyên tử (L3 - Atomic Requirements). Kỹ thuật này giúp đảm bảo không bỏ sót bất kỳ yêu cầu nghiệp vụ nào và làm tiền đề cho việc xây dựng kiến trúc kỹ thuật và lập trình.
+
+---
+
+### 2.1 Cây phân rã chức năng (Functional Decomposition Tree)
+
+```mermaid
+graph TD
+    L0["<b>CAB System Platform (L0)</b>"]
+    
+    %% L1 Modules
+    L0 --> M1["1.0 Quản lý Xác thực & Tài khoản"]
+    L0 --> M2["2.0 Quản lý Tài xế & Phương tiện"]
+    L0 --> M3["3.0 Đặt xe & Vòng đời Chuyến đi"]
+    L0 --> M4["4.0 Phân công & Ghép nối Tài xế"]
+    L0 --> M5["5.0 Tính cước & Thanh toán"]
+    L0 --> M6["6.0 Định vị & Giám sát Real-time"]
+    L0 --> M7["7.0 Trung tâm Thông báo Đa kênh"]
+    L0 --> M8["8.0 Đánh giá & Phản hồi"]
+    L0 --> M9["9.0 Quản trị Vận hành & Báo cáo"]
+    L0 --> M10["10.0 Bảo mật, RBAC & Audit Log"]
+
+    %% L2 Sub-functions
+    M1 --> M1_1["1.1 Đăng ký đa kênh"]
+    M1 --> M1_2["1.2 Xác thực JWT & Phiên"]
+    M1 --> M1_3["1.3 Quản lý Hồ sơ cá nhân"]
+
+    M2 --> M2_1["2.1 Đăng ký hồ sơ lái xe"]
+    M2 --> M2_2["2.2 Quản lý hồ sơ phương tiện"]
+    M2 --> M2_3["2.3 Quản lý trạng thái Online/Offline"]
+    M2 --> M2_4["2.4 Xét duyệt hồ sơ (Operator)"]
+
+    M3 --> M3_1["3.1 Khởi tạo yêu cầu chuyến"]
+    M3 --> M3_2["3.2 Lựa chọn hạng xe & Ước tính cước"]
+    M3 --> M3_3["3.3 Quản lý trạng thái chuyến đi"]
+    M3 --> M3_4["3.4 Xử lý hủy chuyến"]
+    M3 --> M3_5["3.5 Tra cứu lịch sử chuyến đi"]
+
+    M4 --> M4_1["4.1 Quét tài xế quanh vùng 5km"]
+    M4 --> M4_2["4.2 Thuật toán xếp hạng ưu tiên"]
+    M4 --> M4_3["4.3 Điều phối yêu cầu & Timeout 30s"]
+    M4 --> M4_4["4.4 Cơ chế thử lại tự động (Retry Max 5)"]
+
+    M5 --> M5_1["5.1 Tính cước tự động theo công thức"]
+    M5 --> M5_2["5.2 Quản lý cấu hình biểu phí xe"]
+    M5 --> M5_3["5.3 Xử lý thanh toán Tiền mặt"]
+    M5 --> M5_4["5.4 Xử lý thanh toán Điện tử (Mock Gateway)"]
+    M5 --> M5_5["5.5 Xử lý lỗi & Thử lại giao dịch"]
+
+    M6 --> M6_1["6.1 Thu nhận GPS tài xế liên tục"]
+    M6 --> M6_2["6.2 Phát sóng vị trí qua WebSocket"]
+    M6 --> M6_3["6.3 Tính toán khoảng cách & ETA"]
+
+    M7 --> M7_1["7.1 Thông báo Real-time In-App (Socket)"]
+    M7 --> M7_2["7.2 Thông báo qua Email (Nodemailer)"]
+    M7 --> M7_3["7.3 Trung tâm quản lý thông báo người dùng"]
+
+    M8 --> M8_1["8.1 Gửi đánh giá sao & Nhận xét"]
+    M8 --> M8_2["8.2 Cập nhật Rating trung bình"]
+
+    M9 --> M9_1["9.1 Dashboard Giám sát Real-time"]
+    M9 --> M9_2["9.2 Quản lý Khách hàng & Tài xế"]
+    M9 --> M9_3["9.3 Can thiệp & Xử lý chuyến đi"]
+    M9 --> M9_4["9.4 Báo cáo thống kê & Doanh thu"]
+
+    M10 --> M10_1["10.1 Phân quyền vai trò RBAC"]
+    M10 --> M10_2["10.2 Ghi nhật ký kiểm toán Audit Log"]
+    M10 --> M10_3["10.3 Mã hóa dữ liệu nhạy cảm"]
+```
+
+---
+
+### 2.2 Bảng phân rã chi tiết yêu cầu chức năng theo từng phân hệ
+
+---
+
+#### 2.2.1 Phân hệ 1.0: Quản lý Xác thực & Tài khoản (Authentication & User Management)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-AUTH-01** | Đăng ký tài khoản Khách hàng | Là khách hàng, tôi muốn tạo tài khoản bằng Email/SĐT để sử dụng dịch vụ. | Họ tên, Email, Số điện thoại, Mật khẩu | Kiểm tra định dạng email, SĐT hợp lệ, kiểm tra trùng lặp trong DB, hash mật khẩu bằng bcrypt. | Tài khoản được tạo ở trạng thái `Active`, gửi email chào mừng. | BR-001 | Must Have |
+| **FR-AUTH-02** | Đăng ký tài khoản Tài xế | Là tài xế, tôi muốn đăng ký tài khoản kèm giấy tờ để xin gia nhập hệ thống. | Họ tên, SĐT, Email, Mật khẩu, Số GPLX, Hạng bằng lái, Ảnh chụp bằng lái | Kiểm tra tính hợp lệ dữ liệu, lưu hồ sơ ở trạng thái `Pending_Approval`. | Bản ghi tài xế được tạo, chờ duyệt từ Operator. | BR-002 | Must Have |
+| **FR-AUTH-03** | Đăng nhập hệ thống | Là người dùng, tôi muốn đăng nhập bằng Email/SĐT và mật khẩu để truy cập chức năng. | Email/SĐT, Mật khẩu | So khớp thông tin trong DB, kiểm tra trạng thái tài khoản không bị khóa, phát sinh Access Token (JWT - 15p) và Refresh Token (7 ngày). | Token xác thực, thông tin Role và Profile trả về Client. | BR-003, BR-041 | Must Have |
+| **FR-AUTH-04** | Cập nhật hồ sơ cá nhân | Là người dùng, tôi muốn cập nhật thông tin cá nhân của mình. | Tên hiển thị, Số điện thoại, Ảnh đại diện (Avatar) | Xác thực token, cập nhật DB, không cho phép đổi email định danh. | Hồ sơ cập nhật thành công. | BR-004 | Must Have |
+| **FR-AUTH-05** | Đổi mật khẩu | Là người dùng, tôi muốn đổi mật khẩu mới để bảo mật tài khoản. | Mật khẩu hiện tại, Mật khẩu mới | So khớp mật khẩu cũ, kiểm tra mật khẩu mới đủ độ dài (≥ 6 ký tự), mã hóa và lưu DB. | Mật khẩu được cập nhật, hủy bỏ các token cũ. | BR-042 | Must Have |
+| **FR-AUTH-06** | Đăng xuất & Thu hồi phiên | Là người dùng, tôi muốn đăng xuất khỏi ứng dụng. | Refresh Token | Xóa refresh token khỏi cơ sở dữ liệu/blacklist. | Phiên làm việc kết thúc an toàn. | BR-041 | Must Have |
+
+---
+
+#### 2.2.2 Phân hệ 2.0: Quản lý Tài xế & Phương tiện (Driver & Vehicle Management)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-DRV-01** | Đăng ký thông tin phương tiện | Là tài xế, tôi muốn khai báo xe của mình để phục vụ chở khách. | Biển số xe, Hãng xe, Dòng xe (Model), Màu sắc, Phân loại xe (Sedan/SUV/Van), Số ghế ngồi | Kiểm tra biển số xe duy nhất, liên kết thông tin phương tiện với Driver ID. | Bản ghi xe được lưu, trạng thái `Active`. | BR-017 | Must Have |
+| **FR-DRV-02** | Bật/Tắt trạng thái trực tuyến (Online/Offline) | Là tài xế, tôi muốn bật chế độ sẵn sàng nhận chuyến khi bắt đầu ca làm việc. | Trạng thái mong muốn (`Available` / `Offline`) | Chỉ cho phép bật `Available` nếu hồ sơ đã được duyệt (`Approved`) và phương tiện hợp lệ. | Cập nhật DB, phát socket thông báo tài xế online. | BR-014 | Must Have |
+| **FR-DRV-03** | Tự động chuyển trạng thái bận | Hệ thống tự động gán trạng thái bận khi tài xế đang chạy cuốc. | Sự kiện nhận chuyến (`accepted`) | Chuyển trạng thái sang `Busy`, tạm ngưng nhận các yêu cầu mới. | Tài xế không xuất hiện trong danh sách tìm kiếm chuyến khác. | BR-014, BR-023 | Must Have |
+| **FR-DRV-04** | Duyệt hồ sơ tài xế | Là Operator, tôi muốn xét duyệt hồ sơ tài xế đăng ký mới. | Driver ID, Quyết định (`Approve` / `Reject`), Ghi chú lý do | Cập nhật trạng thái `isApproved = true/false`, gửi email thông báo kết quả cho tài xế. | Hồ sơ tài xế được kích hoạt hoặc từ chối. | BR-016, BR-036 | Must Have |
+| **FR-DRV-05** | Xem hồ sơ và hiệu suất tài xế | Là tài xế, tôi muốn xem tổng số chuyến hoàn thành, thu nhập và rating của mình. | Driver ID | Tổng hợp số cuốc xe, rating trung bình, tổng tiền từ các cuốc hoàn thành. | Màn hình Dashboard tài xế với các chỉ số đo lường. | BR-013, BR-035 | Should Have |
+| **FR-DRV-06** | Khóa/Vô hiệu hóa tài xế vi phạm | Là Admin, tôi muốn tạm khóa tài xế khi có hành vi vi phạm. | Driver ID, Lý do khóa | Chuyển trạng thái `isActive = false`, ngắt kết nối socket, thu hồi quyền nhận chuyến. | Tài xế bị đăng xuất và không thể trực tuyến. | BR-036, BR-039 | Should Have |
+
+---
+
+#### 2.2.3 Phân hệ 3.0: Đặt xe & Vòng đời Chuyến đi (Ride Booking & Trip Lifecycle)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-RIDE-01** | Tìm kiếm & Nhập địa chỉ điểm đón/trả | Là khách hàng, tôi muốn tìm kiếm địa chỉ đón và trả khách trên bản đồ. | Tên địa chỉ (Text) hoặc Điểm ghim tọa độ | Gọi Map Service để Geocoding (chuyển chữ sang tọa độ [lat, lng]) hoặc Reverse Geocoding. | Tọa độ chuẩn hóa và tên địa chỉ rõ ràng. | BR-005 | Must Have |
+| **FR-RIDE-02** | Hiển thị cước phí ước tính theo hạng xe | Là khách hàng, tôi muốn xem trước số tiền ước tính cho các loại xe để lựa chọn. | Tọa độ đón, Tọa độ trả | Tính khoảng cách đường đi (Km), thời gian ước tính (Phút), áp dụng bảng giá của từng loại xe (Sedan, SUV, Van). | Bảng giá ước tính cho 3 hạng xe. | BR-005, BR-006, BR-025 | Must Have |
+| **FR-RIDE-03** | Khởi tạo yêu cầu đặt xe | Là khách hàng, tôi muốn gửi yêu cầu đặt xe chính thức sau khi xem giá. | Điểm đón, Điểm trả, Loại xe chọn, Phương thức thanh toán dự kiến | Tạo bản ghi Ride với mã duy nhất, trạng thái ban đầu `searching`, kích hoạt tiến trình tìm tài xế. | Ride ID được tạo, chuyển sang màn hình chờ tài xế. | BR-005, BR-012 | Must Have |
+| **FR-RIDE-04** | Cập nhật mốc "Tài xế đã đến điểm đón" | Là tài xế, tôi muốn báo hiệu tôi đã có mặt tại vị trí đón khách. | Ride ID, Driver ID | Kiểm tra trạng thái hiện tại là `accepted`, đổi sang `driver_arrived`, ghi nhận `arrivedAt`. | Socket phát thông báo tức thời đến khách hàng. | BR-007, BR-023 | Must Have |
+| **FR-RIDE-05** | Cập nhật mốc "Bắt đầu chuyến đi" | Là tài xế, tôi muốn xác nhận khách đã lên xe và bắt đầu hành trình. | Ride ID, Driver ID | Đổi trạng thái sang `in_progress`, ghi nhận `startedAt`, bắt đầu tính thời gian di chuyển. | Khách hàng và tài xế chuyển sang màn hình theo dõi lộ trình. | BR-007, BR-023 | Must Have |
+| **FR-RIDE-06** | Cập nhật mốc "Hoàn thành chuyến đi" | Là tài xế, tôi muốn bấm hoàn thành khi đưa khách đến đúng nơi. | Ride ID, Driver ID, Tọa độ kết thúc | Đổi trạng thái sang `completed`, ghi nhận `completedAt`, chuyển giao thông tin sang phân hệ Tính cước. | Màn hình hóa đơn thanh toán xuất hiện. | BR-007, BR-023, BR-024 | Must Have |
+| **FR-RIDE-07** | Khách hàng hủy chuyến | Là khách hàng, tôi muốn hủy cuốc xe khi có việc đột xuất. | Ride ID, Lý do hủy | Kiểm tra trạng thái: nếu chưa đón khách thì cho phép hủy (`cancelled_by_customer`), giải phóng tài xế về `Available`. | Chuyến đi kết thúc, thông báo cho tài xế. | BR-010 | Must Have |
+| **FR-RIDE-08** | Tài xế hủy chuyến do sự cố | Là tài xế, tôi muốn hủy chuyến khi xe gặp sự cố hỏng hóc hoặc không liên hệ được khách. | Ride ID, Lý do hủy | Đổi trạng thái `cancelled_by_driver`, kích hoạt tự động tìm tài xế khác cho khách nếu khách có nhu cầu. | Thông báo cho khách hàng lý do hủy. | BR-010, BR-020 | Must Have |
+| **FR-RIDE-09** | Tra cứu lịch sử và chi tiết chuyến đi | Là người dùng, tôi muốn xem lại toàn bộ các cuốc xe mình đã đi hoặc đã chạy. | User ID, Bộ lọc ngày/trạng thái | Truy vấn DB các chuyến đi tương ứng, sắp xếp mới nhất lên đầu, phân trang. | Danh sách chuyến đi kèm đầy đủ thông số chi tiết. | BR-011 | Must Have |
+
+---
+
+#### 2.2.4 Phân hệ 4.0: Phân công & Ghép nối Tài xế (Driver Matching Engine)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-MATCH-01** | Quét tài xế khả dụng quanh vùng | Hệ thống tự động quét tìm các tài xế quanh tọa độ đón khách. | Tọa độ đón khách, Loại xe yêu cầu, Bán kính (mặc định 5km) | Sử dụng thuật toán tính khoảng cách (Haversine/GeoNear) quét trong DB các tài xế có `status = Available` và loại xe khớp yêu cầu. | Danh sách tài xế tiềm năng được sắp xếp theo khoảng cách tăng dần. | BR-018, BR-019 | Must Have |
+| **FR-MATCH-02** | Xếp hạng ưu tiên tài xế | Hệ thống chấm điểm ưu tiên để chọn tài xế tốt nhất gửi yêu cầu trước. | Danh sách tài xế quanh vùng | Tiêu chí 1: Khoảng cách gần nhất; Tiêu chí 2: Rating trung bình cao hơn. | Tài xế ưu tiên số 1 được chọn. | BR-019 | Must Have |
+| **FR-MATCH-03** | Gửi thông báo chuyến & Đếm ngược 30s | Hệ thống gửi thông tin cuốc xe đến tài xế được chọn và kích hoạt bộ đếm thời gian. | Ride ID, Thông tin cuốc (Điểm đón/trả, Cước ước tính), Socket ID tài xế | Phát socket sự kiện `ride:newRequest`, khởi tạo Timer 30 giây trên Redis/Memory. | Popup nhận cuốc hiển thị trên máy tài xế kèm đồng hồ đếm ngược. | BR-020, BR-021 | Must Have |
+| **FR-MATCH-04** | Xử lý chấp nhận chuyến | Là tài xế, tôi muốn bấm "Chấp nhận" để nhận cuốc xe này. | Ride ID, Driver ID | Kiểm tra chuyến chưa bị tài xế khác nhận, gán `driverId` vào Ride, đổi trạng thái Ride sang `accepted`, đổi tài xế sang `Busy`. | Khóa cuốc xe thành công, hủy timer đếm ngược, thông báo cho khách hàng. | BR-007, BR-023 | Must Have |
+| **FR-MATCH-05** | Xử lý từ chối hoặc hết giờ (Fallback) | Hệ thống tự động chuyển tài xế tiếp theo nếu tài xế hiện tại bấm từ chối hoặc quá 30s. | Sự kiện Từ chối hoặc Timer Expired | Đưa tài xế vừa từ chối vào danh sách loại trừ (Blacklist của chuyến này), tăng `retryCount + 1`. Nếu `retryCount < 5`, chọn tài xế kế tiếp gửi lại. | Yêu cầu được gửi sang tài xế tiếp theo liền mạch. | BR-020, BR-021 | Must Have |
+| **FR-MATCH-06** | Xử lý không tìm thấy tài xế | Hệ thống kết thúc tìm kiếm khi không còn tài xế khả dụng hoặc đã thử hết 5 lần. | `retryCount >= 5` hoặc danh sách tài xế trống | Cập nhật trạng thái Ride sang `no_driver`. | Thông báo rõ ràng cho khách hàng: "Hiện không có tài xế nào, vui lòng thử lại sau". | BR-022 | Must Have |
+
+---
+
+#### 2.2.5 Phân hệ 5.0: Tính cước & Thanh toán (Fare Calculation & Payment)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-PAY-01** | Tính cước phí thực tế | Hệ thống tự động tính toán tổng tiền chuyến đi khi kết thúc. | Loại xe, Khoảng cách thực tế ($Km$), Thời gian di chuyển ($Phút$) | Áp dụng công thức: $\text{Tổng cước} = \text{Giá cơ bản} + (Km \times \text{Đơn giá/Km}) + (Phút \times \text{Đơn giá/Phút})$. | Số tiền cước chính xác (`actualFare`), cập nhật vào Ride. | BR-024, BR-026 | Must Have |
+| **FR-PAY-02** | Cấu hình bảng giá theo loại xe | Là Admin, tôi muốn tùy chỉnh mức cước cơ bản và đơn giá để linh hoạt kinh doanh. | Loại xe, BaseFare, PricePerKm, PricePerMin | Lưu cấu hình bảng giá trong DB/Config, áp dụng ngay cho các cuốc xe khởi tạo sau thời điểm sửa. | Bảng giá mới có hiệu lực. | BR-026 | Must Have |
+| **FR-PAY-03** | Thanh toán Tiền mặt | Là khách hàng, tôi muốn trả tiền mặt trực tiếp cho tài xế. | Ride ID, Lựa chọn `Cash` | Tạo bản ghi Payment với `method = CASH`, `status = PENDING`. | Tài xế nhận được yêu cầu thu tiền mặt trên app. | BR-027, BR-034 | Must Have |
+| **FR-PAY-04** | Tài xế xác nhận đã thu tiền mặt | Là tài xế, tôi muốn bấm xác nhận khi đã nhận đủ tiền mặt từ khách. | Payment ID, Driver ID | Đổi trạng thái Payment sang `COMPLETED`, ghi nhận thời gian `paidAt`. | Hóa đơn thanh toán hoàn tất, gửi biên lai cho khách. | BR-027 | Must Have |
+| **FR-PAY-05** | Thanh toán Điện tử qua Mock Gateway | Là khách hàng, tôi muốn thanh toán qua thẻ/ví điện tử trực tuyến an toàn. | Payment ID, Phương thức (Thẻ/Ví), Token giả lập | Gửi yêu cầu sang Mock Payment Gateway, nhận mã phản hồi giao dịch (`transactionId`). Tuyệt đối không lưu số thẻ/CVV trong DB. | Trạng thái Payment chuyển `COMPLETED`, lưu `transactionId`. | BR-028 | Should Have |
+| **FR-PAY-06** | Xử lý sự cố thanh toán điện tử thất bại | Hệ thống xử lý khi cổng thanh toán trả về mã lỗi (thẻ hết tiền, timeout). | Mã lỗi từ Cổng thanh toán | Chuyển trạng thái Payment sang `FAILED`, thông báo lý do lỗi cho khách hàng. | Cho phép khách hàng chọn: Thử lại thẻ khác hoặc Đổi sang trả tiền mặt. | BR-029 | Should Have |
+| **FR-PAY-07** | Xuất hóa đơn điện tử / Biên lai chi tiết | Là khách hàng, tôi muốn xem chi tiết hóa đơn cước phí của chuyến đi. | Ride ID | Tổng hợp: Giá cơ bản, Phí quãng đường, Phí thời gian, Phương thức thanh toán, Mã GD. | Màn hình hóa đơn điện tử và gửi bản sao qua email. | BR-030 | Should Have |
+
+---
+
+#### 2.2.6 Phân hệ 6.0: Định vị & Giám sát Real-time (Tracking & Geolocation)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-TRACK-01** | Thu nhận và cập nhật tọa độ GPS tài xế | Ứng dụng tài xế tự động truyền tọa độ GPS định kỳ về máy chủ. | Driver ID, Tọa độ hiện tại (`latitude`, `longitude`, `bearing`) | Nhận dữ liệu qua Socket/HTTP mỗi 5-10 giây, cập nhật trường `currentLocation` của tài xế trong DB/Redis. | Tọa độ mới nhất của tài xế được ghi nhận. | BR-015 | Must Have |
+| **FR-TRACK-02** | Phát sóng vị trí xe cho khách hàng theo dõi | Khách hàng xem biểu tượng xe tài xế di chuyển mượt mà trên bản đồ ứng dụng. | Ride ID, Socket Channel của chuyến | Khi tài xế phát tọa độ, server chuyển tiếp (broadcast) tức thì qua Room Socket của chuyến đi đó cho Khách hàng. | Bản đồ phía khách hàng cập nhật điểm đánh dấu xe di chuyển thời gian thực. | BR-008 | Must Have |
+| **FR-TRACK-03** | Tính toán lại thời gian dự kiến đến (ETA) | Hệ thống liên tục ước lượng số phút tài xế sẽ tới điểm đón. | Tọa độ tài xế, Tọa độ điểm đón | Tính khoảng cách còn lại chia cho tốc độ trung bình di chuyển. | Hiển thị dòng chữ "Tài xế sẽ đến trong X phút" trên app khách. | BR-007, BR-008 | Must Have |
+| **FR-TRACK-04** | Hiển thị toàn cảnh vị trí các xe cho Operator | Là Operator, tôi muốn xem bản đồ tổng thể toàn thành phố với các vị trí xe. | Tọa độ trung tâm, Bán kính hiển thị | Truy vấn toàn bộ tài xế `Available` và `Busy`, gắn icon màu tương ứng lên giao diện Admin. | Bản đồ nhiệt/Bản đồ số xe trực quan cho phòng điều hành. | BR-037 | Should Have |
+
+---
+
+#### 2.2.7 Phân hệ 7.0: Trung tâm Thông báo Đa kênh (Notification Hub)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-NOTIF-01** | Bắn thông báo đẩy In-App qua Socket | Hệ thống phát thông báo pop-up trên màn hình người dùng khi có sự kiện. | User ID, Tiêu đề, Nội dung, Loại sự kiện (`Event Type`) | Định tuyến tới kết nối Socket của User, hiển thị toast/alert ngay trên giao diện web. | Người dùng nhận tin báo tức thời mà không cần reload trang. | BR-031, BR-032 | Must Have |
+| **FR-NOTIF-02** | Gửi email thông báo tự động | Hệ thống gửi email xác nhận và hóa đơn tự động. | Email người nhận, Mẫu template HTML, Dữ liệu truyền vào | Sử dụng dịch vụ Nodemailer/SMTP gửi email không đồng bộ (Asynchronous) để không chặn luồng xử lý chính. | Email được gửi tới hộp thư người dùng trong vòng ≤ 3 giây. | BR-031, BR-033 | Should Have |
+| **FR-NOTIF-03** | Hộp thư thông báo trong ứng dụng | Là người dùng, tôi muốn xem lại danh sách các thông báo cũ. | User ID, Phân trang | Lấy danh sách thông báo từ DB, sắp xếp theo thời gian tạo giảm dần. | Danh sách thông báo kèm trạng thái Đã đọc / Chưa đọc. | BR-031 | Should Have |
+| **FR-NOTIF-04** | Đánh dấu đã đọc thông báo | Là người dùng, tôi muốn bấm đánh dấu đã đọc một hoặc tất cả thông báo. | Notification ID hoặc Lệnh "Đọc tất cả" | Cập nhật cờ `isRead = true` trong cơ sở dữ liệu. | Số lượng thông báo chưa đọc trên icon chuông giảm về 0. | BR-031 | Should Have |
+| **FR-NOTIF-05** | Mở rộng kênh thông báo (Provider Pattern) | Kiến trúc hỗ trợ gắn thêm adapter SMS/Push mà không sửa logic lõi. | Giao diện chuẩn `INotificationProvider` | Thiết kế hướng đối tượng tách biệt logic phát sinh thông báo và logic gửi qua từng kênh vật lý. | Dễ dàng cắm thêm module SMS/FCM sau này. | BR-033, BR-045 | Must Have |
+
+---
+
+#### 2.2.8 Phân hệ 8.0: Đánh giá & Phản hồi Dịch vụ (Rating & Feedback)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-RATE-01** | Gửi đánh giá tài xế sau chuyến đi | Là khách hàng, tôi muốn chấm sao (1-5) và viết nhận xét về tài xế sau chuyến. | Ride ID, Customer ID, Driver ID, Số sao (1 đến 5), Nhận xét (Text) | Kiểm tra cuốc xe đã `completed`, mỗi chuyến chỉ được đánh giá 1 lần, lưu bản ghi Rating vào DB. | Đánh giá được lưu trữ, hiển thị lời cảm ơn tới khách hàng. | BR-034 | Must Have |
+| **FR-RATE-02** | Tự động tính toán lại Rating trung bình tài xế | Hệ thống cập nhật điểm sao trung bình hiển thị trên hồ sơ tài xế. | Driver ID, Điểm đánh giá mới | Tính toán lại trung bình cộng của tất cả các lượt đánh giá: $\text{AvgRating} = \frac{\sum \text{Stars}}{\text{TotalReviews}}$. Cập nhật trường `rating` trong bảng Driver. | Rating mới được cập nhật trên profile tài xế. | BR-034 | Must Have |
+| **FR-RATE-03** | Xem danh sách đánh giá của tôi | Là tài xế, tôi muốn xem các phản hồi của khách hàng để rút kinh nghiệm phục vụ. | Driver ID | Truy vấn danh sách đánh giá liên quan đến tài xế này (ẩn danh thông tin nhạy cảm của khách). | Bảng danh sách nhận xét và số sao từng cuốc. | BR-035 | Should Have |
+
+---
+
+#### 2.2.9 Phân hệ 9.0: Quản trị Vận hành & Báo cáo Thống kê (Admin Operations & Reporting)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-ADM-01** | Dashboard tổng quan chỉ số vận hành | Là Admin/Operator, tôi muốn xem nhanh các chỉ số kinh doanh trong ngày. | Ngày xem (mặc định hôm nay) | Đếm tổng số cuốc xe hôm nay, số cuốc thành công, số cuốc hủy, tổng doanh thu phát sinh, số tài xế đang online. | Các thẻ thống kê (Metric Cards) và biểu đồ trực quan trên trang chủ Admin. | BR-036, BR-040 | Must Have |
+| **FR-ADM-02** | Quản lý danh sách Khách hàng | Là Operator, tôi muốn tra cứu thông tin và lịch sử của khách hàng. | Từ khóa tìm kiếm (Tên, SĐT, Email), Bộ lọc trạng thái | Tìm kiếm trong DB người dùng có `role = customer`, phân trang dữ liệu. | Bảng danh sách khách hàng, nút xem chi tiết và khóa tài khoản. | BR-036 | Must Have |
+| **FR-ADM-03** | Quản lý danh sách Tài xế & Phương tiện | Là Operator, tôi muốn quản lý toàn bộ đối tác tài xế và xe trong hệ thống. | Bộ lọc theo trạng thái duyệt (`Pending`/`Approved`), Trạng thái hoạt động | Truy vấn danh sách tài xế kèm thông tin phương tiện tương ứng. | Bảng quản trị tài xế với chức năng duyệt hồ sơ, khóa tài xế, xem vị trí. | BR-016, BR-036 | Must Have |
+| **FR-ADM-04** | Giám sát và Can thiệp Chuyến đi | Là Operator, tôi muốn xem danh sách các chuyến đang chạy và hỗ trợ xử lý khiếu nại. | Bộ lọc trạng thái chuyến (`searching`, `in_progress`, `cancelled`) | Hiển thị các chuyến xe real-time, cung cấp nút "Hủy cưỡng chế" hoặc "Gán lại tài xế" cho Operator khi có sự cố. | Chuyến đi được can thiệp kịp thời, ghi log hành động. | BR-037, BR-043 | Must Have |
+| **FR-ADM-05** | Tra cứu nhật ký giao dịch thanh toán | Là Operator, tôi muốn tra cứu lịch sử nạp/thu cước để đối soát. | Mã giao dịch, Khoảng thời gian, Phương thức thanh toán | Truy vấn bảng Payment, liên kết thông tin Ride, Customer, Driver. | Bảng chi tiết dòng tiền giao dịch. | BR-038 | Should Have |
+| **FR-ADM-06** | Báo cáo Thống kê Doanh thu | Là Admin, tôi muốn xem biểu đồ doanh thu theo ngày, tuần, tháng và loại xe. | Khoảng thời gian từ ngày - đến ngày, Tiêu chí gom nhóm | Thực hiện truy vấn Aggregate dữ liệu thanh toán hoàn thành, gom nhóm theo mốc thời gian và loại xe. | Biểu đồ cột/đường doanh thu và bảng số liệu xuất Excel/PDF. | BR-040 | Should Have |
+| **FR-ADM-07** | Báo cáo Tỷ lệ Hoàn thành & Hủy chuyến | Là Admin, tôi muốn theo dõi tỷ lệ cuốc thành công vs cuốc hủy để đánh giá chất lượng. | Khoảng thời gian phân tích | Thống kê số cuốc `completed` / `cancelled_by_customer` / `cancelled_by_driver` / `no_driver`. | Biểu đồ tròn tỷ lệ và danh sách lý do hủy phổ biến. | BR-040 | Should Have |
+| **FR-ADM-08** | Báo cáo Đánh giá Hiệu quả Tài xế | Là Admin, tôi muốn xem bảng xếp hạng tài xế có doanh thu cao nhất và rating tốt nhất. | Tháng đánh giá, Tiêu chí xếp hạng | Gom nhóm theo Driver ID, tính tổng số cuốc, tổng tiền, rating bình quân, tỷ lệ từ chối cuốc. | Bảng vinh danh tài xế xuất sắc và cảnh báo tài xế tỷ lệ hủy cao. | BR-040 | Could Have |
+
+---
+
+#### 2.2.10 Phân hệ 10.0: Bảo mật, Phân quyền RBAC & Kiểm toán (Security & Audit)
+
+| Mã FR | Tên chức năng | User Story / Mô tả chi tiết | Dữ liệu đầu vào (Input) | Xử lý & Quy tắc (Processing) | Đầu ra (Output) | BR liên quan | Ưu tiên |
+|---|---|---|---|---|---|---|---|
+| **FR-SEC-01** | Kiểm tra quyền truy cập theo vai trò (RBAC) | Hệ thống chặn các thao tác trái thẩm quyền của từng nhóm người dùng. | Token gửi kèm Header, Route/API gọi đến | Middleware `authorize(['admin', 'operator', ...])` kiểm tra quyền. Nếu không khớp trả về HTTP 403 Forbidden. | Ngăn chặn hoàn toàn truy cập trái phép. | BR-039, BR-041 | Must Have |
+| **FR-SEC-02** | Phân tách quyền Operator vs Admin | Phân định rõ ràng: Operator chỉ vận hành, Admin mới có quyền sửa cấu hình/xóa dữ liệu. | Vai trò người dùng (`operator` vs `admin`) | Operator bị cấm truy cập API cấu hình giá cước, xóa vĩnh viễn user, phân quyền tài khoản khác. | Bảo vệ an toàn dữ liệu nhạy cảm của doanh nghiệp. | BR-039 | Must Have |
+| **FR-SEC-03** | Ghi nhật ký kiểm toán (Audit Logging) | Hệ thống tự động lưu vết các hành động quan trọng để phục vụ hậu kiểm. | User ID, Hành động (`Action`), Đối tượng bị tác động (`Resource`), IP Client, Timestamp | Middleware tự động chèn bản ghi vào bảng `AuditLogs` mỗi khi có thao tác: Đổi giá cước, Duyệt/Khóa tài xế, Can thiệp chuyến đi, Đổi quyền. | Cơ sở dữ liệu nhật ký kiểm toán bất biến. | BR-043 | Should Have |
+| **FR-SEC-04** | Mã hóa và bảo mật dữ liệu nhạy cảm | Bảo vệ mật khẩu và thông tin tài khoản người dùng. | Mật khẩu thô | Sử dụng thuật toán `bcrypt` với salt rounds ≥ 10 trước khi lưu DB. Không bao giờ lưu mật khẩu dạng plain-text. | Mật khẩu được mã hóa an toàn 1 chiều. | BR-042 | Must Have |
+| **FR-SEC-05** | Cơ chế cách ly lỗi thành phần | Đảm bảo lỗi ở module phụ (thanh toán/email) không làm chết hệ thống đặt xe. | Sự cố ngoại lệ từ API bên thứ ba | Bao bọc các lời gọi ngoại vi bằng `try-catch`, xử lý fallback, sử dụng Async Worker / Message Queue độc lập. | Module đặt xe vẫn tiếp tục nhận cuốc bình thường. | BR-044, BR-045 | Must Have |
+
+---
+
+### 2.3 Ma trận liên kết chức năng và tác nhân (Function-Actor Traceability Matrix)
+
+Ma trận thể hiện quyền hạn tương tác của từng Actor đối với 10 phân hệ chức năng:
+- **C** (Create): Tạo mới dữ liệu
+- **R** (Read): Xem / Tra cứu dữ liệu
+- **U** (Update): Chỉnh sửa / Cập nhật trạng thái
+- **D** (Delete/Deactivate): Xóa hoặc Vô hiệu hóa
+- **E** (Execute): Kích hoạt tiến trình nghiệp vụ tự động
+
+| Phân hệ chức năng | Khách hàng (Customer) | Tài xế (Driver) | Nhân viên vận hành (Operator) | Quản trị viên (Admin) | Cổng TT / Map (External) |
+|---|:---:|:---:|:---:|:---:|:---:|
+| **1.0 Quản lý Xác thực & Tài khoản** | C, R, U | C, R, U | R, U | C, R, U, D | - |
+| **2.0 Quản lý Tài xế & Phương tiện** | R | C, R, U | R, U (Duyệt) | C, R, U, D (Khóa) | - |
+| **3.0 Đặt xe & Vòng đời Chuyến đi** | C, R, U (Hủy) | R, U (Cập nhật mốc) | R, U (Can thiệp) | R, U, D | - |
+| **4.0 Phân công & Ghép nối Tài xế** | E (Kích hoạt) | R, U (Nhận/Từ chối) | R (Giám sát) | R, U (Cấu hình) | - |
+| **5.0 Tính cước & Thanh toán** | R, E (Thanh toán) | R, U (Xác nhận tiền mặt) | R (Tra cứu) | R, U (Sửa biểu giá) | E (Xử lý giao dịch) |
+| **6.0 Định vị & Giám sát Real-time** | R (Xem xe chạy) | U, E (Bắn GPS) | R (Xem toàn map) | R | E (Cung cấp Geocoding) |
+| **7.0 Trung tâm Thông báo** | R | R | C, R (Gửi thông báo) | C, R | E (SMTP gửi mail) |
+| **8.0 Đánh giá & Phản hồi** | C, R | R | R | R, D | - |
+| **9.0 Quản trị Vận hành & Báo cáo** | - | - | R, U (Xử lý cuốc) | C, R, U, D (Báo cáo) | - |
+| **10.0 Bảo mật, RBAC & Audit Log** | - | - | R (Xem log của mình) | C, R, U, D (Toàn quyền) | - |
+
+---
+
+### 2.4 Thống kê phân rã chức năng (Decomposition Statistics)
+
+```mermaid
+pie title Tỷ lệ mức độ ưu tiên của 57 yêu cầu chức năng (L3)
+    "Must Have - Bắt buộc (39)" : 39
+    "Should Have - Nên có (16)" : 16
+    "Could Have - Có thì tốt (2)" : 2
+```
+
+| Phân hệ (L1) | Số lượng FR (L3) | Must Have | Should Have | Could Have |
+|---|:---:|:---:|:---:|:---:|
+| 1.0 Xác thực & Tài khoản | 6 | 5 | 1 | 0 |
+| 2.0 Tài xế & Phương tiện | 6 | 4 | 2 | 0 |
+| 3.0 Đặt xe & Chuyến đi | 9 | 9 | 0 | 0 |
+| 4.0 Phân công & Ghép nối | 6 | 6 | 0 | 0 |
+| 5.0 Tính cước & Thanh toán | 7 | 4 | 3 | 0 |
+| 6.0 Định vị & Giám sát Real-time | 4 | 3 | 1 | 0 |
+| 7.0 Trung tâm Thông báo | 5 | 2 | 3 | 0 |
+| 8.0 Đánh giá & Phản hồi | 3 | 2 | 1 | 0 |
+| 9.0 Quản trị & Báo cáo | 8 | 4 | 3 | 1 |
+| 10.0 Bảo mật, RBAC & Audit | 5 | 4 | 1 | 0 |
+| **TỔNG CỘNG** | **59** | **43** | **15** | **1** |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
-*Phase: Giai đoạn 1 – Phân tích yêu cầu sơ khởi*
+*Phase: Giai đoạn 2 – Phân rã yêu cầu chức năng (Functional Requirements Decomposition)*
+
