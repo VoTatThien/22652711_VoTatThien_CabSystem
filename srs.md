@@ -50,6 +50,9 @@
    - 7.1 [Nguyên tắc & Định dạng Tiêu chí chấp nhận (Given-When-Then & Rule-based AC)](#71-nguyên-tắc--định-dạng-tiêu-chí-chấp-nhận-given-when-then--rule-based-ac)
    - 7.2 [Bảng tổng hợp Tiêu chí chấp nhận chi tiết theo từng Phân hệ chức năng](#72-bảng-tổng-hợp-tiêu-chí-chấp-nhận-chi-tiết-theo-từng-phân-hệ-chức-năng)
    - 7.3 [Ma trận đối soát Acceptance Criteria với Functional Requirements (AC-FR Matrix)](#73-ma-trận-đối-soát-acceptance-criteria-với-functional-requirements-ac-fr-matrix)
+8. [Giai đoạn 8 – Ma trận Truy xuất Yêu cầu (Requirements Traceability Matrix - RTM)](#giai-đoạn-8--ma-trận-truy-xuất-yêu-cầu-requirements-traceability-matrix---rtm)
+   - 8.1 [Mục đích & Cấu trúc Ma trận RTM](#81-mục-đích--cấu-trúc-ma-trận-rtm)
+   - 8.2 [Bảng Ma trận Truy xuất Yêu cầu Toàn diện (RTM Table)](#82-bảng-ma-trận-truy-xuất-yêu-cầu-toàn-diện-rtm-table)
 
 ---
 
@@ -2602,9 +2605,99 @@ Ma trận chứng minh toàn bộ 59 Yêu cầu chức năng (FRs) đều có Ti
 
 ---
 
+---
+
+## Giai đoạn 8 – Ma trận Truy xuất Yêu cầu (Requirements Traceability Matrix - RTM)
+
+---
+
+### 8.1 Mục đích & Cấu trúc Ma trận RTM
+
+Ma trận truy xuất yêu cầu (Requirements Traceability Matrix - RTM) là công cụ quản lý chất lượng cốt lõi trong kỹ nghệ phần mềm (Software Engineering) và phân tích nghiệp vụ (BA), giúp thiết lập và duy trì mối liên kết hai chiều (Bidirectional Traceability) xuyên suốt vòng đời phát triển phần mềm:
+
+$$\text{Mục tiêu nghiệp vụ (BG)} \longrightarrow \text{Yêu cầu nghiệp vụ (BR)} \longrightarrow \text{Yêu cầu chức năng (FR)} \longrightarrow \text{Use Case (UC)} \longrightarrow \text{Tiêu chí chấp nhận (AC)} \longrightarrow \text{Test Case (TC)}$$
+
+**Cấu trúc các cột trong bảng RTM:**
+1. **Mã BG (Business Goal)**: Mục tiêu chiến lược / vận hành của doanh nghiệp đã xác định ở Giai đoạn 1.4.
+2. **Mã BR (Business Requirement)**: Yêu cầu nghiệp vụ tổng quát ở Giai đoạn 1.6.
+3. **Mã FR (Functional Requirement)**: Yêu cầu chức năng chi tiết ở Giai đoạn 2.2.
+4. **Tên Chức năng / Diễn giải**: Mô tả ngắn gọn tính năng tương ứng.
+5. **Mã UC (Use Case)**: Trường hợp sử dụng ở Giai đoạn 6.
+6. **Mã AC (Acceptance Criteria)**: Tiêu chí chấp nhận kiểm chứng ở Giai đoạn 7.
+7. **Mã TESTCASE (Test Case)**: Mã kịch bản kiểm thử nghiệm thu (*Tạm thời chưa điền theo tiến độ dự án*).
+
+---
+
+### 8.2 Bảng Ma trận Truy xuất Yêu cầu Toàn diện (RTM Table)
+
+| Mã BG | Mã BR | Mã FR | Tên Chức năng / Mô tả tóm tắt | Mã UC | Mã AC | TESTCASE |
+|:---:|:---:|:---:|---|:---:|:---:|:---:|
+| **BG-01, BG-12** | BR-001 | **FR-AUTH-01** | Đăng ký tài khoản Khách hàng | UC-05 | AC-AUTH-01 | *(Chưa điền)* |
+| **BG-01, BG-07** | BR-002 | **FR-AUTH-02** | Đăng ký tài khoản Đối tác Tài xế | UC-04, UC-05 | AC-DRV-01 | *(Chưa điền)* |
+| **BG-12** | BR-003, BR-041 | **FR-AUTH-03** | Đăng nhập hệ thống & Cấp phát JWT | UC-05 | AC-AUTH-02 | *(Chưa điền)* |
+| **BG-13** | BR-004 | **FR-AUTH-04** | Cập nhật thông tin hồ sơ cá nhân | UC-05 | AC-AUTH-01 | *(Chưa điền)* |
+| **BG-12** | BR-042 | **FR-AUTH-05** | Đổi mật khẩu người dùng | UC-05 | AC-AUTH-02 | *(Chưa điền)* |
+| **BG-12** | BR-041 | **FR-AUTH-06** | Đăng xuất & Thu hồi phiên làm việc | UC-05 | AC-AUTH-02 | *(Chưa điền)* |
+| **BG-07** | BR-017 | **FR-DRV-01** | Khai báo & Quản lý thông tin phương tiện | UC-04, UC-06 | AC-DRV-01 | *(Chưa điền)* |
+| **BG-04, BG-07** | BR-014 | **FR-DRV-02** | Bật / Tắt trạng thái trực tuyến (Online/Offline) | UC-06 | AC-TRK-01 | *(Chưa điền)* |
+| **BG-04, BG-07** | BR-014, BR-023 | **FR-DRV-03** | Tự động chuyển trạng thái Bận (Busy) khi có cuốc | UC-02, UC-06 | AC-MCH-02 | *(Chưa điền)* |
+| **BG-07, BG-09** | BR-016, BR-036 | **FR-DRV-04** | Xét duyệt / Từ chối hồ sơ tài xế mới | UC-04 | AC-DRV-02 | *(Chưa điền)* |
+| **BG-07, BG-13** | BR-013, BR-035 | **FR-DRV-05** | Xem hồ sơ hiệu suất, rating và thu nhập tài xế | UC-06 | AC-RAT-01 | *(Chưa điền)* |
+| **BG-09, BG-12** | BR-036, BR-039 | **FR-DRV-06** | Khóa / Tạm đình chỉ tài khoản tài xế vi phạm | UC-04, UC-09 | AC-ADM-01 | *(Chưa điền)* |
+| **BG-01, BG-13** | BR-005 | **FR-RIDE-01** | Tìm kiếm địa chỉ đón/trả & Geocoding bản đồ | UC-01 | AC-BOOK-01 | *(Chưa điền)* |
+| **BG-01, BG-06** | BR-005, BR-025 | **FR-RIDE-02** | Tính toán & Hiển thị cước ước tính theo loại xe | UC-01 | AC-BOOK-01 | *(Chưa điền)* |
+| **BG-01, BG-04** | BR-005, BR-012 | **FR-RIDE-03** | Khởi tạo yêu cầu đặt chuyến xe trực tuyến | UC-01 | AC-BOOK-02 | *(Chưa điền)* |
+| **BG-05, BG-08** | BR-007, BR-023 | **FR-RIDE-04** | Cập nhật mốc "Tài xế đã đến điểm đón" | UC-02 | AC-RIDE-01 | *(Chưa điền)* |
+| **BG-05, BG-08** | BR-007, BR-023 | **FR-RIDE-05** | Cập nhật mốc "Bắt đầu chuyến đi" | UC-02 | AC-RIDE-01 | *(Chưa điền)* |
+| **BG-05, BG-06** | BR-007, BR-024 | **FR-RIDE-06** | Cập nhật mốc "Hoàn thành chuyến đi" | UC-02, UC-03 | AC-RIDE-01, AC-PAY-01 | *(Chưa điền)* |
+| **BG-05, BG-13** | BR-010 | **FR-RIDE-07** | Khách hàng hủy chuyến xe | UC-07 | AC-CNC-01 | *(Chưa điền)* |
+| **BG-05, BG-07** | BR-010, BR-020 | **FR-RIDE-08** | Tài xế hủy chuyến do sự cố phương tiện/No-Show | UC-07 | AC-CNC-02 | *(Chưa điền)* |
+| **BG-01, BG-13** | BR-011 | **FR-RIDE-09** | Tra cứu lịch sử & Chi tiết chuyến đi | UC-01, UC-06 | AC-BOOK-02 | *(Chưa điền)* |
+| **BG-04** | BR-018, BR-019 | **FR-MATCH-01** | Quét tài xế khả dụng quanh bán kính 5km | UC-01 | AC-MCH-01 | *(Chưa điền)* |
+| **BG-04** | BR-019 | **FR-MATCH-02** | Thuật toán xếp hạng ưu tiên khoảng cách & rating | UC-01 | AC-MCH-01 | *(Chưa điền)* |
+| **BG-04, BG-08** | BR-020, BR-021 | **FR-MATCH-03** | Gửi thông báo chuyến & Đếm ngược 30 giây | UC-01 | AC-MCH-01 | *(Chưa điền)* |
+| **BG-04** | BR-007, BR-023 | **FR-MATCH-04** | Xử lý chấp nhận chuyến xe (Atomic Lock) | UC-01 | AC-MCH-02 | *(Chưa điền)* |
+| **BG-04** | BR-020, BR-021 | **FR-MATCH-05** | Xoay vòng tài xế kế tiếp khi từ chối/timeout | UC-01 | AC-MCH-03 | *(Chưa điền)* |
+| **BG-04, BG-08** | BR-022 | **FR-MATCH-06** | Xử lý kết thúc tìm kiếm khi hết 5 lượt retry | UC-01 | AC-MCH-03 | *(Chưa điền)* |
+| **BG-06** | BR-024, BR-026 | **FR-PAY-01** | Tính toán cước phí thực tế tự động (`BRULE-01`) | UC-03 | AC-PAY-01, AC-PAY-02 | *(Chưa điền)* |
+| **BG-06, BG-09** | BR-026 | **FR-PAY-02** | Cấu hình biểu phí dịch vụ theo loại xe | UC-10 | AC-ADM-02 | *(Chưa điền)* |
+| **BG-03, BG-06** | BR-027, BR-034 | **FR-PAY-03** | Khởi tạo giao dịch thanh toán Tiền mặt | UC-03 | AC-PAY-01 | *(Chưa điền)* |
+| **BG-03, BG-06** | BR-027 | **FR-PAY-04** | Tài xế xác nhận đã nhận đủ tiền mặt từ khách | UC-03 | AC-PAY-01 | *(Chưa điền)* |
+| **BG-03, BG-12** | BR-028 | **FR-PAY-05** | Xử lý thanh toán Điện tử qua Mock Gateway | UC-03 | AC-PAY-02 | *(Chưa điền)* |
+| **BG-03, BG-11** | BR-029 | **FR-PAY-06** | Xử lý sự cố thanh toán điện tử thất bại (`EX-07`) | UC-03 | AC-PAY-02 | *(Chưa điền)* |
+| **BG-03, BG-05** | BR-030 | **FR-PAY-07** | Xuất hóa đơn điện tử & Gửi biên lai email | UC-03 | AC-PAY-02 | *(Chưa điền)* |
+| **BG-05, BG-07** | BR-015 | **FR-TRACK-01** | Thu nhận & Cập nhật tọa độ GPS định kỳ 5-10s | UC-06 | AC-TRK-02 | *(Chưa điền)* |
+| **BG-05, BG-13** | BR-008 | **FR-TRACK-02** | Phát sóng vị trí xe cho khách hàng theo dõi | UC-02 | AC-TRK-02 | *(Chưa điền)* |
+| **BG-05, BG-13** | BR-007, BR-008 | **FR-TRACK-03** | Tính toán lại thời gian dự kiến xe đến (ETA) | UC-01, UC-02 | AC-TRK-02 | *(Chưa điền)* |
+| **BG-05, BG-09** | BR-037 | **FR-TRACK-04** | Hiển thị toàn cảnh bản đồ xe cho Operator | UC-09 | AC-ADM-03 | *(Chưa điền)* |
+| **BG-08** | BR-031, BR-032 | **FR-NOTIF-01** | Bắn thông báo đẩy In-App thời gian thực (Socket) | UC-01, UC-02 | AC-MCH-02, AC-RIDE-01 | *(Chưa điền)* |
+| **BG-08** | BR-031, BR-033 | **FR-NOTIF-02** | Gửi email thông báo tự động không đồng bộ | UC-03, UC-04 | AC-AUTH-01, AC-PAY-02 | *(Chưa điền)* |
+| **BG-08, BG-13** | BR-031 | **FR-NOTIF-03** | Hộp thư thông báo trong ứng dụng | UC-01, UC-06 | AC-AUTH-01 | *(Chưa điền)* |
+| **BG-08, BG-13** | BR-031 | **FR-NOTIF-04** | Đánh dấu đã đọc thông báo | UC-01, UC-06 | AC-AUTH-01 | *(Chưa điền)* |
+| **BG-11** | BR-033, BR-045 | **FR-NOTIF-05** | Kiến trúc mở rộng kênh thông báo (Provider) | UC-01, UC-03 | AC-AUTH-01 | *(Chưa điền)* |
+| **BG-05, BG-13** | BR-034 | **FR-RATE-01** | Gửi đánh giá sao (1-5★) và nhận xét sau chuyến | UC-08 | AC-RAT-01 | *(Chưa điền)* |
+| **BG-05, BG-07** | BR-034 | **FR-RATE-02** | Tự động tính toán lại Rating trung bình tài xế | UC-08 | AC-RAT-01 | *(Chưa điền)* |
+| **BG-07, BG-13** | BR-035 | **FR-RATE-03** | Tài xế xem danh sách phản hồi từ khách hàng | UC-06, UC-08 | AC-RAT-01 | *(Chưa điền)* |
+| **BG-09, BG-10** | BR-036, BR-040 | **FR-ADM-01** | Dashboard tổng quan chỉ số vận hành ngày | UC-09, UC-11 | AC-ADM-03 | *(Chưa điền)* |
+| **BG-09** | BR-036 | **FR-ADM-02** | Quản lý danh sách & Hồ sơ Khách hàng | UC-09 | AC-ADM-01 | *(Chưa điền)* |
+| **BG-07, BG-09** | BR-016, BR-036 | **FR-ADM-03** | Quản lý danh sách Tài xế & Phương tiện | UC-04, UC-09 | AC-DRV-02 | *(Chưa điền)* |
+| **BG-09** | BR-037, BR-043 | **FR-ADM-04** | Giám sát & Can thiệp xử lý chuyến đi lỗi | UC-09 | AC-ADM-01 | *(Chưa điền)* |
+| **BG-03, BG-09** | BR-038 | **FR-ADM-05** | Tra cứu nhật ký giao dịch đối soát tài chính | UC-09, UC-11 | AC-ADM-03 | *(Chưa điền)* |
+| **BG-03, BG-10** | BR-040 | **FR-ADM-06** | Báo cáo Thống kê Doanh thu theo xe & kênh TT | UC-11 | AC-ADM-03 | *(Chưa điền)* |
+| **BG-02, BG-10** | BR-040 | **FR-ADM-07** | Báo cáo Tỷ lệ Hoàn thành & Phân tích cuốc hủy | UC-11 | AC-ADM-03 | *(Chưa điền)* |
+| **BG-07, BG-10** | BR-040 | **FR-ADM-08** | Báo cáo Đánh giá Hiệu quả hoạt động Tài xế | UC-11 | AC-ADM-03 | *(Chưa điền)* |
+| **BG-12** | BR-039, BR-041 | **FR-SEC-01** | Kiểm tra quyền truy cập theo vai trò (RBAC) | UC-05, UC-09 | AC-ADM-01 | *(Chưa điền)* |
+| **BG-09, BG-12** | BR-039 | **FR-SEC-02** | Phân tách quyền nghiêm ngặt Operator vs Admin | UC-09, UC-10 | AC-ADM-01 | *(Chưa điền)* |
+| **BG-12** | BR-043 | **FR-SEC-03** | Ghi nhật ký kiểm toán bất biến (Audit Log) | UC-04, UC-10 | AC-ADM-02 | *(Chưa điền)* |
+| **BG-12** | BR-042 | **FR-SEC-04** | Mã hóa mật khẩu (`bcrypt`) & Dữ liệu nhạy cảm | UC-05 | AC-AUTH-01 | *(Chưa điền)* |
+| **BG-11** | BR-044, BR-045 | **FR-SEC-05** | Cơ chế cách ly lỗi thành phần (Circuit Breaker) | UC-01, UC-03 | AC-PAY-02 | *(Chưa điền)* |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
-*Phase: Giai đoạn 7 – Tiêu chí chấp nhận (Acceptance Criteria - AC)*
+*Phase: Giai đoạn 8 – Ma trận Truy xuất Yêu cầu (Requirements Traceability Matrix - RTM)*
+
 
 
 
