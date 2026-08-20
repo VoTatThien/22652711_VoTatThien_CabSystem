@@ -294,55 +294,264 @@ Phân loại mức độ ưu tiên theo mô hình **MoSCoW**:
 
 ### 1.5 Phạm vi hệ thống (Scope)
 
-#### 1.5.1 Trong phạm vi (In Scope)
+#### 1.5.1 Trong phạm vi (In Scope) – MVP Phase 1
 
-Hệ thống CAB mới sẽ bao gồm:
+Hệ thống CAB MVP bao gồm **3 ứng dụng web** và **1 backend API**, phục vụ quy trình cốt lõi: **Đặt xe → Tìm tài xế → Thực hiện chuyến → Tính cước → Thanh toán → Đánh giá**.
 
-**Nhóm chức năng chính:**
+**A. Actors (Tác nhân tương tác với hệ thống):**
 
-| # | Nhóm chức năng | Mô tả tóm tắt |
-|---|---------------|---------------|
-| 1 | Quản lý tài khoản & Xác thực | Đăng ký, đăng nhập, cập nhật hồ sơ cho Customer, Driver, Admin/Operator |
-| 2 | Đặt xe & Quản lý chuyến đi | Tạo yêu cầu, chọn loại xe, theo dõi trạng thái chuyến, hủy chuyến |
-| 3 | Tìm & Phân công tài xế | Tự động tìm tài xế gần, cơ chế retry khi từ chối, thông báo khi không tìm được |
-| 4 | Quản lý tài xế & Phương tiện | Hồ sơ tài xế, thông tin xe, trạng thái hoạt động (offline/available/busy) |
-| 5 | Theo dõi vị trí real-time | GPS tracking tài xế, hiển thị vị trí trên bản đồ, dự kiến thời gian đến |
-| 6 | Tính cước & Thanh toán | Tính tiền theo loại dịch vụ, hỗ trợ tiền mặt + thanh toán điện tử |
-| 7 | Thông báo | Thông báo các sự kiện quan trọng cho Customer và Driver (in-app, email) |
-| 8 | Đánh giá & Phản hồi | Customer đánh giá Driver sau chuyến |
-| 9 | Quản trị hệ thống | Dashboard, quản lý người dùng, phương tiện, chuyến đi, báo cáo |
-| 10 | Bảo mật & Phân quyền | Xác thực JWT, phân quyền theo vai trò (RBAC), audit log |
+| # | Actor | Loại | Mô tả |
+|---|-------|------|-------|
+| 1 | **Khách hàng (Customer)** | Primary – External | Người đặt xe, sử dụng dịch vụ, thanh toán và đánh giá |
+| 2 | **Tài xế (Driver)** | Primary – External | Người nhận và thực hiện chuyến đi |
+| 3 | **Nhân viên vận hành (Operator)** | Primary – Internal | Quản lý vận hành hàng ngày (quyền hạn chế) |
+| 4 | **Quản trị viên (Admin)** | Primary – Internal | Quản trị toàn bộ hệ thống (toàn quyền) |
+| 5 | **Cổng thanh toán (Payment Gateway)** | Secondary – External System | Xử lý giao dịch thanh toán điện tử |
+| 6 | **Dịch vụ bản đồ (Map Service)** | Secondary – External System | Cung cấp bản đồ, tính khoảng cách, geocoding |
+| 7 | **Dịch vụ Email (Email Service)** | Secondary – External System | Gửi email thông báo |
 
-**Các actor (tác nhân):**
+**B. Chức năng chi tiết theo module:**
 
+---
+
+**Module 1: Quản lý tài khoản & Xác thực (Authentication & User Management)**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-01 | Đăng ký tài khoản khách hàng | Customer | Must Have | Đăng ký bằng email, SĐT, mật khẩu. Xác thực email |
+| F-02 | Đăng ký tài khoản tài xế | Driver | Must Have | Đăng ký kèm thông tin bằng lái, phương tiện. Chờ duyệt |
+| F-03 | Đăng nhập / Đăng xuất | Customer, Driver, Operator, Admin | Must Have | Đăng nhập bằng email + mật khẩu, nhận JWT token |
+| F-04 | Cập nhật thông tin cá nhân | Customer, Driver | Must Have | Sửa tên, SĐT, avatar, địa chỉ |
+| F-05 | Đổi mật khẩu | Customer, Driver, Operator, Admin | Must Have | Đổi mật khẩu khi đang đăng nhập |
+| F-06 | Quên mật khẩu / Reset | Customer, Driver | Should Have | Gửi link reset qua email |
+| F-07 | Admin tạo tài khoản tài xế | Operator, Admin | Must Have | Tạo tài khoản cho tài xế từ phía vận hành |
+
+---
+
+**Module 2: Quản lý tài xế & Phương tiện (Driver & Vehicle Management)**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-08 | Cập nhật hồ sơ tài xế | Driver | Must Have | Bằng lái, CMND/CCCD, ảnh đại diện |
+| F-09 | Đăng ký / Cập nhật thông tin phương tiện | Driver | Must Have | Biển số, hãng xe, model, màu, loại xe (Sedan/SUV/Van), số ghế |
+| F-10 | Chuyển trạng thái hoạt động | Driver | Must Have | Toggle: Offline ↔ Available. Khi đang chở khách tự chuyển sang Busy |
+| F-11 | Cập nhật vị trí GPS | Driver | Must Have | Gửi tọa độ GPS liên tục qua Socket.IO khi ở trạng thái Available/Busy |
+| F-12 | Duyệt hồ sơ tài xế | Operator, Admin | Must Have | Xem và phê duyệt/từ chối hồ sơ tài xế đăng ký mới |
+| F-13 | Xem danh sách phương tiện | Operator, Admin | Should Have | Danh sách xe đã đăng ký, lọc theo loại, trạng thái |
+| F-14 | Vô hiệu hóa tài xế / phương tiện | Admin | Should Have | Tạm khóa tài xế vi phạm hoặc xe hết hạn đăng kiểm |
+
+---
+
+**Module 3: Đặt xe & Quản lý chuyến đi (Ride Booking & Management) ⭐ Core**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-15 | Nhập điểm đón và điểm đến | Customer | Must Have | Nhập địa chỉ hoặc chọn trên bản đồ, hệ thống geocoding sang tọa độ |
+| F-16 | Chọn loại xe | Customer | Must Have | Chọn loại xe (Sedan/SUV/Van), hiển thị giá ước tính tương ứng |
+| F-17 | Xem cước phí ước tính | Customer | Must Have | Hiển thị giá ước tính trước khi xác nhận đặt xe |
+| F-18 | Gửi yêu cầu đặt xe | Customer | Must Have | Xác nhận đặt xe, tạo ride với status = `requested` |
+| F-19 | Theo dõi trạng thái chuyến đi | Customer | Must Have | Hiển thị trạng thái: Đang tìm tài xế → Tài xế nhận → Đang đến → Đã đón → Đang di chuyển → Hoàn thành |
+| F-20 | Theo dõi vị trí tài xế trên bản đồ | Customer | Must Have | Hiển thị real-time vị trí tài xế trên bản đồ sau khi có tài xế nhận chuyến |
+| F-21 | Xem thông tin tài xế được phân công | Customer | Must Have | Tên, SĐT, ảnh, biển số xe, loại xe, rating |
+| F-22 | Hủy chuyến | Customer | Must Have | Hủy chuyến trước khi tài xế đến điểm đón (miễn phí cho MVP) |
+| F-23 | Xem lịch sử chuyến đi | Customer, Driver | Must Have | Danh sách chuyến đã hoàn thành/hủy, chi tiết từng chuyến |
+| F-24 | Xem chi tiết chuyến đi | Customer, Driver | Must Have | Điểm đón/trả, khoảng cách, thời gian, cước phí, trạng thái, tài xế |
+
+---
+
+**Module 4: Tìm & Phân công tài xế (Driver Matching) ⭐ Core**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-25 | Tự động tìm tài xế phù hợp | System | Must Have | Tìm tài xế Available trong bán kính, đúng loại xe, sắp xếp theo khoảng cách gần nhất |
+| F-26 | Gửi yêu cầu chuyến cho tài xế | System → Driver | Must Have | Gửi thông báo real-time qua Socket.IO cho tài xế được chọn |
+| F-27 | Chấp nhận chuyến | Driver | Must Have | Tài xế nhấn chấp nhận, status chuyển sang `accepted` |
+| F-28 | Từ chối chuyến | Driver | Must Have | Tài xế nhấn từ chối, hệ thống tự động tìm tài xế tiếp theo |
+| F-29 | Tự động chuyển tài xế khi hết thời gian | System | Must Have | Nếu tài xế không phản hồi trong 30s, tự chuyển sang tài xế kế tiếp |
+| F-30 | Thông báo không tìm được tài xế | System → Customer | Must Have | Sau khi thử hết (tối đa 5 tài xế), thông báo cho khách hàng |
+| F-31 | Cập nhật trạng thái chuyến đi | Driver | Must Have | Driver cập nhật: `driver_arrived` → `in_progress` → `completed` |
+
+---
+
+**Module 5: Tính cước & Thanh toán (Fare & Payment)**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-32 | Tính cước tự động | System | Must Have | Tính cước khi hoàn thành: `baseFare + (km × ratePerKm) + (phút × ratePerMin)` |
+| F-33 | Cấu hình bảng giá theo loại xe | Admin | Must Have | Thiết lập giá cơ bản, đơn giá/km, đơn giá/phút cho từng loại xe |
+| F-34 | Thanh toán tiền mặt | Customer | Must Have | Ghi nhận chuyến thanh toán bằng tiền mặt, tài xế xác nhận đã nhận tiền |
+| F-35 | Thanh toán điện tử (Mock) | Customer | Should Have | Tích hợp cổng thanh toán giả lập, không lưu thông tin thẻ trong hệ thống |
+| F-36 | Xử lý thanh toán thất bại | System | Should Have | Thông báo khách hàng, cho phép thử lại hoặc chuyển sang tiền mặt |
+| F-37 | Xem hóa đơn / chi tiết thanh toán | Customer | Should Have | Hiển thị chi tiết cước: giá cơ bản, phí km, phí thời gian, tổng cộng |
+
+---
+
+**Module 6: Thông báo (Notification)**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-38 | Thông báo in-app (real-time) | Customer, Driver | Must Have | Thông báo qua Socket.IO: đặt xe thành công, có tài xế, trạng thái chuyến |
+| F-39 | Thông báo email | Customer, Driver | Should Have | Email xác nhận đăng ký, hoàn thành chuyến, hóa đơn |
+| F-40 | Danh sách thông báo | Customer, Driver | Should Have | Xem lịch sử thông báo, đánh dấu đã đọc |
+
+**Danh sách sự kiện thông báo MVP:**
+
+| Sự kiện | Customer nhận | Driver nhận | Kênh |
+|---------|:---:|:---:|------|
+| Yêu cầu đặt xe được tiếp nhận | ✅ | | In-app |
+| Có chuyến mới cần nhận | | ✅ | In-app |
+| Tài xế nhận chuyến | ✅ | | In-app |
+| Tài xế đến điểm đón | ✅ | | In-app |
+| Chuyến đi hoàn thành | ✅ | ✅ | In-app + Email |
+| Kết quả thanh toán | ✅ | | In-app |
+| Chuyến bị hủy | ✅ | ✅ | In-app |
+| Không tìm được tài xế | ✅ | | In-app |
+
+---
+
+**Module 7: Đánh giá & Phản hồi (Rating & Review)**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-41 | Đánh giá tài xế sau chuyến | Customer | Must Have | Chấm điểm 1–5 sao + nhận xét sau khi chuyến hoàn thành |
+| F-42 | Xem rating trung bình | Customer, Driver | Should Have | Hiển thị rating trung bình của tài xế trên hồ sơ |
+| F-43 | Xem danh sách đánh giá | Driver | Should Have | Tài xế xem các đánh giá khách hàng đã để lại |
+
+---
+
+**Module 8: Quản trị hệ thống (Admin Dashboard)**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-44 | Dashboard tổng quan | Operator, Admin | Must Have | Số chuyến hôm nay, tài xế đang online, doanh thu hôm nay, chuyến đang diễn ra |
+| F-45 | Quản lý khách hàng | Operator, Admin | Must Have | Xem danh sách, tìm kiếm, xem chi tiết, vô hiệu hóa tài khoản |
+| F-46 | Quản lý tài xế | Operator, Admin | Must Have | Xem danh sách, duyệt hồ sơ, xem trạng thái, vô hiệu hóa |
+| F-47 | Quản lý chuyến đi | Operator, Admin | Must Have | Xem chuyến đang diễn ra, chuyến lỗi, can thiệp xử lý |
+| F-48 | Tra cứu lịch sử giao dịch | Operator, Admin | Should Have | Tìm kiếm giao dịch theo khách hàng, tài xế, thời gian, trạng thái |
+| F-49 | Báo cáo số lượng chuyến | Admin | Should Have | Thống kê chuyến theo ngày/tuần/tháng, tỷ lệ hoàn thành/hủy |
+| F-50 | Báo cáo doanh thu | Admin | Should Have | Tổng doanh thu, doanh thu theo loại xe, theo phương thức thanh toán |
+| F-51 | Báo cáo hiệu quả tài xế | Admin | Could Have | Số chuyến, rating, tỷ lệ từ chối, thu nhập của từng tài xế |
+| F-52 | Phân quyền Operator / Admin | Admin | Must Have | Operator: chỉ xem + vận hành. Admin: toàn quyền bao gồm cấu hình, phân quyền |
+
+---
+
+**Module 9: Bảo mật & Hạ tầng (Security & Infrastructure)**
+
+| # | Chức năng | Actor | Mức ưu tiên | Mô tả |
+|---|----------|-------|-------------|-------|
+| F-53 | Xác thực JWT | System | Must Have | Access token (15 phút) + Refresh token (7 ngày) |
+| F-54 | Phân quyền RBAC | System | Must Have | 4 roles: Customer, Driver, Operator, Admin. Middleware kiểm tra quyền |
+| F-55 | Mã hóa mật khẩu | System | Must Have | Hash mật khẩu bằng bcrypt trước khi lưu DB |
+| F-56 | Audit Log | System | Should Have | Ghi log thao tác nhạy cảm: tạo/hủy chuyến, thanh toán, thay đổi quyền, khóa tài khoản |
+| F-57 | Seed Data | System | Should Have | Dữ liệu mẫu: tài khoản test, tài xế, phương tiện, chuyến đi mẫu |
+
+---
+
+**C. Tổng hợp In Scope:**
+
+| Thống kê | Số lượng |
+|----------|---------|
+| Tổng số chức năng | 57 |
+| Must Have | 35 |
+| Should Have | 18 |
+| Could Have | 4 |
+| Actors (Primary) | 4 (Customer, Driver, Operator, Admin) |
+| Actors (Secondary) | 3 (Payment Gateway, Map Service, Email Service) |
+| Modules | 9 |
+
+```mermaid
+pie title Phân bổ chức năng theo mức ưu tiên (MoSCoW)
+    "Must Have (35)" : 35
+    "Should Have (18)" : 18
+    "Could Have (4)" : 4
 ```
-                          ┌──────────────────┐
-                          │   CAB System     │
-                          └────────┬─────────┘
-                                   │
-              ┌────────────────────┼────────────────────┐
-              │                    │                     │
-     ┌────────▼─────┐   ┌────────▼────────┐   ┌───────▼──────────┐
-     │   Customer   │   │     Driver      │   │  Operator/Admin  │
-     │  (Khách hàng)│   │   (Tài xế)     │   │ (Nhân viên VH)   │
-     └──────────────┘   └─────────────────┘   └──────────────────┘
 
-     External Systems:
-     ┌──────────────────┐  ┌────────────────────┐
-     │  Payment Gateway │  │  Map/GPS Service   │
-     │  (Cổng TT)       │  │  (Dịch vụ bản đồ)  │
-     └──────────────────┘  └────────────────────┘
-```
+---
 
 #### 1.5.2 Ngoài phạm vi (Out of Scope) – Giai đoạn MVP
 
-- Ứng dụng mobile native (iOS/Android) – chỉ làm web responsive
-- Tích hợp tổng đài điện thoại (IVR)
-- Chế độ chia sẻ chuyến (ride sharing / carpooling)
-- Ví điện tử nội bộ (internal wallet)
-- Surge pricing tự động theo thuật toán
-- Đa ngôn ngữ (chỉ hỗ trợ tiếng Việt trong MVP)
-- Tính năng chat giữa Customer và Driver
+Các tính năng sau **KHÔNG nằm trong phạm vi MVP** nhưng có thể xem xét cho phiên bản tiếp theo:
+
+| # | Tính năng | Lý do loại khỏi MVP | Phiên bản dự kiến |
+|---|----------|---------------------|-------------------|
+| OS-01 | **Ứng dụng mobile native (iOS/Android)** | Tốn thời gian phát triển, MVP dùng web responsive thay thế. Trải nghiệm đủ tốt trên mobile browser | v2.0 |
+| OS-02 | **Tích hợp tổng đài điện thoại (IVR)** | Cần hạ tầng viễn thông, chi phí cao. Hệ thống mới hướng đến self-service qua app | v3.0 |
+| OS-03 | **Chia sẻ chuyến đi (Ride Sharing / Carpooling)** | Logic phức tạp (ghép khách, tính cước chia sẻ, tối ưu lộ trình). Cần core ổn định trước | v2.0 |
+| OS-04 | **Ví điện tử nội bộ (Internal Wallet)** | Cần license tài chính, quy trình nạp/rút tiền. MVP dùng thanh toán trực tiếp | v2.0 |
+| OS-05 | **Surge pricing tự động** | Cần dữ liệu lịch sử lớn và thuật toán phức tạp. MVP dùng bảng giá cố định có thể cấu hình | v2.0 |
+| OS-06 | **Đa ngôn ngữ (i18n)** | MVP chỉ hỗ trợ tiếng Việt. Thêm tiếng Anh và các ngôn ngữ khác sau | v2.0 |
+| OS-07 | **Chat in-app giữa Customer và Driver** | Không thiết yếu cho MVP, Customer đã có SĐT tài xế để liên lạc | v2.0 |
+| OS-08 | **Đặt xe hẹn giờ (Scheduled Ride)** | Logic lên lịch, nhắc nhở, tìm tài xế theo lịch phức tạp. MVP chỉ hỗ trợ đặt xe tức thì | v2.0 |
+| OS-09 | **Mã khuyến mãi / Voucher** | Cần module quản lý campaign, validation, tính cước kết hợp | v2.0 |
+| OS-10 | **Chương trình khách hàng thân thiết (Loyalty)** | Tích điểm, đổi thưởng – cần hệ thống riêng, phụ thuộc chiến lược marketing | v3.0 |
+| OS-11 | **Tích hợp cổng thanh toán thật (VNPay, MoMo)** | MVP dùng Mock Gateway. Tích hợp thật cần hợp đồng và sandbox testing | v1.1 |
+| OS-12 | **Push Notification (Firebase/APNs)** | Cần native app hoặc PWA. MVP dùng Socket.IO in-app + Email | v2.0 |
+| OS-13 | **Notification qua SMS** | Chi phí gửi SMS, cần tích hợp nhà cung cấp SMS (Twilio, Vonage) | v1.1 |
+| OS-14 | **Báo cáo nâng cao (BI Dashboard)** | Biểu đồ phức tạp, drill-down, export PDF/Excel. MVP chỉ báo cáo cơ bản | v2.0 |
+| OS-15 | **Quản lý khiếu nại / Dispute** | Quy trình xử lý phức tạp, cần policy rõ từ doanh nghiệp | v2.0 |
+| OS-16 | **Định tuyến / Navigation cho tài xế** | Cần tích hợp sâu Maps API (Directions), chi phí API cao. MVP hiển thị điểm đón/trả trên bản đồ | v2.0 |
+| OS-17 | **Đánh giá khách hàng bởi tài xế** | Two-way rating phức tạp hơn. MVP chỉ Customer đánh giá Driver | v1.1 |
+
+---
+
+#### 1.5.3 Ranh giới hệ thống (System Boundary)
+
+```mermaid
+flowchart TB
+    subgraph InScope["✅ TRONG PHẠM VI MVP"]
+        subgraph Apps["Ứng dụng Web"]
+            CApp["🧑 Customer Web App\n(React - Responsive)"]
+            DApp["🚗 Driver Web App\n(React - Responsive)"]
+            AApp["🔧 Admin Dashboard\n(React + Ant Design)"]
+        end
+
+        subgraph Backend["Backend API Server"]
+            Auth["Module Auth\n& User"]
+            Driver["Module Driver\n& Vehicle"]
+            Ride["Module Ride\n& Matching"]
+            Pay["Module Payment\n& Fare"]
+            Notif["Module\nNotification"]
+            Rating["Module\nRating"]
+            Admin["Module\nAdmin"]
+        end
+
+        subgraph Data["Database"]
+            DB[(MongoDB)]
+        end
+
+        subgraph Realtime["Real-time"]
+            Socket["Socket.IO\nServer"]
+        end
+    end
+
+    subgraph OutScope["❌ NGOÀI PHẠM VI MVP"]
+        Mobile["📱 Native Mobile App"]
+        IVR["📞 Tổng đài IVR"]
+        Wallet["💰 Ví nội bộ"]
+        RideShare["🤝 Ride Sharing"]
+        Surge["📈 Surge Pricing"]
+        Chat["💬 Chat In-app"]
+        SMS["📨 SMS Notification"]
+        BI["📊 BI Dashboard"]
+    end
+
+    subgraph External["🔗 HỆ THỐNG BÊN NGOÀI"]
+        MapAPI["🗺️ Map Service\n(OpenStreetMap)"]
+        PayGW["💳 Payment Gateway\n(Mock cho MVP)"]
+        EmailSvc["📧 Email Service\n(Nodemailer)"]
+    end
+
+    CApp --> Backend
+    DApp --> Backend
+    AApp --> Backend
+    Backend --> DB
+    Backend --> Socket
+    Backend --> MapAPI
+    Backend --> PayGW
+    Backend --> EmailSvc
+    Socket --> CApp
+    Socket --> DApp
+```
 
 ---
 
