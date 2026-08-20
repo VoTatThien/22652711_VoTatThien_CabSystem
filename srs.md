@@ -25,6 +25,10 @@
    - 2.1 [Cây phân rã chức năng (Functional Decomposition Tree)](#21-cây-phân-rã-chức-năng-functional-decomposition-tree)
    - 2.2 [Bảng phân rã chi tiết yêu cầu chức năng theo từng phân hệ](#22-bảng-phân-rã-chi-tiết-yêu-cầu-chức-năng-theo-từng-phân-hệ)
    - 2.3 [Ma trận liên kết chức năng và tác nhân (Function-Actor Matrix)](#23-ma-trận-liên-kết-chức-năng-và-tác-nhân-function-actor-matrix)
+3. [Giai đoạn 3 – Quy tắc nghiệp vụ (Business Rules) & Xử lý ngoại lệ (Exception Handling)](#giai-đoạn-3--quy-tắc-nghiệp-vụ-business-rules--xử-lý-ngoại-lệ-exception-handling)
+   - 3.1 [Danh mục Quy tắc nghiệp vụ (Business Rules Catalog)](#31-danh-mục-quy-tắc-nghiệp-vụ-business-rules-catalog)
+   - 3.2 [Danh mục Trường hợp ngoại lệ & Cơ chế xử lý (Exception Handling & Edge Cases)](#32-danh-mục-trường-hợp-ngoại-lệ--cơ-chế-xử-lý-exception-handling--edge-cases)
+   - 3.3 [Ma trận liên kết Quy tắc nghiệp vụ & Trường hợp ngoại lệ (Rule-Exception Traceability Matrix)](#33-ma-trận-liên-kết-quy-tắc-nghiệp-vụ--trường-hợp-ngoại-lệ-rule-exception-traceability-matrix)
 
 ---
 
@@ -1251,7 +1255,258 @@ pie title Tỷ lệ mức độ ưu tiên của 57 yêu cầu chức năng (L3)
 
 ---
 
+## Giai đoạn 3 – Quy tắc nghiệp vụ (Business Rules) & Xử lý ngoại lệ (Exception Handling)
+
+---
+
+### 3.1 Danh mục Quy tắc nghiệp vụ (Business Rules Catalog)
+
+Quy tắc nghiệp vụ (Business Rules - `BRULE`) là các ràng buộc, công thức, điều kiện tiên quyết và chính sách vận hành bắt buộc hệ thống phải tuân thủ nghiêm ngặt trong mọi tình huống.
+
+---
+
+#### BRULE-01: Quy tắc Cấu hình Định giá Cước (Fare Calculation & Pricing Rule)
+- **Mã quy tắc**: `BRULE-01`
+- **Phân hệ áp dụng**: Phân hệ 5.0 (Tính cước & Thanh toán)
+- **Nội dung quy tắc**:
+  1. Tổng cước chuyến đi được tính theo công thức:
+     $$\text{Fare} = \max\left(\text{BaseFare}, \text{BaseFare} + (d \times \text{PricePerKm}) + (t \times \text{PricePerMin})\right)$$
+     Trong đó:
+     - $d$: Quãng đường di chuyển thực tế (tính theo Km, làm tròn đến 1 chữ số thập phân).
+     - $t$: Thời gian di chuyển thực tế (tính theo Phút, làm tròn lên).
+     - $\text{BaseFare}$: Giá mở cửa tối thiểu (đã bao gồm 1 km đầu tiên).
+  2. Bảng giá mặc định theo từng hạng xe trong giai đoạn MVP:
+     | Hạng xe (Vehicle Type) | Số chỗ | Giá mở cửa (BaseFare) | Đơn giá / Km (PricePerKm) | Đơn giá / Phút (PricePerMin) |
+     |---|:---:|:---:|:---:|:---:|
+     | **Sedan (Tiêu chuẩn)** | 4 chỗ | 15.000 VNĐ | 12.000 VNĐ/km | 1.000 VNĐ/phút |
+     | **SUV (Tiện lợi)** | 7 chỗ | 20.000 VNĐ | 15.000 VNĐ/km | 1.500 VNĐ/phút |
+     | **Van (Tập thể)** | 16 chỗ | 35.000 VNĐ | 22.000 VNĐ/km | 2.500 VNĐ/phút |
+  3. Giá ước tính hiển thị khi đặt xe dựa trên khoảng cách định tuyến lý thuyết từ Map Service và thời gian di chuyển ước tính. Số tiền thực tế thanh toán có thể chênh lệch dựa trên lộ trình thực tế.
+
+---
+
+#### BRULE-02: Quy tắc Quét & Ghép nối Tài xế (Driver Matching & Proximity Rule)
+- **Mã quy tắc**: `BRULE-02`
+- **Phân hệ áp dụng**: Phân hệ 4.0 (Matching Engine)
+- **Nội dung quy tắc**:
+  1. Chỉ các tài xế thỏa mãn đồng thời **4 điều kiện** sau mới được đưa vào danh sách ứng viên (Candidate Pool):
+     - Có tài khoản đang hoạt động (`isActive = true`) và đã được phê duyệt hồ sơ (`isApproved = true`).
+     - Trạng thái trực tuyến đang là `Available` (không bận chuyến khác, không offline).
+     - Phương tiện đăng ký khớp chính xác với loại xe khách hàng yêu cầu (`VehicleType`).
+     - Tọa độ GPS hiện tại cách điểm đón khách trong phạm vi bán kính $R \le 5.0\text{ km}$ (tính theo đường chim bay bằng công thức Haversine).
+  2. Thứ tự ưu tiên gửi yêu cầu chuyến:
+     - **Ưu tiên 1**: Khoảng cách từ tài xế đến điểm đón gần nhất ($d \rightarrow \min$).
+     - **Ưu tiên 2 (khi khoảng cách tương đương $\pm 200\text{m}$)**: Tài xế có điểm đánh giá trung bình (`rating`) cao hơn.
+
+---
+
+#### BRULE-03: Quy tắc Thời gian Phản hồi & Thử lại Tự động (Dispatch Timeout & Max Retry Rule)
+- **Mã quy tắc**: `BRULE-03`
+- **Phân hệ áp dụng**: Phân hệ 4.0 (Matching Engine)
+- **Nội dung quy tắc**:
+  1. Mỗi tài xế nhận yêu cầu chuyến xe có chính xác **30 giây** đếm ngược để bấm "Chấp nhận" hoặc "Từ chối".
+  2. Nếu tài xế bấm "Từ chối" hoặc hết 30 giây không phản hồi:
+     - Hệ thống tự động ghi nhận là 1 lượt từ chối, loại tài xế này khỏi danh sách xét duyệt của cuốc xe hiện tại (Blacklist per Ride).
+     - Tăng chỉ số thử lại: $\text{RetryCount} = \text{RetryCount} + 1$.
+  3. Giới hạn thử lại tối đa: $\text{MaxRetries} = 5$.
+     - Nếu $\text{RetryCount} < 5$ và còn tài xế hợp lệ: Ngay lập tức gửi yêu cầu cho tài xế kế tiếp.
+     - Nếu $\text{RetryCount} \ge 5$ hoặc không còn tài xế nào trong bán kính: Ngừng tìm kiếm và chuyển trạng thái chuyến sang `no_driver`.
+
+---
+
+#### BRULE-04: Quy tắc Chuyển đổi Trạng thái Tài xế (Driver Status State Machine)
+- **Mã quy tắc**: `BRULE-04`
+- **Phân hệ áp dụng**: Phân hệ 2.0 (Quản lý Tài xế)
+- **Nội dung quy tắc**:
+  1. Tài xế chỉ có thể chuyển đổi trạng thái theo sơ đồ hợp lệ:
+     ```mermaid
+     stateDiagram-v2
+         [*] --> Offline
+         Offline --> Available: Bật Online (Nếu đã Approved & Active)
+         Available --> Offline: Tắt Online
+         Available --> Busy: Chấp nhận cuốc xe (accepted)
+         Busy --> Available: Chuyến đi hoàn tất (completed / cancelled)
+         Available --> Suspended: Admin khóa tài khoản
+         Busy --> Suspended: Admin khóa (Sau khi chuyến kết thúc)
+         Suspended --> Offline: Admin mở khóa
+     ```
+  2. Nghiêm cấm tài xế chuyển sang `Available` nếu chưa có thông tin phương tiện hợp lệ hoặc đang bị tạm đình chỉ (`isActive = false`).
+
+---
+
+#### BRULE-05: Quy tắc Vòng đời Chuyến đi (Trip Lifecycle Transitions)
+- **Mã quy tắc**: `BRULE-05`
+- **Phân hệ áp dụng**: Phân hệ 3.0 (Đặt xe & Chuyến đi)
+- **Nội dung quy tắc**:
+  1. Trạng thái của chuyến đi phải tuân thủ nghiêm ngặt thứ tự tuyến tính sau:
+     ```mermaid
+     stateDiagram-v2
+         [*] --> requested: Khách tạo yêu cầu
+         requested --> searching: Bắt đầu quét tài xế
+         searching --> accepted: Tài xế nhận cuốc
+         searching --> no_driver: Hết 5 lần retry hoặc hết tài xế
+         accepted --> driver_arrived: Tài xế tới điểm đón
+         driver_arrived --> in_progress: Đón khách & Bắt đầu chạy
+         in_progress --> completed: Đến nơi trả khách
+         
+         requested --> cancelled: Khách hủy khi đang tạo
+         searching --> cancelled: Khách hủy khi đang tìm
+         accepted --> cancelled: Khách/Tài xế hủy trước khi đón
+         driver_arrived --> cancelled: Khách/Tài xế hủy tại điểm đón
+         
+         completed --> [*]
+         cancelled --> [*]
+         no_driver --> [*]
+     ```
+  2. Bất kỳ bước nhảy trạng thái nào không đúng trình tự (VD: từ `accepted` nhảy thẳng lên `completed` mà không qua `in_progress`) đều bị từ chối và ghi nhận lỗi hệ thống.
+
+---
+
+#### BRULE-06: Quy tắc Chính sách Hủy Chuyến (Cancellation Policy Rule)
+- **Mã quy tắc**: `BRULE-06`
+- **Phân hệ áp dụng**: Phân hệ 3.0 (Đặt xe)
+- **Nội dung quy tắc**:
+  1. **Khách hàng hủy chuyến**:
+     - Khi chuyến ở trạng thái `requested` hoặc `searching`: **Hủy miễn phí 100%**, tức thì.
+     - Khi chuyến ở trạng thái `accepted` (Tài xế đang chạy đến đón): **Hủy miễn phí (MVP policy)**, phát thông báo cho tài xế và chuyển trạng thái tài xế về `Available`.
+     - Khi chuyến đã chuyển sang `in_progress` (Khách đã lên xe): **Không cho phép hủy từ ứng dụng khách hàng**, bắt buộc tài xế phải kết thúc cuốc hoặc liên hệ Operator can thiệp.
+  2. **Tài xế hủy chuyến**:
+     - Chỉ được hủy khi ở trạng thái `accepted` hoặc `driver_arrived` kèm lý do cụ thể (xe hỏng, tai nạn, khách không xuất hiện).
+     - Hệ thống ghi nhận tỷ lệ hủy (`cancellation_rate`) của tài xế vào hồ sơ đánh giá định kỳ.
+
+---
+
+#### BRULE-07: Quy tắc Thanh toán & Bảo mật Dữ liệu Tài chính (Payment & Security Rule)
+- **Mã quy tắc**: `BRULE-07`
+- **Phân hệ áp dụng**: Phân hệ 5.0 (Thanh toán)
+- **Nội dung quy tắc**:
+  1. **Thanh toán Tiền mặt (`Cash`)**:
+     - Trạng thái Payment ban đầu là `PENDING`.
+     - Chỉ chuyển sang `COMPLETED` khi tài xế bấm xác nhận "Đã nhận tiền mặt từ khách".
+  2. **Thanh toán Điện tử (`E-Payment`)**:
+     - Toàn bộ thao tác thanh toán thẻ/ví điện tử được ủy quyền xử lý qua cổng thanh toán bên thứ ba (hoặc Mock Payment Gateway).
+     - Hệ thống CAB **tuyệt đối không lưu trữ** số thẻ ngân hàng (PAN), ngày hết hạn, mã bảo mật CVV/CVC trong cơ sở dữ liệu để tuân thủ tiêu chuẩn an toàn bảo mật.
+     - Chỉ lưu trữ mã tham chiếu giao dịch (`TransactionId`), thời gian giao dịch và trạng thái trả về từ cổng thanh toán.
+
+---
+
+#### BRULE-08: Quy tắc Tính điểm Đánh giá Trung bình (Rating Calculation Rule)
+- **Mã quy tắc**: `BRULE-08`
+- **Phân hệ áp dụng**: Phân hệ 8.0 (Đánh giá & Phản hồi)
+- **Nội dung quy tắc**:
+  1. Khách hàng chỉ được đánh giá cuốc xe khi chuyến đi có trạng thái `completed` và giao dịch thanh toán đã `COMPLETED`.
+  2. Mỗi chuyến đi chỉ được đánh giá duy nhất **1 lần**, điểm số là số nguyên từ $1$ đến $5$ sao.
+  3. Công thức tính điểm đánh giá trung bình hiển thị của tài xế:
+     $$\bar{R} = \frac{\sum_{i=1}^{N} \text{Star}_i}{N}$$
+     (Làm tròn đến 1 chữ số thập phân, ví dụ: 4.85 $\rightarrow$ 4.9 sao).
+
+---
+
+#### BRULE-09: Quy tắc Phân quyền Vai trò Quản trị (Role-Based Access Control Rule)
+- **Mã quy tắc**: `BRULE-09`
+- **Phân hệ áp dụng**: Phân hệ 10.0 (Bảo mật & RBAC)
+- **Nội dung quy tắc**:
+  1. **Nhân viên vận hành (Operator)**:
+     - Có quyền: Xem danh sách user, duyệt hồ sơ tài xế, xem bản đồ xe chạy, giám sát chuyến đi, tra cứu giao dịch, can thiệp cuốc xe sự cố.
+     - **Không có quyền**: Thay đổi cấu hình giá cước, xóa vĩnh viễn dữ liệu người dùng, phân quyền Admin cho tài khoản khác, xem báo cáo doanh thu tài chính cấp cao.
+  2. **Quản trị viên hệ thống (Admin)**:
+     - Toàn quyền (`Superuser`): Cấu hình biểu phí, quản lý tài khoản nhân viên, xem toàn bộ báo cáo doanh thu, phân quyền, cấu hình hệ thống.
+
+---
+
+#### BRULE-10: Quy tắc Ghi vết Kiểm toán (Audit Trail Compliance Rule)
+- **Mã quy tắc**: `BRULE-10`
+- **Phân hệ áp dụng**: Phân hệ 10.0 (Kiểm toán)
+- **Nội dung quy tắc**:
+  1. Mọi thao tác làm thay đổi dữ liệu trọng yếu đều bắt buộc phải được ghi nhật ký kiểm toán (`AuditLog`) bao gồm:
+     - Thay đổi cấu hình bảng giá cước.
+     - Phê duyệt / Từ chối / Khóa tài khoản tài xế.
+     - Can thiệp cưỡng chế hủy chuyến đi từ phía Operator/Admin.
+     - Đổi vai trò hoặc quyền hạn người dùng.
+  2. Dữ liệu nhật ký kiểm toán mang tính chất **Append-Only** (chỉ thêm mới, nghiêm cấm chỉnh sửa hoặc xóa bỏ).
+
+---
+
+### 3.2 Danh mục Trường hợp ngoại lệ & Cơ chế xử lý (Exception Handling & Edge Cases)
+
+Các kịch bản bất thường (Exceptions) có thể phát sinh trong quá trình vận hành thực tế và giải pháp xử lý tương ứng của hệ thống:
+
+```mermaid
+graph TD
+    subgraph Exceptions["⚠️ Các tình huống ngoại lệ chính"]
+        E1["EX-01: Không tìm thấy tài xế"]
+        E2["EX-02: Tài xế Timeout 30s"]
+        E3["EX-03: Mất GPS / Mạng giữa chừng"]
+        E4["EX-04: Khách hủy khi xe đang đến"]
+        E5["EX-05: Khách không xuất hiện"]
+        E6["EX-06: Xe hỏng / Tai nạn"]
+        E7["EX-07: Lỗi thanh toán điện tử"]
+        E8["EX-08: Tranh chấp nhận cuốc"]
+        E9["EX-09: Khóa tài khoản giữa cuốc"]
+        E10["EX-10: Cổng ngoại vi Outage"]
+    end
+
+    subgraph Solutions["🛡️ Cơ chế xử lý của hệ thống"]
+        S1["Thông báo no_driver & Gợi ý thử lại"]
+        S2["Tự động xoay vòng tài xế kế tiếp (Max 5)"]
+        S3["Giữ trạng thái chuyến, buffer tọa độ & chờ 5p"]
+        S4["Giải phóng tài xế về Available & Log"]
+        S5["Cho phép tài xế hủy kèm lý do No-Show"]
+        S6["Hủy cuốc khẩn cấp & Tự động gán xe thay thế"]
+        S7["Chuyển hướng thử lại hoặc thanh toán tiền mặt"]
+        S8["Khóa giao dịch bằng Distributed Lock / Atomic Update"]
+        S9["Hoàn tất chuyến đi hiện tại rồi mới khóa"]
+        S10["Graceful Degradation & Fallback cục bộ"]
+    end
+
+    E1 --> S1
+    E2 --> S2
+    E3 --> S3
+    E4 --> S4
+    E5 --> S5
+    E6 --> S6
+    E7 --> S7
+    E8 --> S8
+    E9 --> S9
+    E10 --> S10
+```
+
+---
+
+| Mã Ngoại lệ | Tình huống ngoại lệ (Scenario) | Hậu quả tiềm ẩn | Cơ chế phát hiện (Detection) | Giải pháp xử lý tự động & Thủ công (Handling Strategy) |
+|---|---|---|---|---|
+| **EX-01** | **Không tìm được tài xế khả dụng**<br>Quanh khu vực 5km không có tài xế nào trực tuyến hoặc tất cả tài xế trong vùng đều từ chối cuốc xe. | Khách hàng chờ đợi vô ích, giảm uy tín nền tảng. | Sau khi quét DB không có tài xế hoặc `RetryCount >= 5`. | • Hệ thống lập tức cập nhật trạng thái Ride sang `no_driver`.<br>• Bắn thông báo đẩy rõ ràng cho khách: *"Rất tiếc, hiện các tài xế quanh bạn đều đang bận. Vui lòng thử lại sau ít phút!"*<br>• Không trừ bất kỳ khoản phí nào của khách. |
+| **EX-02** | **Tài xế không phản hồi trong 30 giây**<br>Tài xế không để ý điện thoại hoặc đang bận thao tác khác khi có yêu cầu chuyến mới. | Cuốc xe bị treo, khách hàng chờ lâu. | Server Timer (30s) hết hạn mà chưa nhận được gói tin `accept` từ tài xế. | • Hệ thống tự động hủy popup trên app tài xế cũ.<br>• Tăng `RetryCount` thêm 1, đưa tài xế vào danh sách loại trừ.<br>• Ngay lập tức gửi yêu cầu cho tài xế khả dụng tiếp theo trong danh sách đã xếp hạng. |
+| **EX-03** | **Mất kết nối mạng / Mất tín hiệu GPS**<br>Điện thoại tài xế hoặc khách đi vào vùng mất sóng, hầm đường bộ hoặc hết pin giữa hành trình. | Mất dấu vết xe trên bản đồ, không thể cập nhật mốc hoàn thành. | Server không nhận được ping socket/GPS định kỳ quá 60 giây. | • Hệ thống giữ nguyên trạng thái cuốc xe hiện tại trong thời gian chờ 5 phút (`Connection Grace Period`).<br>• Phía Client tài xế lưu tạm các điểm tọa độ vào bộ nhớ đệm cục bộ (Local Cache). Khi có mạng trở lại, Client tự động đồng bộ bù (Sync Back) dữ liệu lên Server.<br>• Nếu mất kết nối > 5 phút: Hệ thống gắn cờ cảnh báo cuốc xe nghi vấn trên Dashboard Operator để nhân viên gọi điện xác minh. |
+| **EX-04** | **Khách hàng hủy chuyến khi tài xế đang đến**<br>Tài xế đã chạy được một đoạn nhưng khách bấm hủy chuyến. | Tài xế tốn công di chuyển và xăng xe. | Khách hàng bấm nút "Hủy chuyến" trên giao diện khi trạng thái là `accepted` hoặc `driver_arrived`. | • Hệ thống đổi trạng thái cuốc sang `cancelled_by_customer`.<br>• Bắn thông báo tức thì kèm âm thanh báo động cho tài xế: *"Khách hàng đã hủy chuyến này"*, hiển thị lý do hủy.<br>• Lập tức chuyển trạng thái tài xế về `Available` để có thể nhận ngay cuốc xe khác. |
+| **EX-05** | **Khách hàng không xuất hiện tại điểm đón (No-Show)**<br>Tài xế đã đến điểm đón quá 5-10 phút nhưng không thấy khách và không liên lạc được. | Lãng phí thời gian chờ đợi của tài xế. | Tài xế đã bấm `driver_arrived` được hơn 5 phút. | • Cho phép tài xế bấm nút "Hủy cuốc do khách không xuất hiện".<br>• Hệ thống chuyển trạng thái `cancelled_by_driver` với lý do `Customer No-Show`.<br>• Giải phóng tài xế về `Available`. |
+| **EX-06** | **Xe hỏng / Tai nạn giữa hành trình**<br>Phương tiện gặp sự cố kỹ thuật (thủng lốp, chết máy) khi đang di chuyển chở khách. | Chuyến đi bị gián đoạn, nguy hiểm và gây trễ giờ của khách. | Tài xế bấm nút "Báo cáo sự cố khẩn cấp" trên ứng dụng. | • Hệ thống đổi trạng thái chuyến sang `interrupted_by_incident`.<br>• Hệ thống tính toán cước phí quãng đường đã đi thực tế đến thời điểm hỏng xe (hoặc miễn phí theo chính sách hỗ trợ).<br>• Tự động kích hoạt luồng đặt xe ưu tiên tìm tài xế khác gần đó đến đón tiếp khách hàng di chuyển tiếp. |
+| **EX-07** | **Thanh toán Điện tử thất bại**<br>Tài khoản thẻ của khách không đủ số dư, thẻ hết hạn, hoặc cổng thanh toán bị timeout. | Doanh nghiệp không thu được tiền, tắc nghẽn hoàn tất chuyến. | Cổng thanh toán trả về mã lỗi (`ResponseCode != 00`). | • Hệ thống cập nhật bản ghi Payment sang `FAILED`.<br>• Hiển thị thông báo giải thích lý do thanh toán không thành công.<br>• Cung cấp giao diện 2 tùy chọn cho khách: **(1)** Đổi phương thức/nhập lại thẻ khác để thanh toán lại; **(2)** Chuyển đổi trực tiếp sang hình thức trả tiền mặt cho tài xế. |
+| **EX-08** | **Xung đột nhận cuốc đồng thời (Race Condition)**<br>Nhiều tiến trình hoặc tài xế gửi yêu cầu nhận cùng 1 cuốc xe tại cùng một mili-giây. | 1 cuốc xe bị gán cho 2 tài xế khác nhau. | Truy vấn cập nhật trạng thái Ride trong cơ sở dữ liệu. | • Sử dụng kỹ thuật **Optimistic Locking** hoặc câu lệnh cập nhật nguyên tử (Atomic Update):<br>`UPDATE Rides SET driverId = :dId, status = 'accepted' WHERE id = :rId AND status = 'searching'`<br>• Chỉ tài xế đầu tiên có số bản ghi ảnh hưởng = 1 được nhận cuốc. Tài xế đến sau nhận thông báo: *"Cuốc xe đã được tài xế khác tiếp nhận"*. |
+| **EX-09** | **Khóa tài khoản khi đang có chuyến xe chạy**<br>Admin khóa tài khoản khách hàng hoặc tài xế trong lúc cuốc xe đang diễn ra. | Giao diện bị văng, gián đoạn cuốc xe đang phục vụ. | Thao tác khóa tài khoản từ Admin Dashboard. | • Hệ thống vẫn cho phép chuyến đi hiện tại tiếp tục hoàn thành bình thường đến khi thanh toán xong.<br>• Lệnh khóa tài khoản chỉ có hiệu lực chặn các cuốc xe mới hoặc ngăn tài xế bật lại `Available` sau khi cuốc hiện tại kết thúc. |
+| **EX-10** | **Cổng dịch vụ bên ngoài ngừng hoạt động (External Outage)**<br>Máy chủ OpenStreetMap hoặc Cổng thanh toán hoặc SMTP Server bị sập. | Toàn bộ hệ thống có nguy cơ tê liệt theo. | Bắt lỗi `Connection Exception` / `Timeout` từ các API bên ngoài. | • Áp dụng mô hình **Circuit Breaker** & **Graceful Degradation**:<br>  - Nếu Map API lỗi: Dùng tọa độ ước lượng đơn giản cục bộ để không chặn việc tạo cuốc.<br>  - Nếu Email SMTP lỗi: Bỏ qua việc gửi email, ghi log cảnh báo ngầm, quy trình đặt xe và thanh toán vẫn hoàn tất 100%.<br>  - Nếu Cổng thanh toán lỗi: Tạm thời vô hiệu hóa tùy chọn thanh toán thẻ, ép chuyển sang thanh toán Tiền mặt. |
+
+---
+
+### 3.3 Ma trận liên kết Quy tắc nghiệp vụ & Trường hợp ngoại lệ (Rule-Exception Traceability Matrix)
+
+| Quy tắc nghiệp vụ (Business Rule) | Trường hợp ngoại lệ tương ứng (Exception) | Cơ chế đảm bảo tính toàn vẹn (Integrity Mechanism) |
+|---|---|---|
+| **BRULE-01 (Định giá cước)** | EX-06 (Xe hỏng giữa đường), EX-10 (Map API lỗi) | Fallback tính cước tối thiểu hoặc tính theo quãng đường GPS thực tế đã ghi nhận. |
+| **BRULE-02 (Ghép nối tài xế)** | EX-01 (Không có tài xế quanh vùng), EX-08 (Tranh chấp nhận cuốc) | Atomic database query, thuật toán bán kính 5km, phân bổ tuần tự không gửi đại trà. |
+| **BRULE-03 (Timeout & Retry)** | EX-02 (Tài xế quá 30s), EX-01 (Hết 5 lần retry) | Bộ đếm thời gian phân tán (Distributed Timer) và danh sách loại trừ tạm thời. |
+| **BRULE-04 (Trạng thái tài xế)** | EX-04 (Khách hủy cuốc), EX-05 (Khách vắng mặt), EX-09 (Bị khóa tài khoản) | Tự động hoàn nguyên trạng thái về `Available` hoặc cưỡng chế về `Offline`. |
+| **BRULE-05 (Vòng đời chuyến đi)** | EX-03 (Mất mạng giữa chừng), EX-06 (Sự cố tai nạn) | Máy trạng thái hữu hạn (FSM) ngăn chặn nhảy cóc trạng thái, cơ chế đồng bộ bù GPS. |
+| **BRULE-06 (Chính sách hủy)** | EX-04 (Khách hủy sớm/muộn), EX-05 (Khách không ra xe) | Kiểm tra điều kiện trạng thái hiện tại trước khi thực hiện thao tác hủy. |
+| **BRULE-07 (Thanh toán & Bảo mật)** | EX-07 (Lỗi thẻ/Cổng thanh toán), EX-10 (Cổng thanh toán sập) | Không lưu thông tin thẻ nhạy cảm, cơ chế Retry và Fallback sang tiền mặt. |
+| **BRULE-08 (Đánh giá Rating)** | EX-06 (Chuyến bị gián đoạn/Hủy) | Chỉ kích hoạt form đánh giá khi chuyến đi kết thúc trọn vẹn và đã thanh toán. |
+| **BRULE-09 (Phân quyền RBAC)** | EX-09 (Khóa tài khoản đột xuất) | Middleware JWT kiểm tra quyền mỗi request; trì hoãn thu hồi quyền cuốc đang chạy. |
+| **BRULE-10 (Nhật ký kiểm toán)** | EX-06 (Sự cố khẩn cấp), EX-09 (Thao tác can thiệp Admin) | Tự động chèn bản ghi bất biến (Immutable Audit Log) vào cơ sở dữ liệu. |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
-*Phase: Giai đoạn 2 – Phân rã yêu cầu chức năng (Functional Requirements Decomposition)*
+*Phase: Giai đoạn 3 – Quy tắc nghiệp vụ (Business Rules) & Xử lý ngoại lệ (Exception Handling)*
+
 
