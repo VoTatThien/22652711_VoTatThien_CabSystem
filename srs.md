@@ -29,6 +29,10 @@
    - 3.1 [Danh mục Quy tắc nghiệp vụ (Business Rules Catalog)](#31-danh-mục-quy-tắc-nghiệp-vụ-business-rules-catalog)
    - 3.2 [Danh mục Trường hợp ngoại lệ & Cơ chế xử lý (Exception Handling & Edge Cases)](#32-danh-mục-trường-hợp-ngoại-lệ--cơ-chế-xử-lý-exception-handling--edge-cases)
    - 3.3 [Ma trận liên kết Quy tắc nghiệp vụ & Trường hợp ngoại lệ (Rule-Exception Traceability Matrix)](#33-ma-trận-liên-kết-quy-tắc-nghiệp-vụ--trường-hợp-ngoại-lệ-rule-exception-traceability-matrix)
+4. [Giai đoạn 4 – Mô hình hóa dữ liệu (Data Modeling & Database Design)](#giai-đoạn-4--mô-hình-hóa-dữ-liệu-data-modeling--database-design)
+   - 4.1 [Sơ đồ thực thể liên kết (Entity Relationship Diagram - ERD)](#41-sơ-đồ-thực-thể-liên-kết-entity-relationship-diagram---erd)
+   - 4.2 [Từ điển dữ liệu chi tiết (Data Dictionary / Schema Specification)](#42-từ-điển-dữ-liệu-chi-tiết-data-dictionary--schema-specification)
+   - 4.3 [Chiến lược chỉ mục & Tối ưu hóa truy vấn địa không gian (Indexes & Geospatial Strategy)](#43-chiến-lược-chỉ-mục--tối-ưu-hóa-truy-vấn-địa-không-gian-indexes--geospatial-strategy)
 
 ---
 
@@ -1505,8 +1509,379 @@ graph TD
 
 ---
 
+## Giai đoạn 4 – Mô hình hóa dữ liệu (Data Modeling & Database Design)
+
+Mô hình hóa dữ liệu là bước thiết kế cấu trúc lưu trữ thông tin của hệ thống CAB, đảm bảo tính toàn vẹn dữ liệu (Data Integrity), hiệu năng truy vấn cao cho các tác vụ địa không gian thời gian thực (Geospatial Real-time Queries), và khả năng mở rộng linh hoạt theo kiến trúc Document Model (MongoDB / Relational hybrid).
+
+---
+
+### 4.1 Sơ đồ Thực thể Liên kết (Entity Relationship Diagram - ERD)
+
+```mermaid
+erDiagram
+    USER ||--o| DRIVER_PROFILE : "extends (1:0..1)"
+    USER ||--o{ RIDE : "creates as customer (1:N)"
+    USER ||--o{ NOTIFICATION : "receives (1:N)"
+    USER ||--o{ AUDIT_LOG : "performs (1:N)"
+    
+    DRIVER_PROFILE ||--|{ VEHICLE : "owns / drives (1:N)"
+    DRIVER_PROFILE ||--o{ RIDE : "accepts as driver (1:N)"
+    DRIVER_PROFILE ||--o{ RATING_REVIEW : "is reviewed (1:N)"
+    
+    VEHICLE ||--|| PRICING_CONFIG : "categorized by (N:1)"
+    
+    RIDE ||--|| PAYMENT : "generates invoice (1:1)"
+    RIDE ||--o| RATING_REVIEW : "evaluated by (1:0..1)"
+    RIDE }|--|| PRICING_CONFIG : "applies fare rate (N:1)"
+
+    USER {
+        string _id PK "Mã định danh người dùng"
+        string fullName "Họ và tên"
+        string email UK "Địa chỉ email"
+        string phone UK "Số điện thoại"
+        string passwordHash "Mật khẩu mã hóa bcrypt"
+        string role "Vai trò: customer, driver, operator, admin"
+        string avatarUrl "Đường dẫn ảnh đại diện"
+        boolean isActive "Trạng thái hoạt động"
+        datetime createdAt "Thời gian tạo tài khoản"
+        datetime updatedAt "Thời gian cập nhật"
+    }
+
+    DRIVER_PROFILE {
+        string _id PK "Mã hồ sơ tài xế"
+        string userId FK "Liên kết USER._id"
+        string licenseNumber UK "Số giấy phép lái xe"
+        string licenseClass "Hạng GPLX (B2, C, D...)"
+        string licenseImageUrl "Ảnh chụp bằng lái"
+        string status "Trạng thái: offline, available, busy, suspended"
+        geojson currentLocation "Tọa độ GPS [lng, lat] (2dsphere)"
+        number rating "Điểm đánh giá TB (1.0 - 5.0)"
+        int totalRides "Tổng số cuốc đã hoàn thành"
+        int totalReviews "Tổng số lượt được đánh giá"
+        boolean isApproved "Đã duyệt hồ sơ bởi Operator"
+        datetime approvedAt "Thời gian duyệt"
+    }
+
+    VEHICLE {
+        string _id PK "Mã phương tiện"
+        string driverId FK "Liên kết DRIVER_PROFILE._id"
+        string plateNumber UK "Biển số xe đăng ký"
+        string brand "Hãng sản xuất (Toyota, Honda...)"
+        string model "Dòng xe (Vios, Innova, Transit...)"
+        string color "Màu sắc xe"
+        string vehicleType "Phân loại xe: sedan, suv, van"
+        int seats "Số chỗ ngồi"
+        string registrationImageUrl "Ảnh chụp giấy đăng ký xe"
+        boolean isActive "Trạng thái xe đang lưu hành"
+    }
+
+    PRICING_CONFIG {
+        string _id PK "Mã cấu hình giá"
+        string vehicleType UK "Loại xe: sedan, suv, van"
+        number baseFare "Giá mở cửa (1km đầu)"
+        number pricePerKm "Đơn giá mỗi Km tiếp theo"
+        number pricePerMin "Đơn giá mỗi phút di chuyển"
+        boolean isActive "Trạng thái áp dụng"
+        datetime updatedAt "Thời gian cập nhật biểu phí"
+    }
+
+    RIDE {
+        string _id PK "Mã chuyến đi"
+        string customerId FK "Liên kết USER._id"
+        string driverId FK "Liên kết DRIVER_PROFILE._id"
+        string vehicleType "Loại xe yêu cầu"
+        string status "Trạng thái: requested, searching, accepted, driver_arrived, in_progress, completed, cancelled, no_driver"
+        string pickupAddress "Địa chỉ đón khách bằng chữ"
+        geojson pickupLocation "Tọa độ đón [lng, lat]"
+        string dropoffAddress "Địa chỉ trả khách bằng chữ"
+        geojson dropoffLocation "Tọa độ trả [lng, lat]"
+        number estimatedDistance "Khoảng cách ước tính (Km)"
+        number estimatedDuration "Thời gian ước tính (Phút)"
+        number estimatedFare "Cước phí ước tính (VNĐ)"
+        number actualDistance "Quãng đường thực tế (Km)"
+        number actualDuration "Thời gian chạy thực tế (Phút)"
+        number actualFare "Cước phí thực tế cuối cùng (VNĐ)"
+        string cancelReason "Lý do hủy chuyến nếu có"
+        string cancelledBy "Người hủy: customer, driver, operator"
+        int retryCount "Số lần quét thử lại tài xế"
+        datetime requestedAt "Thời điểm tạo cuốc"
+        datetime acceptedAt "Thời điểm tài xế nhận"
+        datetime arrivedAt "Thời điểm tài xế đến điểm đón"
+        datetime startedAt "Thời điểm bắt đầu chở khách"
+        datetime completedAt "Thời điểm kết thúc chuyến"
+    }
+
+    PAYMENT {
+        string _id PK "Mã giao dịch thanh toán"
+        string rideId FK "Liên kết RIDE._id"
+        string customerId FK "Liên kết USER._id"
+        string driverId FK "Liên kết DRIVER_PROFILE._id"
+        number amount "Tổng số tiền thanh toán (VNĐ)"
+        string method "Phương thức: CASH, EWALLET, CARD"
+        string status "Trạng thái: PENDING, COMPLETED, FAILED, REFUNDED"
+        string transactionId "Mã tham chiếu từ cổng thanh toán"
+        string failureReason "Lý do thất bại nếu có"
+        datetime paidAt "Thời điểm thanh toán thành công"
+        datetime createdAt "Thời điểm tạo hóa đơn"
+    }
+
+    RATING_REVIEW {
+        string _id PK "Mã đánh giá"
+        string rideId FK "Liên kết RIDE._id (UK)"
+        string customerId FK "Liên kết USER._id"
+        string driverId FK "Liên kết DRIVER_PROFILE._id"
+        int score "Điểm đánh giá (1 đến 5 sao)"
+        string comment "Nhận xét góp ý của khách"
+        datetime createdAt "Thời điểm đánh giá"
+    }
+
+    NOTIFICATION {
+        string _id PK "Mã thông báo"
+        string userId FK "Liên kết USER._id"
+        string title "Tiêu đề thông báo"
+        string message "Nội dung chi tiết"
+        string type "Loại sự kiện: RIDE, PAYMENT, SYSTEM"
+        string channel "Kênh gửi: IN_APP, EMAIL"
+        boolean isRead "Trạng thái đã đọc"
+        json metadata "Dữ liệu đính kèm (rideId, etc.)"
+        datetime createdAt "Thời gian gửi"
+    }
+
+    AUDIT_LOG {
+        string _id PK "Mã vết kiểm toán"
+        string userId FK "Liên kết USER._id"
+        string action "Hành động (CREATE_RIDE, UPDATE_PRICE...)"
+        string resource "Tài nguyên bị tác động (RIDE, CONFIG...)"
+        string resourceId "ID của tài nguyên"
+        json details "Chi tiết thay đổi trước/sau"
+        string ipAddress "Địa chỉ IP client"
+        datetime timestamp "Thời điểm thực hiện thao tác"
+    }
+```
+
+---
+
+### 4.2 Từ điển Dữ liệu Chi tiết (Data Dictionary / Schema Specification)
+
+---
+
+#### 4.2.1 Bảng `Users` (Người dùng hệ thống)
+Lưu trữ định danh và thông tin xác thực của toàn bộ các tài khoản (Khách hàng, Tài xế, Nhân viên vận hành, Quản trị viên).
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh duy nhất của người dùng |
+| `fullName` | String | Required, Length: 2-100 | N/A | Họ và tên đầy đủ của người dùng |
+| `email` | String | Required, Unique, Format: Email | N/A | Địa chỉ email dùng để đăng nhập và nhận thông báo |
+| `phone` | String | Required, Unique, Regex: `^(0[3\|5\|7\|8\|9])+([0-9]{8})$` | N/A | Số điện thoại di động Việt Nam |
+| `passwordHash` | String | Required | N/A | Mật khẩu băm một chiều qua thư viện `bcrypt` |
+| `role` | String (Enum) | Required, Enum: `['customer', 'driver', 'operator', 'admin']` | `'customer'` | Vai trò người dùng trong hệ thống (RBAC) |
+| `avatarUrl` | String | Optional, Format: URL | `null` | Đường dẫn ảnh đại diện cá nhân |
+| `isActive` | Boolean | Required | `true` | Cờ trạng thái tài khoản (`false` = bị khóa) |
+| `createdAt` | Date | Required | `Date.now()` | Thời điểm tạo tài khoản |
+| `updatedAt` | Date | Required | `Date.now()` | Thời điểm cập nhật hồ sơ gần nhất |
+
+---
+
+#### 4.2.2 Bảng `DriverProfiles` (Hồ sơ Tài xế)
+Lưu trữ thông tin bằng lái, trạng thái trực tuyến và định vị thời gian thực của tài xế.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh hồ sơ tài xế |
+| `userId` | ObjectId / String | Foreign Key $\rightarrow$ `Users._id`, Unique, Required | N/A | Liên kết 1-1 với tài khoản User |
+| `licenseNumber` | String | Required, Unique, Length: 12 | N/A | Số giấy phép lái xe (GPLX) |
+| `licenseClass` | String | Required, Enum: `['B1', 'B2', 'C', 'D', 'E']` | `'B2'` | Hạng giấy phép lái xe |
+| `licenseImageUrl` | String | Required, Format: URL | N/A | Đường dẫn ảnh chụp bằng lái gốc |
+| `status` | String (Enum) | Required, Enum: `['offline', 'available', 'busy', 'suspended']` | `'offline'` | Trạng thái sẵn sàng nhận cuốc của tài xế |
+| `currentLocation` | GeoJSON Point | Required, Format: `{ type: "Point", coordinates: [lng, lat] }` | `[106.660172, 10.762622]` | Vị trí GPS kinh độ - vĩ độ hiện tại (Tạo 2dsphere Index) |
+| `rating` | Number | Min: 1.0, Max: 5.0 | `5.0` | Điểm đánh giá sao trung bình (Làm tròn 1 số lẻ) |
+| `totalRides` | Number (Int) | Min: 0 | `0` | Tổng số chuyến đi đã hoàn thành |
+| `totalReviews` | Number (Int) | Min: 0 | `0` | Tổng số lượt khách hàng đã đánh giá |
+| `isApproved` | Boolean | Required | `false` | Trạng thái phê duyệt hồ sơ bởi Operator |
+| `approvedAt` | Date | Optional | `null` | Mốc thời gian được phê duyệt hoạt động |
+
+---
+
+#### 4.2.3 Bảng `Vehicles` (Phương tiện vận tải)
+Lưu trữ thông tin xe thuộc quyền sở hữu hoặc sử dụng của tài xế.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh phương tiện |
+| `driverId` | ObjectId / String | Foreign Key $\rightarrow$ `DriverProfiles._id`, Required | N/A | Liên kết với tài xế sở hữu |
+| `plateNumber` | String | Required, Unique, Format: Biển số VN (VD: `51G-123.45`) | N/A | Biển số đăng ký xe |
+| `brand` | String | Required (VD: Toyota, Hyundai...) | N/A | Hãng sản xuất xe |
+| `model` | String | Required (VD: Vios, Accent, Fortuner...) | N/A | Dòng xe |
+| `color` | String | Required (VD: Trắng, Bạc, Đen...) | N/A | Màu sắc nhận diện của xe |
+| `vehicleType` | String (Enum) | Required, Enum: `['sedan', 'suv', 'van']` | `'sedan'` | Phân loại phân khúc xe phục vụ đặt chuyến |
+| `seats` | Number (Int) | Required, Min: 4, Max: 16 | `4` | Số chỗ ngồi cho phép |
+| `registrationImageUrl` | String | Optional, Format: URL | `null` | Ảnh chụp cà-vẹt / giấy đăng ký xe |
+| `isActive` | Boolean | Required | `true` | Trạng thái xe đang lưu hành (`false` = xe bảo dưỡng) |
+
+---
+
+#### 4.2.4 Bảng `PricingConfigs` (Cấu hình Bảng giá Dịch vụ)
+Bảng tham số cấu hình biểu phí động theo từng phân khúc xe.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã cấu hình biểu giá |
+| `vehicleType` | String (Enum) | Required, Unique, Enum: `['sedan', 'suv', 'van']` | N/A | Loại xe áp dụng mức giá |
+| `baseFare` | Number | Required, Min: 0 | `15000` | Giá mở cửa cố định (bao gồm 1 km đầu tiên) |
+| `pricePerKm` | Number | Required, Min: 0 | `12000` | Đơn giá cước mỗi Km di chuyển tiếp theo |
+| `pricePerMin` | Number | Required, Min: 0 | `1000` | Đơn giá cước mỗi phút thời gian di chuyển |
+| `isActive` | Boolean | Required | `true` | Trạng thái bảng giá có hiệu lực |
+| `updatedAt` | Date | Required | `Date.now()` | Thời điểm cập nhật giá gần nhất |
+
+---
+
+#### 4.2.5 Bảng `Rides` (Chuyến đi / Cuốc xe)
+Bảng dữ liệu trung tâm quản lý toàn bộ vòng đời và lộ trình của từng chuyến xe.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh cuốc xe |
+| `customerId` | ObjectId / String | Foreign Key $\rightarrow$ `Users._id`, Required | N/A | Khách hàng khởi tạo cuốc xe |
+| `driverId` | ObjectId / String | Foreign Key $\rightarrow$ `DriverProfiles._id`, Optional | `null` | Tài xế tiếp nhận cuốc xe (`null` khi đang tìm) |
+| `vehicleType` | String (Enum) | Required, Enum: `['sedan', 'suv', 'van']` | `'sedan'` | Hạng xe khách hàng yêu cầu |
+| `status` | String (Enum) | Required, Enum: `['requested', 'searching', 'accepted', 'driver_arrived', 'in_progress', 'completed', 'cancelled', 'no_driver']` | `'requested'` | Trạng thái tiến trình của chuyến đi |
+| `pickupAddress` | String | Required, Length: 5-255 | N/A | Tên địa chỉ đón khách hiển thị |
+| `pickupLocation` | GeoJSON Point | Required, Format: `{ type: "Point", coordinates: [lng, lat] }` | N/A | Tọa độ GPS điểm đón (2dsphere Index) |
+| `dropoffAddress` | String | Required, Length: 5-255 | N/A | Tên địa chỉ trả khách hiển thị |
+| `dropoffLocation` | GeoJSON Point | Required, Format: `{ type: "Point", coordinates: [lng, lat] }` | N/A | Tọa độ GPS điểm trả (2dsphere Index) |
+| `estimatedDistance` | Number | Required, Min: 0 | `0` | Khoảng cách lộ trình ước tính (Km) |
+| `estimatedDuration` | Number | Required, Min: 0 | `0` | Thời gian di chuyển ước tính (Phút) |
+| `estimatedFare` | Number | Required, Min: 0 | `0` | Tiền cước ước tính hiển thị lúc đặt (VNĐ) |
+| `actualDistance` | Number | Optional, Min: 0 | `null` | Quãng đường thực tế GPS đo được (Km) |
+| `actualDuration` | Number | Optional, Min: 0 | `null` | Thời gian chạy thực tế từ lúc đón đến trả (Phút) |
+| `actualFare` | Number | Optional, Min: 0 | `null` | Tiền cước thực tế cuối cùng phải trả (VNĐ) |
+| `cancelReason` | String | Optional | `null` | Lý do hủy cuốc nếu chuyến bị hủy |
+| `cancelledBy` | String (Enum) | Optional, Enum: `['customer', 'driver', 'operator']` | `null` | Tác nhân thực hiện hành động hủy |
+| `retryCount` | Number (Int) | Min: 0, Max: 5 | `0` | Số lần hệ thống đã thử tìm tài xế khác |
+| `requestedAt` | Date | Required | `Date.now()` | Thời điểm tạo yêu cầu đặt xe |
+| `acceptedAt` | Date | Optional | `null` | Thời điểm tài xế bấm nhận chuyến |
+| `arrivedAt` | Date | Optional | `null` | Thời điểm tài xế tới điểm đón |
+| `startedAt` | Date | Optional | `null` | Thời điểm đón khách lên xe và bắt đầu chạy |
+| `completedAt` | Date | Optional | `null` | Thời điểm trả khách và hoàn thành chuyến |
+
+---
+
+#### 4.2.6 Bảng `Payments` (Giao dịch Thanh toán)
+Lưu trữ hóa đơn và kết quả giao dịch thanh toán cho mỗi cuốc xe.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh hóa đơn thanh toán |
+| `rideId` | ObjectId / String | Foreign Key $\rightarrow$ `Rides._id`, Unique, Required | N/A | Mỗi cuốc xe liên kết với duy nhất 1 Payment |
+| `customerId` | ObjectId / String | Foreign Key $\rightarrow$ `Users._id`, Required | N/A | Người chịu trách nhiệm thanh toán |
+| `driverId` | ObjectId / String | Foreign Key $\rightarrow$ `DriverProfiles._id`, Optional | `null` | Tài xế nhận thu nhập từ cuốc xe |
+| `amount` | Number | Required, Min: 0 | `0` | Tổng số tiền thanh toán thực tế (VNĐ) |
+| `method` | String (Enum) | Required, Enum: `['CASH', 'EWALLET', 'CARD']` | `'CASH'` | Phương thức thanh toán lựa chọn |
+| `status` | String (Enum) | Required, Enum: `['PENDING', 'COMPLETED', 'FAILED', 'REFUNDED']` | `'PENDING'` | Trạng thái xử lý thu tiền |
+| `transactionId` | String | Optional | `null` | Mã tham chiếu giao dịch từ Mock Payment Gateway |
+| `failureReason` | String | Optional | `null` | Mã lỗi / Lý do nếu giao dịch thanh toán thất bại |
+| `paidAt` | Date | Optional | `null` | Mốc thời gian hoàn tất giao dịch thanh toán |
+| `createdAt` | Date | Required | `Date.now()` | Thời điểm tạo bản ghi hóa đơn |
+
+---
+
+#### 4.2.7 Bảng `RatingReviews` (Đánh giá & Nhận xét)
+Lưu trữ điểm sao và phản hồi của khách hàng sau khi hoàn thành chuyến đi.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh đánh giá |
+| `rideId` | ObjectId / String | Foreign Key $\rightarrow$ `Rides._id`, Unique, Required | N/A | Ràng buộc 1 chuyến chỉ được đánh giá 1 lần |
+| `customerId` | ObjectId / String | Foreign Key $\rightarrow$ `Users._id`, Required | N/A | Khách hàng thực hiện đánh giá |
+| `driverId` | ObjectId / String | Foreign Key $\rightarrow$ `DriverProfiles._id`, Required | N/A | Tài xế được đánh giá |
+| `score` | Number (Int) | Required, Min: 1, Max: 5 | `5` | Điểm số đánh giá (1 đến 5 sao) |
+| `comment` | String | Optional, Length: 0-500 | `""` | Nội dung nhận xét góp ý |
+| `createdAt` | Date | Required | `Date.now()` | Thời điểm gửi đánh giá |
+
+---
+
+#### 4.2.8 Bảng `Notifications` (Hộp thư Thông báo)
+Lưu trữ các thông báo đẩy trong ứng dụng cho người dùng.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh thông báo |
+| `userId` | ObjectId / String | Foreign Key $\rightarrow$ `Users._id`, Required | N/A | Người nhận thông báo |
+| `title` | String | Required, Length: 2-100 | N/A | Tiêu đề thông báo ngắn |
+| `message` | String | Required, Length: 2-500 | N/A | Nội dung chi tiết của thông báo |
+| `type` | String (Enum) | Required, Enum: `['RIDE', 'PAYMENT', 'ACCOUNT', 'SYSTEM']` | `'RIDE'` | Phân loại nghiệp vụ của sự kiện thông báo |
+| `channel` | String (Enum) | Required, Enum: `['IN_APP', 'EMAIL']` | `'IN_APP'` | Kênh phân phối thông báo |
+| `isRead` | Boolean | Required | `false` | Cờ trạng thái người dùng đã xem thông báo |
+| `metadata` | Object (JSON) | Optional | `{}` | Dữ liệu ngữ cảnh đính kèm (chứa `rideId`, URL...) |
+| `createdAt` | Date | Required | `Date.now()` | Thời điểm phát sinh thông báo |
+
+---
+
+#### 4.2.9 Bảng `AuditLogs` (Nhật ký Kiểm toán Hệ thống)
+Bảng ghi vết Append-Only phục vụ công tác thanh tra và bảo mật hệ thống.
+
+| Tên trường (Field) | Kiểu dữ liệu | Ràng buộc (Constraints) | Giá trị mặc định | Mô tả & Quy tắc nghiệp vụ |
+|---|---|---|---|---|
+| `_id` | ObjectId / String | Primary Key, Required | Auto-generated | Mã định danh bản ghi kiểm toán |
+| `userId` | ObjectId / String | Foreign Key $\rightarrow$ `Users._id`, Required | N/A | Tác nhân thực hiện hành động |
+| `action` | String | Required (VD: `CREATE_RIDE`, `UPDATE_PRICE`, `BAN_USER`) | N/A | Mã định danh hành động nghiệp vụ |
+| `resource` | String | Required (VD: `PricingConfigs`, `Users`, `Rides`) | N/A | Bảng/Tài nguyên bị tác động |
+| `resourceId` | String | Optional | `null` | Khóa chính của đối tượng bị thay đổi |
+| `details` | Object (JSON) | Optional | `{}` | Dữ liệu chi tiết trước và sau thay đổi |
+| `ipAddress` | String | Optional | `null` | Địa chỉ IP của máy khách gửi yêu cầu |
+| `timestamp` | Date | Required | `Date.now()` | Thời điểm chính xác thực hiện hành động |
+
+---
+
+### 4.3 Chiến lược Chỉ mục & Tối ưu hóa Truy vấn Địa không gian (Indexes & Geospatial Strategy)
+
+Để đảm bảo hệ thống đạt hiệu năng phản hồi $< 200\text{ms}$ khi tìm kiếm tài xế trong hàng chục ngàn bản ghi, các chỉ mục (Indexes) sau bắt buộc phải được thiết lập trên MongoDB / Database:
+
+```mermaid
+graph LR
+    subgraph GeoIndexes["🗺️ Chỉ mục Địa không gian (2dsphere)"]
+        G1["DriverProfiles.currentLocation (2dsphere)"]
+        G2["Rides.pickupLocation (2dsphere)"]
+        G3["Rides.dropoffLocation (2dsphere)"]
+    end
+
+    subgraph CompoundIndexes["⚡ Chỉ mục Phức hợp (Compound Indexes)"]
+        C1["DriverProfiles: { status: 1, isApproved: 1, isActive: 1 }"]
+        C2["Rides: { customerId: 1, status: 1, createdAt: -1 }"]
+        C3["Rides: { driverId: 1, status: 1, createdAt: -1 }"]
+        C4["Payments: { rideId: 1, status: 1 }"]
+        C5["Notifications: { userId: 1, isRead: 1, createdAt: -1 }"]
+    end
+
+    subgraph UniqueIndexes["🔑 Chỉ mục Duy nhất (Unique Indexes)"]
+        U1["Users.email (Unique)"]
+        U2["Users.phone (Unique)"]
+        U3["DriverProfiles.licenseNumber (Unique)"]
+        U4["Vehicles.plateNumber (Unique)"]
+        U5["RatingReviews.rideId (Unique)"]
+    end
+```
+
+**Bảng kê chi tiết các Indexes cần tạo:**
+
+| Bộ sưu tập (Collection) | Tên chỉ mục (Index Fields) | Kiểu chỉ mục (Type) | Mục đích tối ưu hóa truy vấn |
+|---|---|---|---|
+| `DriverProfiles` | `currentLocation: "2dsphere"` | **2dsphere** | Hỗ trợ toán tử `$nearSphere` / `$geoNear` tìm tài xế bán kính 5km cực nhanh |
+| `DriverProfiles` | `{ status: 1, isApproved: 1 }` | Compound Index | Lọc nhanh danh sách tài xế đang `Available` và đã được phê duyệt |
+| `Rides` | `pickupLocation: "2dsphere"` | **2dsphere** | Truy vấn thống kê mật độ điểm đón theo khu vực địa lý |
+| `Rides` | `{ customerId: 1, createdAt: -1 }` | Compound Index | Tối ưu hóa màn hình xem lịch sử chuyến đi của khách hàng |
+| `Rides` | `{ driverId: 1, createdAt: -1 }` | Compound Index | Tối ưu hóa màn hình xem lịch sử chuyến và thu nhập của tài xế |
+| `Rides` | `{ status: 1, createdAt: -1 }` | Compound Index | Dashboard Operator theo dõi danh sách các chuyến đang chạy |
+| `Payments` | `{ rideId: 1 }` | Unique Index | Truy vấn hóa đơn của chuyến đi, đảm bảo tính duy nhất 1-1 |
+| `Notifications` | `{ userId: 1, isRead: 1, createdAt: -1 }` | Compound Index | Đếm số lượng thông báo chưa đọc và lấy danh sách thông báo mới nhất |
+| `AuditLogs` | `{ timestamp: -1, action: 1 }` | Compound Index | Tra cứu nhanh nhật ký thao tác gần nhất của quản trị viên |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
-*Phase: Giai đoạn 3 – Quy tắc nghiệp vụ (Business Rules) & Xử lý ngoại lệ (Exception Handling)*
+*Phase: Giai đoạn 4 – Mô hình hóa dữ liệu (Data Modeling & Database Design)*
+
 
 
