@@ -41,6 +41,11 @@
    - 5.5 [Khả năng sử dụng & Trải nghiệm (Usability & User Experience)](#55-khả-năng-sử-dụng--trải-nghiệm-usability--user-experience)
    - 5.6 [Khả năng bảo trì & Giám sát (Maintainability & Observability)](#56-khả-năng-bảo-trì--giám-sát-maintainability--observability)
    - 5.7 [Ma trận truy xuất NFRs với Business Goals (NFR-BG Traceability Matrix)](#57-ma-trận-truy-xuất-nfrs-với-business-goals-nfr-bg-traceability-matrix)
+6. [Giai đoạn 6 – Mô hình hóa Use Case (Use Case Modeling & Diagrams)](#giai-đoạn-6--mô-hình-hóa-use-case-use-case-modeling--diagrams)
+   - 6.1 [Danh mục Tác nhân (Actor Catalog)](#61-danh-mục-tác-nhân-actor-catalog)
+   - 6.2 [Sơ đồ Use Case Tổng thể (System-Level Use Case Diagram)](#62-sơ-đồ-use-case-tổng-thể-system-level-use-case-diagram)
+   - 6.3 [Sơ đồ Use Case theo từng Nhóm Tác nhân](#63-sơ-đồ-use-case-theo-từng-nhóm-tác-nhân)
+   - 6.4 [Bảng đặc tả chi tiết các Use Case cốt lõi (Use Case Specifications)](#64-bảng-đặc-tả-chi-tiết-các-use-case-cốt-lõi-use-case-specifications)
 
 ---
 
@@ -2013,9 +2018,339 @@ flowchart LR
 
 ---
 
+## Giai đoạn 6 – Mô hình hóa Use Case (Use Case Modeling & Diagrams)
+
+Mô hình hóa Use Case mô tả trực quan các tương tác giữa các **Tác nhân (Actors)** và **Hệ thống CAB (CAB Platform)** nhằm đạt được các mục tiêu nghiệp vụ cụ thể.
+
+---
+
+### 6.1 Danh mục Tác nhân (Actor Catalog)
+
+| Tác nhân (Actor) | Phân loại | Mô tả vai trò & Trách nhiệm chính trong hệ thống |
+|---|:---:|---|
+| **Khách hàng (Customer)** | Primary Actor | Người dùng đầu cuối sử dụng ứng dụng để tìm địa chỉ, xem giá cước, đặt chuyến, theo dõi tài xế trên bản đồ thời gian thực, thanh toán và đánh giá chất lượng dịch vụ. |
+| **Tài xế (Driver)** | Primary Actor | Đối tác vận chuyển đăng ký hồ sơ xe, bật trạng thái trực tuyến nhận cuốc, tiếp nhận/từ chối cuốc xe, cập nhật các mốc hành trình di chuyển, phát tọa độ GPS và xác nhận thu cước tiền mặt. |
+| **Nhân viên vận hành (Operator)** | Primary Actor | Nhân viên nội bộ chịu trách nhiệm vận hành hàng ngày: duyệt hồ sơ tài xế mới, giám sát toàn cảnh bản đồ xe trực tuyến, hỗ trợ xử lý khiếu nại hoặc can thiệp cuốc xe sự cố. |
+| **Quản trị viên (Admin)** | Primary Actor | Người nắm quyền cao nhất trong hệ thống: cấu hình biểu phí xe, phân quyền tài khoản, khóa tài khoản vi phạm, xem toàn bộ báo cáo doanh thu tài chính và tra cứu nhật ký kiểm toán. |
+| **Cổng thanh toán (Payment Gateway)** | Supporting Actor | Hệ thống bên thứ ba (hoặc Mock Gateway) tiếp nhận yêu cầu thanh toán thẻ/ví điện tử, xác thực giao dịch và trả kết quả thành công/thất bại về cho CAB Platform. |
+| **Dịch vụ Bản đồ (Map Service)** | Supporting Actor | Dịch vụ bên ngoài (OpenStreetMap / Nominatim) cung cấp dữ liệu bản đồ nền, Geocoding (chuyển chữ sang tọa độ), tính toán lộ trình khoảng cách và thời gian di chuyển. |
+| **Dịch vụ Email (Email Service)** | Supporting Actor | Hệ thống SMTP / Nodemailer tiếp nhận yêu cầu gửi email xác nhận đăng ký, email chào mừng và hóa đơn điện tử sau chuyến đi. |
+
+---
+
+### 6.2 Sơ đồ Use Case Tổng thể (System-Level Use Case Diagram)
+
+```mermaid
+graph LR
+    %% Actors
+    subgraph Primary_Actors["👥 Tác nhân Chính (Primary)"]
+        Cust["🧑 Khách hàng\n(Customer)"]
+        Drv["🚗 Tài xế\n(Driver)"]
+        Op["👨‍💼 Nhân viên vận hành\n(Operator)"]
+        Adm["👑 Quản trị viên\n(Admin)"]
+    end
+
+    subgraph External_Actors["🌐 Hệ thống Ngoại vi (Secondary)"]
+        MapAPI["🗺️ Dịch vụ Bản đồ\n(Map Service)"]
+        PayGW["💳 Cổng Thanh toán\n(Payment Gateway)"]
+        MailSvc["📧 Dịch vụ Email\n(Email Service)"]
+    end
+
+    %% System Boundary
+    subgraph CAB_Platform["🚖 NỀN TẢNG CAB SYSTEM"]
+        %% Auth Use Cases
+        UC_Auth(["UC01: Đăng ký & Đăng nhập"])
+        UC_Profile(["UC02: Quản lý Hồ sơ"])
+
+        %% Core Ride Use Cases
+        UC_Estimate(["UC03: Xem cước ước tính"])
+        UC_Book(["UC04: Đặt xe trực tuyến"])
+        UC_Match(["UC05: Tự động ghép tài xế"])
+        UC_Track(["UC06: Theo dõi xe Real-time"])
+        UC_Cancel(["UC07: Hủy chuyến đi"])
+        UC_Execute(["UC08: Thực hiện cuốc xe"])
+        
+        %% Payment & Review
+        UC_Pay(["UC09: Thanh toán cước"])
+        UC_Review(["UC10: Đánh giá tài xế"])
+        
+        %% Driver Ops
+        UC_Online(["UC11: Bật/Tắt Online"])
+        UC_Accept(["UC12: Nhận/Từ chối cuốc"])
+        UC_GPS(["UC13: Phát tọa độ GPS"])
+
+        %% Admin & Operator Ops
+        UC_ApproveDrv(["UC14: Duyệt hồ sơ tài xế"])
+        UC_Monitor(["UC15: Giám sát toàn cảnh"])
+        UC_Intervene(["UC16: Can thiệp chuyến lỗi"])
+        UC_Pricing(["UC17: Cấu hình giá cước"])
+        UC_Report(["UC18: Xem báo cáo thống kê"])
+        UC_Audit(["UC19: Tra cứu Audit Log"])
+    end
+
+    %% Customer Connections
+    Cust --> UC_Auth
+    Cust --> UC_Profile
+    Cust --> UC_Estimate
+    Cust --> UC_Book
+    Cust --> UC_Track
+    Cust --> UC_Cancel
+    Cust --> UC_Pay
+    Cust --> UC_Review
+
+    %% Driver Connections
+    Drv --> UC_Auth
+    Drv --> UC_Profile
+    Drv --> UC_Online
+    Drv --> UC_Accept
+    Drv --> UC_Execute
+    Drv --> UC_GPS
+    Drv --> UC_Cancel
+
+    %% Operator Connections
+    Op --> UC_Auth
+    Op --> UC_ApproveDrv
+    Op --> UC_Monitor
+    Op --> UC_Intervene
+
+    %% Admin Connections (Admin inherits Operator capabilities)
+    Adm --> UC_Auth
+    Adm --> UC_Pricing
+    Adm --> UC_Report
+    Adm --> UC_Audit
+    Adm --> UC_ApproveDrv
+    Adm --> UC_Monitor
+
+    %% Includes & Extends Relationships
+    UC_Book -.->|"<<include>>"| UC_Estimate
+    UC_Book -.->|"<<include>>"| UC_Match
+    UC_Execute -.->|"<<include>>"| UC_GPS
+    UC_Execute -.->|"<<include>>"| UC_Pay
+    UC_Pay -.->|"<<extend>>"| UC_Review
+    UC_Book -.->|"<<extend>>"| UC_Cancel
+
+    %% External Systems Connections
+    UC_Estimate --> MapAPI
+    UC_Track --> MapAPI
+    UC_Pay --> PayGW
+    UC_Auth --> MailSvc
+    UC_Pay --> MailSvc
+```
+
+---
+
+### 6.3 Sơ đồ Use Case theo từng Nhóm Tác nhân
+
+---
+
+#### 6.3.1 Sơ đồ Use Case Phân hệ Khách hàng (Customer Subsystem)
+
+```mermaid
+graph LR
+    Customer["🧑 Khách hàng (Customer)"]
+    MapService["🗺️ Map Service"]
+    PaymentGateway["💳 Payment Gateway"]
+
+    subgraph Customer_UseCases["📱 Phân hệ Khách hàng"]
+        UC_C1(["Đăng ký tài khoản"])
+        UC_C2(["Đăng nhập / Đổi mật khẩu"])
+        UC_C3(["Tìm địa chỉ đón & trả"])
+        UC_C4(["Xem bảng giá cước ước tính"])
+        UC_C5(["Xác nhận đặt chuyến xe"])
+        UC_C6(["Theo dõi vị trí tài xế trên bản đồ"])
+        UC_C7(["Hủy cuốc xe"])
+        UC_C8(["Thanh toán Tiền mặt"])
+        UC_C9(["Thanh toán Điện tử"])
+        UC_C10(["Đánh giá sao & Nhận xét"])
+        UC_C11(["Xem lịch sử chuyến đi"])
+    end
+
+    Customer --> UC_C1
+    Customer --> UC_C2
+    Customer --> UC_C3
+    Customer --> UC_C4
+    Customer --> UC_C5
+    Customer --> UC_C6
+    Customer --> UC_C7
+    Customer --> UC_C8
+    Customer --> UC_C9
+    Customer --> UC_C10
+    Customer --> UC_C11
+
+    UC_C3 --> MapService
+    UC_C4 --> MapService
+    UC_C6 --> MapService
+    UC_C9 --> PaymentGateway
+
+    UC_C5 -.->|"<<include>>"| UC_C3
+    UC_C5 -.->|"<<include>>"| UC_C4
+    UC_C5 -.->|"<<extend>>"| UC_C7
+    UC_C8 -.->|"<<extend>>"| UC_C10
+    UC_C9 -.->|"<<extend>>"| UC_C10
+```
+
+---
+
+#### 6.3.2 Sơ đồ Use Case Phân hệ Tài xế (Driver Subsystem)
+
+```mermaid
+graph LR
+    Driver["🚗 Tài xế (Driver)"]
+
+    subgraph Driver_UseCases["📱 Phân hệ Tài xế"]
+        UC_D1(["Đăng ký hồ sơ lái xe & Phương tiện"])
+        UC_D2(["Đăng nhập tài khoản"])
+        UC_D3(["Bật / Tắt trạng thái Online"])
+        UC_D4(["Tiếp nhận yêu cầu cuốc xe mới"])
+        UC_D5(["Từ chối yêu cầu cuốc xe"])
+        UC_D6(["Bấm 'Đã đến điểm đón'"])
+        UC_D7(["Bấm 'Bắt đầu chuyến đi'"])
+        UC_D8(["Bấm 'Hoàn thành chuyến đi'"])
+        UC_D9(["Tự động bắn tọa độ GPS"])
+        UC_D10(["Xác nhận đã thu tiền mặt"])
+        UC_D11(["Báo cáo sự cố khẩn cấp"])
+        UC_D12(["Xem doanh thu & Rating"])
+    end
+
+    Driver --> UC_D1
+    Driver --> UC_D2
+    Driver --> UC_D3
+    Driver --> UC_D4
+    Driver --> UC_D5
+    Driver --> UC_D6
+    Driver --> UC_D7
+    Driver --> UC_D8
+    Driver --> UC_D9
+    Driver --> UC_D10
+    Driver --> UC_D11
+    Driver --> UC_D12
+
+    UC_D4 -.->|"<<include>>"| UC_D9
+    UC_D7 -.->|"<<include>>"| UC_D9
+    UC_D8 -.->|"<<include>>"| UC_D10
+    UC_D4 -.->|"<<extend>>"| UC_D5
+    UC_D6 -.->|"<<extend>>"| UC_D11
+    UC_D7 -.->|"<<extend>>"| UC_D11
+```
+
+---
+
+#### 6.3.3 Sơ đồ Use Case Phân hệ Vận hành & Quản trị (Operator & Admin Subsystem)
+
+```mermaid
+graph LR
+    Operator["👨‍💼 Nhân viên vận hành\n(Operator)"]
+    Admin["👑 Quản trị viên\n(Admin)"]
+
+    subgraph Management_UseCases["💻 Phân hệ Quản trị & Vận hành"]
+        UC_M1(["Xem Dashboard tổng quan"])
+        UC_M2(["Duyệt hồ sơ tài xế mới"])
+        UC_M3(["Giám sát bản đồ xe thời gian thực"])
+        UC_M4(["Tra cứu & Can thiệp chuyến xe lỗi"])
+        UC_M5(["Tra cứu lịch sử giao dịch thanh toán"])
+        UC_M6(["Khóa / Mở khóa tài khoản"])
+        UC_M7(["Cấu hình biểu phí xe (Sedan/SUV/Van)"])
+        UC_M8(["Xem báo cáo doanh thu & cuốc hủy"])
+        UC_M9(["Phân quyền vai trò người dùng"])
+        UC_M10(["Tra cứu nhật ký kiểm toán (Audit Log)"])
+    end
+
+    Operator --> UC_M1
+    Operator --> UC_M2
+    Operator --> UC_M3
+    Operator --> UC_M4
+    Operator --> UC_M5
+
+    Admin --> UC_M1
+    Admin --> UC_M2
+    Admin --> UC_M3
+    Admin --> UC_M4
+    Admin --> UC_M5
+    Admin --> UC_M6
+    Admin --> UC_M7
+    Admin --> UC_M8
+    Admin --> UC_M9
+    Admin --> UC_M10
+```
+
+---
+
+### 6.4 Bảng Đặc tả Chi tiết các Use Case Cốt lõi (Use Case Specifications)
+
+---
+
+#### 📋 UC-01: Đặt xe trực tuyến & Tự động ghép nối tài xế (Book a Ride & Match Driver)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-01` |
+| **Tên Use Case** | Đặt xe trực tuyến & Tự động ghép nối tài xế |
+| **Tác nhân chính (Primary Actor)** | Khách hàng (Customer) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Tài xế (Driver), Dịch vụ Bản đồ (Map Service), Hệ thống CAB |
+| **Mô tả tóm tắt** | Khách hàng nhập địa chỉ đón, địa chỉ đến, chọn loại xe (Sedan/SUV/Van), xem giá ước tính và bấm đặt xe. Hệ thống tự động quét và điều phối tài xế phù hợp gần nhất trong vòng bán kính 5km. |
+| **Tiền điều kiện (Preconditions)** | 1. Khách hàng đã đăng nhập tài khoản thành công.<br>2. Thiết bị khách hàng có kết nối Internet ổn định. |
+| **Hậu điều kiện (Postconditions)** | 1. Bản ghi chuyến đi (Ride) được tạo với trạng thái `accepted`.<br>2. Tài xế nhận cuốc chuyển sang trạng thái `Busy`.<br>3. Khách hàng và tài xế nhận thông báo ghép cuốc thành công kèm vị trí và ETA. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Khách hàng mở màn hình Đặt xe, nhập Điểm đón và Điểm đến.<br>2. Hệ thống gọi Map Service để định vị tọa độ và vẽ lộ trình mẫu.<br>3. Khách hàng chọn hạng xe mong muốn (Sedan 4 chỗ / SUV 7 chỗ / Van 16 chỗ).<br>4. Hệ thống áp dụng `BRULE-01` tính toán và hiển thị cước phí ước tính cùng thời gian di chuyển dự kiến.<br>5. Khách hàng chọn phương thức thanh toán dự kiến và bấm nút **"Xác nhận đặt xe"**.<br>6. Hệ thống tạo Ride với trạng thái `searching`.<br>7. Hệ thống thực hiện `BRULE-02` quét danh sách tài xế `Available` trong bán kính 5km, sắp xếp theo khoảng cách gần nhất.<br>8. Hệ thống gửi thông báo mời cuốc kèm đếm ngược 30 giây đến Tài xế ưu tiên số 1 qua Socket.<br>9. Tài xế bấm nút **"Chấp nhận"** trong vòng 30 giây.<br>10. Hệ thống cập nhật trạng thái Ride sang `accepted`, chuyển tài xế sang `Busy`.<br>11. Hệ thống phát socket thông báo ghép xe thành công cho Khách hàng kèm tên, SĐT, biển số xe và tọa độ GPS tài xế. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Tài xế đầu tiên từ chối hoặc quá 30 giây không bấm nhận (`BRULE-03` / `EX-02`)**<br>1. Tại bước 9, nếu tài xế bấm "Từ chối" hoặc hết 30s không phản hồi.<br>2. Hệ thống loại trừ tài xế này, tăng `RetryCount + 1`.<br>3. Hệ thống tự động chuyển yêu cầu cuốc xe sang Tài xế tiếp theo trong danh sách đã xếp hạng.<br>4. Lặp lại bước 8-9 cho đến khi có tài xế bấm Chấp nhận. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Không có tài xế nào quanh khu vực hoặc hết 5 lượt thử lại (`EX-01`)**<br>1. Tại bước 7 hoặc A1, nếu không còn tài xế khả dụng hoặc `RetryCount >= 5`.<br>2. Hệ thống chuyển trạng thái Ride sang `no_driver`.<br>3. Hiển thị thông báo xin lỗi khách hàng: *"Hiện các tài xế đều đang bận, vui lòng thử lại sau ít phút!"*<br>4. Kết thúc Use Case mà không trừ bất kỳ chi phí nào.<br><br>**E2: Khách hàng bấm Hủy chuyến khi đang tìm kiếm (`BRULE-06`)**<br>1. Khách hàng bấm nút "Hủy tìm xe" trên màn hình chờ.<br>2. Hệ thống chuyển trạng thái Ride sang `cancelled_by_customer`.<br>3. Hủy bỏ tiến trình quét tìm tài xế, kết thúc Use Case. |
+
+---
+
+#### 📋 UC-02: Thực hiện chuyến đi & Giám sát vị trí Real-time (Execute Ride & Live Tracking)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-02` |
+| **Tên Use Case** | Thực hiện chuyến đi & Giám sát vị trí Real-time |
+| **Tác nhân chính (Primary Actor)** | Tài xế (Driver), Khách hàng (Customer) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Hệ thống CAB (Socket Server, Geolocation Engine) |
+| **Mô tả tóm tắt** | Quản lý toàn bộ tiến trình di chuyển từ khi tài xế xuất phát đón khách đến khi chở khách đến nơi an toàn, đồng thời phát sóng tọa độ GPS liên tục lên bản đồ trực tiếp. |
+| **Tiền điều kiện (Preconditions)** | Cuốc xe đang ở trạng thái `accepted`. |
+| **Hậu điều kiện (Postconditions)** | Cuốc xe chuyển sang trạng thái `completed`, sẵn sàng chuyển sang bước tính cước và thanh toán. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Tài xế bắt đầu di chuyển tới điểm hẹn, app tài xế tự động phát tọa độ GPS định kỳ mỗi 5-10s (`NFR-PERF-02`).<br>2. Bản đồ của khách hàng hiển thị biểu tượng xe di chuyển mượt mà về phía điểm đón kèm thời gian dự kiến đến (ETA).<br>3. Khi tới nơi đón, Tài xế bấm nút **"Đã đến điểm đón"**.<br>4. Hệ thống đổi trạng thái cuốc sang `driver_arrived`, phát âm thanh thông báo cho khách hàng.<br>5. Khách hàng bước lên xe. Tài xế bấm nút **"Bắt đầu chuyến đi"**.<br>6. Hệ thống đổi trạng thái cuốc sang `in_progress`, ghi nhận mốc thời gian `startedAt`.<br>7. Tài xế lái xe theo lộ trình di chuyển tới điểm trả khách. GPS tiếp tục phát sóng thời gian thực.<br>8. Khi đến đúng điểm đến, Tài xế bấm nút **"Hoàn thành chuyến đi"**.<br>9. Hệ thống ghi nhận mốc thời gian `completedAt`, tổng quãng đường thực tế và chuyển sang trạng thái `completed`. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Khách hàng hủy chuyến trước khi tài xế đến nơi (`EX-04`)**<br>1. Tại bước 1-2, khách hàng bấm "Hủy chuyến".<br>2. Hệ thống đổi trạng thái sang `cancelled_by_customer`.<br>3. Phát còi cảnh báo trên app tài xế, tự động đưa tài xế về lại trạng thái `Available`. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Khách không ra điểm đón quá 5 phút (`EX-05`)**<br>1. Tại bước 4, sau khi tài xế chờ quá 5 phút mà không liên lạc được khách.<br>2. Tài xế bấm nút "Hủy do khách vắng mặt".<br>3. Hệ thống đổi trạng thái sang `cancelled_by_driver (No-Show)`, giải phóng tài xế.<br><br>**E2: Mất tín hiệu mạng / GPS giữa đường (`EX-03`)**<br>1. Thiết bị tài xế mất sóng 3G/4G trong hành trình.<br>2. App tài xế tự động chuyển sang chế độ lưu đệm tọa độ ngoại tuyến (Offline Buffer).<br>3. Khi có mạng trở lại, app tự động gửi đồng bộ bù toàn bộ chuỗi tọa độ lên máy chủ. |
+
+---
+
+#### 📋 UC-03: Tính cước & Thanh toán Đa phương thức (Calculate Fare & Process Payment)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-03` |
+| **Tên Use Case** | Tính cước & Thanh toán Đa phương thức |
+| **Tác nhân chính (Primary Actor)** | Khách hàng (Customer), Tài xế (Driver) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Cổng thanh toán (Payment Gateway), Dịch vụ Email (Email Service) |
+| **Mô tả tóm tắt** | Hệ thống tự động tính cước phí thực tế dựa trên quãng đường và thời gian di chuyển, xuất hóa đơn điện tử và xử lý thu tiền qua Tiền mặt hoặc Cổng thanh toán điện tử. |
+| **Tiền điều kiện (Preconditions)** | Cuốc xe vừa chuyển sang trạng thái `completed`. |
+| **Hậu điều kiện (Postconditions)** | Bản ghi Payment chuyển sang trạng thái `COMPLETED`, hóa đơn được gửi qua Email cho khách hàng. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Hệ thống áp dụng công thức `BRULE-01` tự động tính toán tổng tiền cước cuối cùng `actualFare`.<br>2. Hệ thống tạo hóa đơn `Payment` ở trạng thái `PENDING`, hiển thị chi tiết biểu phí lên màn hình của Khách hàng và Tài xế.<br>3. Khách hàng lựa chọn phương thức thanh toán:<br>&nbsp;&nbsp;&nbsp;&nbsp;• **Trường hợp Tiền mặt (`Cash`)**: Khách đưa tiền mặt cho Tài xế. Tài xế nhận đủ tiền và bấm nút **"Xác nhận đã thu tiền"**.<br>&nbsp;&nbsp;&nbsp;&nbsp;• **Trường hợp Điện tử (`E-Payment`)**: Khách chọn Thẻ/Ví $\rightarrow$ Hệ thống gọi API Cổng thanh toán $\rightarrow$ Cổng thanh toán trả về mã giao dịch `TransactionId` thành công.<br>4. Hệ thống cập nhật trạng thái Payment sang `COMPLETED`, ghi nhận `paidAt`.<br>5. Hệ thống gửi biên lai thanh toán qua Email cho khách hàng.<br>6. Màn hình tự động chuyển sang giao diện Đánh giá sao (Rating). |
+| **Luồng nhánh (Alternative Flows)** | **A1: Khách hàng đổi phương thức thanh toán tại chỗ**<br>1. Tại bước 3, ban đầu khách chọn thẻ nhưng muốn đổi sang trả tiền mặt.<br>2. Khách bấm nút "Chuyển sang trả Tiền mặt" trên ứng dụng.<br>3. Hệ thống cập nhật phương thức thanh toán sang `CASH` và hiển thị yêu cầu thu tiền trên app tài xế. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Giao dịch thanh toán điện tử thất bại (`EX-07`)**<br>1. Cổng thanh toán trả về mã lỗi (thẻ hết tiền, timeout).<br>2. Hệ thống đổi trạng thái Payment sang `FAILED`.<br>3. Hiển thị thông báo lỗi và đưa ra 2 nút bấm: (1) "Thử lại thanh toán thẻ khác" hoặc (2) "Chuyển sang trả tiền mặt". |
+
+---
+
+#### 📋 UC-04: Xét duyệt Hồ sơ & Quản lý Tài xế (Approve & Manage Driver Profiles)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-04` |
+| **Tên Use Case** | Xét duyệt Hồ sơ & Quản lý Tài xế |
+| **Tác nhân chính (Primary Actor)** | Nhân viên vận hành (Operator), Quản trị viên (Admin) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Dịch vụ Email (Email Service), Hệ thống CAB |
+| **Mô tả tóm tắt** | Nhân viên vận hành kiểm tra giấy phép lái xe, thông tin phương tiện đăng ký của tài xế mới và đưa ra quyết định Phê duyệt hoặc Từ chối gia nhập hệ thống. |
+| **Tiền điều kiện (Preconditions)** | 1. Operator/Admin đã đăng nhập vào Dashboard quản trị.<br>2. Có tài xế đã nộp hồ sơ ở trạng thái `Pending_Approval`. |
+| **Hậu điều kiện (Postconditions)** | Hồ sơ tài xế chuyển sang `Approved` (được phép bật Online nhận cuốc) hoặc `Rejected` (kèm email thông báo lý do). |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Operator truy cập mục "Quản lý Tài xế" $\rightarrow$ Tab "Hồ sơ chờ duyệt".<br>2. Hệ thống hiển thị danh sách tài xế nộp đơn mới nhất.<br>3. Operator chọn xem chi tiết một hồ sơ: xem ảnh chụp bằng lái, hạng bằng, biển số xe, ảnh xe.<br>4. Operator đối soát tính hợp lệ của thông tin và bấm nút **"Phê duyệt hồ sơ"**.<br>5. Hệ thống cập nhật `isApproved = true`, ghi nhận thời gian `approvedAt`.<br>6. Hệ thống tự động ghi nhật ký kiểm toán vào bảng `AuditLogs` (`BRULE-10`).<br>7. Hệ thống kích hoạt Email Service gửi thư thông báo chúc mừng tới email của tài xế. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Operator từ chối hồ sơ không hợp lệ**<br>1. Tại bước 4, Operator phát hiện bằng lái mờ hoặc hết hạn.<br>2. Operator bấm nút "Từ chối hồ sơ", nhập lý do từ chối vào ô ghi chú.<br>3. Hệ thống cập nhật `isApproved = false`.<br>4. Hệ thống gửi email thông báo lý do từ chối và hướng dẫn tài xế chụp lại ảnh để nộp lại. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Tài khoản tài xế có dấu hiệu gian lận bị phát hiện sau khi duyệt**<br>1. Admin phát hiện tài xế đã được duyệt có hành vi vi phạm chính sách.<br>2. Admin bấm nút "Khóa tài khoản tài xế" trên bảng quản trị.<br>3. Hệ thống đổi `isActive = false`, ngắt kết nối socket của tài xế và ghi log kiểm toán. |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
-*Phase: Giai đoạn 5 – Yêu cầu phi chức năng (Non-Functional Requirements - NFRs)*
+*Phase: Giai đoạn 6 – Mô hình hóa Use Case (Use Case Modeling & Diagrams)*
+
 
 
 
