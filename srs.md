@@ -185,18 +185,110 @@ quadrantChart
 
 ---
 
-### 1.4 Business Objectives (Mục tiêu nghiệp vụ)
+### 1.4 Business Goals (Mục tiêu nghiệp vụ)
 
-Từ phân tích vấn đề, xác định được các mục tiêu nghiệp vụ mà hệ thống mới cần đạt được:
+Dựa trên phân tích Business Context và Business Problem, xác định được các mục tiêu nghiệp vụ mà dự án CAB System cần đạt được. Các mục tiêu được phân theo **3 cấp độ**: Chiến lược (Strategic), Vận hành (Operational) và Hỗ trợ (Enabler).
 
-| # | Mục tiêu | Đo lường (KPI) | Liên quan đến vấn đề |
-|---|----------|----------------|---------------------|
-| BO-01 | **Tự động hóa** quy trình tìm và phân công tài xế | Thời gian từ đặt xe → có tài xế < 2 phút | Vấn đề 1 |
-| BO-02 | **Nâng cao trải nghiệm** khách hàng với theo dõi real-time | Giảm 80% cuộc gọi hỏi trạng thái vào tổng đài | Vấn đề 2 |
-| BO-03 | **Số hóa thanh toán** và quản lý tập trung doanh thu | 100% giao dịch được ghi nhận trong hệ thống | Vấn đề 3 |
-| BO-04 | **Xây dựng nền tảng mở rộng** phục vụ số lượng lớn người dùng | Hệ thống hoạt động ổn định khi tải tăng gấp 3 lần | Vấn đề 4 |
-| BO-05 | **Cung cấp dữ liệu vận hành** cho ban lãnh đạo ra quyết định | Báo cáo tự động: chuyến/ngày, doanh thu, tỷ lệ hoàn thành | Vấn đề 5 |
-| BO-06 | **Đảm bảo bảo mật** dữ liệu người dùng và giao dịch | 0 sự cố lộ dữ liệu, 100% thao tác nhạy cảm được ghi log | Vấn đề 6 |
+---
+
+#### 1.4.1 Mục tiêu chiến lược (Strategic Goals)
+
+Các mục tiêu cấp cao, gắn với tầm nhìn kinh doanh dài hạn của Ban giám đốc.
+
+| ID | Mục tiêu | Mô tả chi tiết | Chỉ số đo lường (KPI) | Liên quan |
+|----|----------|----------------|----------------------|-----------|
+| **BG-01** | **Chuyển đổi số toàn bộ quy trình đặt xe** | Thay thế quy trình thủ công (gọi tổng đài, điều phối bằng tay) bằng nền tảng số tự động hóa. Khách hàng tự đặt xe qua ứng dụng, hệ thống tự tìm và phân công tài xế, tự tính cước và xử lý thanh toán. | • ≥ 90% chuyến đi được xử lý hoàn toàn qua hệ thống (không cần can thiệp thủ công)<br>• Giảm ≥ 70% cuộc gọi vào tổng đài | Vấn đề 1, 2 |
+| **BG-02** | **Mở rộng quy mô phục vụ** | Xây dựng nền tảng có khả năng phục vụ số lượng lớn khách hàng và tài xế đồng thời, không bị giới hạn bởi nhân lực vận hành như hệ thống cũ. | • Hệ thống hoạt động ổn định với ≥ 1.000 chuyến/ngày<br>• Hỗ trợ ≥ 500 tài xế hoạt động đồng thời<br>• Thời gian phản hồi API ≤ 2 giây dưới tải cao | Vấn đề 4 |
+| **BG-03** | **Tăng doanh thu và kiểm soát tài chính** | Số hóa thanh toán để ghi nhận 100% giao dịch, loại bỏ thất thoát từ quy trình tiền mặt không kiểm soát. Đa dạng hóa phương thức thanh toán để tăng tỷ lệ chuyển đổi. | • 100% giao dịch được ghi nhận trong hệ thống<br>• ≥ 30% khách hàng sử dụng thanh toán điện tử trong 3 tháng đầu<br>• Giảm ≥ 50% sai lệch đối soát doanh thu giữa tài xế và công ty | Vấn đề 3 |
+
+---
+
+#### 1.4.2 Mục tiêu vận hành (Operational Goals)
+
+Các mục tiêu liên quan trực tiếp đến hoạt động hàng ngày của hệ thống.
+
+| ID | Mục tiêu | Mô tả chi tiết | Chỉ số đo lường (KPI) | Liên quan |
+|----|----------|----------------|----------------------|-----------|
+| **BG-04** | **Tự động hóa tìm và phân công tài xế** | Khi khách hàng đặt xe, hệ thống tự động xác định tài xế phù hợp dựa trên vị trí, trạng thái, loại xe. Nếu tài xế đầu tiên từ chối hoặc không phản hồi, hệ thống tự chuyển sang tài xế tiếp theo mà khách hàng không cần đặt lại. | • Thời gian từ đặt xe → có tài xế nhận chuyến ≤ 2 phút<br>• Tỷ lệ tìm được tài xế thành công ≥ 85%<br>• 0% trường hợp cần nhân viên vận hành phân công thủ công | Vấn đề 1 |
+| **BG-05** | **Minh bạch trạng thái chuyến đi cho khách hàng** | Khách hàng theo dõi được toàn bộ hành trình: hệ thống đang tìm tài xế → tài xế nào nhận → tài xế ở đâu → dự kiến bao lâu đến → đã đón → đang di chuyển → hoàn thành. | • 100% chuyến đi có thông tin trạng thái real-time<br>• Cập nhật vị trí tài xế mỗi 5–10 giây<br>• Giảm ≥ 80% cuộc gọi hỏi "tài xế ở đâu rồi" vào tổng đài | Vấn đề 2 |
+| **BG-06** | **Tính cước chính xác và tự động** | Sau khi chuyến hoàn thành, hệ thống tự động tính cước dựa trên loại dịch vụ, khoảng cách, thời gian. Khách hàng biết trước cước ước tính khi đặt xe. Quy tắc tính cước có thể cấu hình mà không cần sửa code. | • 100% chuyến đi được tính cước tự động<br>• Sai số cước ước tính so với thực tế ≤ 15%<br>• Thay đổi bảng giá trong ≤ 5 phút (qua cấu hình) | Vấn đề 3 |
+| **BG-07** | **Quản lý tài xế và phương tiện hiệu quả** | Hệ thống quản lý đầy đủ thông tin tài xế (hồ sơ, giấy phép, trạng thái), phương tiện (biển số, loại xe, tình trạng). Tài xế tự quản lý trạng thái online/offline. Nhân viên vận hành can thiệp khi cần. | • 100% tài xế được quản lý hồ sơ trên hệ thống<br>• 100% phương tiện được đăng ký và xác minh<br>• Thời gian duyệt hồ sơ tài xế mới ≤ 24 giờ | Vấn đề 1, 5 |
+| **BG-08** | **Thông báo kịp thời cho tất cả các bên** | Khách hàng, tài xế đều nhận thông báo tại mỗi bước quan trọng của chuyến đi. Hệ thống thông báo được thiết kế theo Provider Pattern, dễ dàng bổ sung kênh mới (SMS, Push) mà không thay đổi logic nghiệp vụ. | • 100% sự kiện quan trọng có thông báo (≥ 8 loại event)<br>• Thời gian gửi thông báo ≤ 3 giây sau sự kiện<br>• Bổ sung kênh thông báo mới trong ≤ 1 ngày phát triển | Vấn đề 2, 4 |
+
+---
+
+#### 1.4.3 Mục tiêu hỗ trợ quản lý và ra quyết định (Management & Decision Support Goals)
+
+| ID | Mục tiêu | Mô tả chi tiết | Chỉ số đo lường (KPI) | Liên quan |
+|----|----------|----------------|----------------------|-----------|
+| **BG-09** | **Cung cấp công cụ quản trị tập trung** | Nhân viên vận hành và Admin có dashboard quản lý khách hàng, tài xế, phương tiện, chuyến đi. Hỗ trợ xử lý sự cố (chuyến lỗi, thanh toán thất bại). Phân quyền rõ ràng: Operator chỉ vận hành, Admin có toàn quyền. | • 100% thao tác quản lý thực hiện qua hệ thống (không dùng Excel/giấy)<br>• Thời gian xử lý sự cố chuyến đi ≤ 10 phút<br>• Phân quyền ít nhất 2 cấp: Operator và Admin | Vấn đề 5 |
+| **BG-10** | **Báo cáo dữ liệu vận hành cho Ban lãnh đạo** | Hệ thống cung cấp báo cáo tổng hợp để Ban giám đốc theo dõi hiệu quả kinh doanh và ra quyết định. Bao gồm: số chuyến, doanh thu, tỷ lệ hoàn thành, tỷ lệ hủy, hiệu quả từng tài xế. | • Báo cáo tự động theo ngày/tuần/tháng<br>• ≥ 5 loại báo cáo: chuyến, doanh thu, hoàn thành, hủy, hiệu quả tài xế<br>• Dữ liệu báo cáo trễ tối đa 1 giờ so với thực tế | Vấn đề 5 |
+
+---
+
+#### 1.4.4 Mục tiêu kỹ thuật và bảo mật (Technology & Security Goals)
+
+| ID | Mục tiêu | Mô tả chi tiết | Chỉ số đo lường (KPI) | Liên quan |
+|----|----------|----------------|----------------------|-----------|
+| **BG-11** | **Kiến trúc linh hoạt, dễ mở rộng** | Hệ thống được thiết kế modular, các thành phần tách biệt (đặt xe, thanh toán, thông báo) có thể mở rộng độc lập. Lỗi ở một thành phần (VD: thanh toán) không làm sập toàn bộ hệ thống đặt xe. Tính năng mới triển khai từng phần mà không ảnh hưởng chức năng đang hoạt động. | • Lỗi module thanh toán/thông báo không ảnh hưởng module đặt xe<br>• Thêm loại dịch vụ xe mới trong ≤ 2 ngày phát triển<br>• Thêm phương thức thanh toán mới trong ≤ 3 ngày phát triển<br>• Uptime hệ thống ≥ 99% | Vấn đề 4 |
+| **BG-12** | **Bảo mật dữ liệu và kiểm soát truy cập** | Tất cả người dùng phải xác thực trước khi sử dụng. Phân quyền theo vai trò (RBAC). Thông tin cá nhân, vị trí, giao dịch được bảo vệ. Thông tin thanh toán nhạy cảm KHÔNG lưu trong hệ thống CAB. Ghi log tất cả thao tác quan trọng để truy vết khi có sự cố. | • 100% API yêu cầu xác thực (trừ đăng ký/đăng nhập)<br>• 0 thông tin thẻ/tài khoản thanh toán lưu trong DB<br>• 100% thao tác nhạy cảm được ghi audit log<br>• Mật khẩu mã hóa (hashed), token có thời hạn | Vấn đề 6 |
+| **BG-13** | **Nâng cao trải nghiệm người dùng** | Giao diện trực quan, dễ sử dụng cho cả khách hàng lần đầu. Thao tác đặt xe tối đa 3 bước. Tài xế thao tác đơn giản, ít phân tán khi lái xe. Responsive trên cả desktop và mobile. | • Khách hàng hoàn thành đặt xe trong ≤ 3 bước (≤ 60 giây)<br>• Tài xế nhận/từ chối chuyến trong 1 chạm<br>• Giao diện responsive, hoạt động tốt trên mobile | Vấn đề 2 |
+
+---
+
+#### 1.4.5 Tổng hợp Business Goals – Bản đồ liên kết
+
+Sơ đồ thể hiện mối liên hệ giữa **Vấn đề nghiệp vụ → Mục tiêu → Nhóm chức năng**:
+
+```mermaid
+flowchart LR
+    subgraph Problems["Vấn đề nghiệp vụ"]
+        P1["VĐ1: Phân công\nthủ công"]
+        P2["VĐ2: Không theo\ndõi được chuyến"]
+        P3["VĐ3: Thanh toán\nchưa tập trung"]
+        P4["VĐ4: Khó mở\nrộng hệ thống"]
+        P5["VĐ5: Thiếu công cụ\nquản trị & báo cáo"]
+        P6["VĐ6: Bảo mật\nyếu"]
+    end
+
+    subgraph Goals["Mục tiêu nghiệp vụ"]
+        BG01["BG-01: Chuyển đổi số"]
+        BG04["BG-04: Tự động\nphân công tài xế"]
+        BG05["BG-05: Minh bạch\ntrạng thái"]
+        BG06["BG-06: Tính cước\ntự động"]
+        BG03["BG-03: Tăng doanh thu\nkiểm soát tài chính"]
+        BG02["BG-02: Mở rộng\nquy mô"]
+        BG09["BG-09: Công cụ\nquản trị"]
+        BG10["BG-10: Báo cáo\nvận hành"]
+        BG11["BG-11: Kiến trúc\nlinh hoạt"]
+        BG12["BG-12: Bảo mật\n& RBAC"]
+    end
+
+    P1 --> BG01
+    P1 --> BG04
+    P2 --> BG05
+    P2 --> BG01
+    P3 --> BG06
+    P3 --> BG03
+    P4 --> BG02
+    P4 --> BG11
+    P5 --> BG09
+    P5 --> BG10
+    P6 --> BG12
+```
+
+---
+
+#### 1.4.6 Ưu tiên triển khai Business Goals
+
+Phân loại mức độ ưu tiên theo mô hình **MoSCoW**:
+
+| Mức ưu tiên | Business Goals | Lý do |
+|-------------|---------------|-------|
+| **Must Have** (Bắt buộc) | BG-01, BG-04, BG-05, BG-06, BG-07, BG-12 | Nếu thiếu, hệ thống không thể vận hành được. Đây là lõi nghiệp vụ: đặt xe → tìm tài xế → chạy chuyến → tính cước + bảo mật cơ bản |
+| **Should Have** (Nên có) | BG-03, BG-08, BG-09, BG-13 | Quan trọng cho vận hành hàng ngày: thanh toán điện tử, thông báo, quản trị, UX. Có thể MVP trước rồi nâng cấp |
+| **Could Have** (Có thì tốt) | BG-02, BG-10, BG-11 | Mở rộng quy mô, báo cáo nâng cao, kiến trúc tối ưu – triển khai sau khi core ổn định |
+| **Won't Have** (Chưa làm) | Surge pricing tự động, Ví nội bộ, Ride sharing, Chat in-app | Ngoài phạm vi MVP, xem xét cho các phiên bản sau |
 
 ---
 
