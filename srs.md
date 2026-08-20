@@ -33,6 +33,14 @@
    - 4.1 [Sơ đồ thực thể liên kết (Entity Relationship Diagram - ERD)](#41-sơ-đồ-thực-thể-liên-kết-entity-relationship-diagram---erd)
    - 4.2 [Từ điển dữ liệu chi tiết (Data Dictionary / Schema Specification)](#42-từ-điển-dữ-liệu-chi-tiết-data-dictionary--schema-specification)
    - 4.3 [Chiến lược chỉ mục & Tối ưu hóa truy vấn địa không gian (Indexes & Geospatial Strategy)](#43-chiến-lược-chỉ-mục--tối-ưu-hóa-truy-vấn-địa-không-gian-indexes--geospatial-strategy)
+5. [Giai đoạn 5 – Yêu cầu phi chức năng (Non-Functional Requirements - NFRs)](#giai-đoạn-5--yêu-cầu-phi-chức-năng-non-functional-requirements---nfrs)
+   - 5.1 [Hiệu năng & Khả năng đáp ứng (Performance & Latency)](#51-hiệu-năng--khả-năng-đáp-ứng-performance--latency)
+   - 5.2 [Bảo mật & Quyền riêng tư (Security & Privacy)](#52-bảo-mật--quyền-riêng-tư-security--privacy)
+   - 5.3 [Độ tin cậy & Tính sẵn sàng (Reliability & Availability)](#53-độ-tin-cậy--tính-sẵn-sàng-reliability--availability)
+   - 5.4 [Khả năng mở rộng & Kiến trúc (Scalability & Architecture)](#54-khả-năng-mở-rộng--kiến-trúc-scalability--architecture)
+   - 5.5 [Khả năng sử dụng & Trải nghiệm (Usability & User Experience)](#55-khả-năng-sử-dụng--trải-nghiệm-usability--user-experience)
+   - 5.6 [Khả năng bảo trì & Giám sát (Maintainability & Observability)](#56-khả-năng-bảo-trì--giám-sát-maintainability--observability)
+   - 5.7 [Ma trận truy xuất NFRs với Business Goals (NFR-BG Traceability Matrix)](#57-ma-trận-truy-xuất-nfrs-với-business-goals-nfr-bg-traceability-matrix)
 
 ---
 
@@ -1879,9 +1887,136 @@ graph LR
 
 ---
 
+## Giai đoạn 5 – Yêu cầu phi chức năng (Non-Functional Requirements - NFRs)
+
+Yêu cầu phi chức năng (NFRs) đặc tả các tiêu chuẩn chất lượng dịch vụ, hiệu năng, độ tin cậy, bảo mật và khả năng mở rộng của hệ thống CAB, đảm bảo nền tảng hoạt động ổn định, mượt mà dưới tải cao và tuân thủ các quy chuẩn kỹ thuật theo tiêu chuẩn **ISO/IEC 25010**.
+
+---
+
+### 5.1 Hiệu năng & Khả năng đáp ứng (Performance & Latency)
+
+| Mã NFR | Tiêu chí chất lượng | Mô tả chi tiết & Chỉ số định lượng (KPI) | Phương pháp kiểm chứng (Verification) | Mức ưu tiên |
+|---|---|---|---|---|
+| **NFR-PERF-01** | **Thời gian phản hồi API (API Latency)** | • 95% các yêu cầu HTTP thông thường (CRUD, Profile, Pricing) phải phản hồi trong thời gian **$< 300\text{ ms}$**.<br>• 99% các yêu cầu HTTP phức tạp (báo cáo, tra cứu lịch sử phân trang) phản hồi trong **$< 800\text{ ms}$**. | Kiểm thử tự động bằng Apache JMeter / k6 với tải 500 RPS. | Must Have |
+| **NFR-PERF-02** | **Độ trễ truyền phát GPS (Real-time GPS Latency)** | Tọa độ GPS của tài xế khi bắn qua WebSocket (Socket.IO) phải được chuyển tiếp và hiển thị trên màn hình bản đồ khách hàng với độ trễ **$< 1.5\text{ giây}$**. | Đo đạc Timestamp truyền tải giữa 2 Client qua Socket Server. | Must Have |
+| **NFR-PERF-03** | **Thời gian thực thi tìm tài xế (Matching Execution Time)** | Thuật toán quét và sắp xếp tài xế quanh bán kính 5km (sử dụng MongoDB 2dsphere index) phải hoàn tất trong vòng **$< 200\text{ ms}$** cho tập dữ liệu 10.000 tài xế. | Benchmark truy vấn `$nearSphere` trên DB test. | Must Have |
+| **NFR-PERF-04** | **Năng lực chịu tải đồng thời (Concurrency Capacity)** | Hệ thống MVP phải duy trì hoạt động ổn định, không suy giảm hiệu năng khi có:<br>• **$\ge 1.000$** người dùng hoạt động đồng thời (Active Users).<br>• **$\ge 500$** tài xế đang trực tuyến và phát sóng GPS liên tục.<br>• Xử lý tối thiểu **$50$ cuốc xe khởi tạo/phút**. | Load testing k6 kịch bản tăng dần tải lên 1.500 VUs. | Must Have |
+| **NFR-PERF-05** | **Tối ưu hóa dung lượng truyền tải mạng (Payload Footprint)** | Gói tin tọa độ GPS gửi định kỳ giữa Driver $\rightarrow$ Server $\rightarrow$ Customer có kích thước tối đa **$< 500\text{ Bytes}$** để tiết kiệm dung lượng 3G/4G trên thiết bị di động. | Phân tích Network Packet qua Chrome DevTools. | Should Have |
+
+---
+
+### 5.2 Bảo mật & Quyền riêng tư (Security & Privacy)
+
+| Mã NFR | Tiêu chí chất lượng | Mô tả chi tiết & Quy chuẩn bảo mật | Phương pháp kiểm chứng (Verification) | Mức ưu tiên |
+|---|---|---|---|---|
+| **NFR-SEC-01** | **Xác thực & Quản lý phiên (Authentication & Tokens)** | • Áp dụng cơ chế **JWT (JSON Web Token)** với chữ ký bảo mật thuật toán HMAC-SHA256.<br>• **Access Token** có thời hạn sống ngắn: **15 phút**.<br>• **Refresh Token** có thời hạn **7 ngày**, lưu trữ an toàn trong DB và hỗ trợ cơ chế thu hồi phiên tức thì khi đăng xuất. | Unit Test luồng xác thực và kiểm thử hết hạn Token. | Must Have |
+| **NFR-SEC-02** | **Mã hóa dữ liệu mật khẩu (Password Hashing)** | Mật khẩu người dùng bắt buộc phải được mã hóa một chiều bằng thư viện `bcrypt` với **Salt Rounds $\ge 10$** trước khi lưu vào DB. Tuyệt đối không lưu mật khẩu dạng văn bản thô (Plain Text). | Rà soát mã nguồn (Code Review) và kiểm tra dữ liệu mẫu trong DB. | Must Have |
+| **NFR-SEC-03** | **Mã hóa đường truyền (Data in Transit)** | 100% kết nối giữa Client $\leftrightarrow$ Server bắt buộc phải được mã hóa qua giao thức **HTTPS / TLS 1.3** và **WSS (WebSocket Secure)**. Tự động chuyển hướng toàn bộ HTTP sang HTTPS. | Quét chứng chỉ SSL/TLS bằng SSL Labs (Đạt điểm A). | Must Have |
+| **NFR-SEC-04** | **Tuân thủ bảo mật tài chính (PCI-DSS Zero Storage)** | Hệ thống **tuyệt đối KHÔNG lưu trữ** bất kỳ thông tin nhạy cảm nào liên quan đến thẻ thanh toán (Số thẻ 16 số, Ngày hết hạn, Mã bảo mật CVV/CVC). Toàn bộ giao dịch thẻ được token hóa qua Mock Payment Gateway. | Kiểm tra schema DB đảm bảo không có trường lưu thẻ nhạy cảm. | Must Have |
+| **NFR-SEC-05** | **Phân quyền truy cập nghiêm ngặt (Strict RBAC)** | Middleware kiểm tra quyền theo 4 vai trò (`customer`, `driver`, `operator`, `admin`). Chặn đứng mọi hành vi tấn công IDOR (Insecure Direct Object References) hoặc leo thang đặc quyền trái phép (trả về `403 Forbidden`). | Viết Automated Integration Tests cho từng Endpoint với các Role khác nhau. | Must Have |
+| **NFR-SEC-06** | **Chống Brute-force & Giới hạn tần suất (Rate Limiting)** | Áp dụng `express-rate-limit` trên các Endpoint nhạy cảm:<br>• Đăng nhập / Đổi mật khẩu: Tối đa **5 lần thử sai / phút / IP**, nếu quá sẽ khóa tạm 15 phút.<br>• Khởi tạo cuốc xe: Tối đa **10 yêu cầu / phút / User**. | Viết kịch bản test tấn công brute-force liên tục bằng Postman. | Should Have |
+
+---
+
+### 5.3 Độ tin cậy, Tính sẵn sàng & Dung lỗi (Reliability & Fault Tolerance)
+
+| Mã NFR | Tiêu chí chất lượng | Mô tả chi tiết & Giải pháp kỹ thuật | Phương pháp kiểm chứng (Verification) | Mức ưu tiên |
+|---|---|---|---|---|
+| **NFR-REL-01** | **Tính sẵn sàng của hệ thống (System Availability / Uptime)** | Hệ thống cam kết mức độ sẵn sàng tối thiểu **$\ge 99.5\%$** trong giai đoạn MVP (thời gian ngừng hoạt động tối đa $< 3.6$ giờ/tháng). | Giám sát Uptime bằng UptimeRobot / Pingdom. | Must Have |
+| **NFR-REL-02** | **Cách ly lỗi thành phần (Fault Isolation & Circuit Breaker)** | Sự cố sập hoặc timeout ở các dịch vụ ngoại vi (Cổng thanh toán, Map Service, Mail Server) **KHÔNG được phép làm tê liệt** luồng nghiệp vụ đặt xe cốt lõi. Áp dụng mô hình **Graceful Degradation** (Fallback sang tiền mặt, bỏ qua gửi mail). | Kiểm thử ngắt kết nối giả lập đến Cổng thanh toán / Map API. | Must Have |
+| **NFR-REL-03** | **Thời gian phục hồi sự cố (MTTR - Mean Time To Recovery)** | Khi Server gặp sự cố crash đột ngột, tiến trình quản lý (PM2 / Docker Restart Policy) phải tự động khởi động lại dịch vụ trong thời gian **$< 15\text{ giây}$**. | Thử nghiệm lệnh `kill -9` trên tiến trình server Node.js. | Must Have |
+| **NFR-REL-04** | **Sao lưu dữ liệu định kỳ (Automated Backup & Recovery)** | Cơ sở dữ liệu MongoDB được tự động snapshot sao lưu **hàng ngày (Daily Backup)** vào lúc 02:00 AM, lưu trữ bản sao tối thiểu 30 ngày và kiểm tra tính toàn vẹn định kỳ. | Diễn tập phục hồi dữ liệu từ bản snapshot sao lưu. | Should Have |
+| **NFR-REL-05** | **Toàn vẹn trạng thái khi mất mạng (Grace Period & Sync Back)** | Khi Client tài xế hoặc khách hàng mất mạng tạm thời trong chuyến đi, hệ thống giữ nguyên ngữ cảnh trong **5 phút**. Dữ liệu GPS được lưu đệm ở Client và đồng bộ bù khi có mạng trở lại. | Thử nghiệm ngắt kết nối Wifi/4G trên máy tài xế trong 2 phút rồi bật lại. | Must Have |
+
+---
+
+### 5.4 Khả năng mở rộng & Kiến trúc (Scalability & Architecture)
+
+| Mã NFR | Tiêu chí chất lượng | Mô tả chi tiết & Định hướng thiết kế | Phương pháp kiểm chứng (Verification) | Mức ưu tiên |
+|---|---|---|---|---|
+| **NFR-SCL-01** | **Kiến trúc Modular Monolith sạch** | Mã nguồn Backend được cấu trúc theo dạng Modular Monolith: Mỗi phân hệ (Auth, Driver, Ride, Payment, Notification) được đóng gói độc lập theo mô hình Routes $\rightarrow$ Controller $\rightarrow$ Service $\rightarrow$ Model, sẵn sàng tách ra Microservices khi tải tăng. | Code Review kiến trúc và kiểm tra tính độc lập giữa các module. | Must Have |
+| **NFR-SCL-02** | **Mở rộng theo chiều ngang (Stateless Horizontal Scaling)** | Server Backend được thiết kế hoàn toàn không lưu trạng thái phiên làm việc cục bộ (Stateless). Phiên làm việc được xác thực qua JWT, cho phép nhân bản nhiều instance chạy song song phía sau Load Balancer (Nginx). | Triển khai 2 instance Backend qua Nginx Load Balancer. | Should Have |
+| **NFR-SCL-03** | **Khả năng mở rộng kênh dịch vụ (Provider Pattern)** | Phân hệ Thông báo (Notification) và Thanh toán (Payment) được thiết kế theo **Design Pattern: Provider / Strategy**, cho phép bổ sung thêm Cổng thanh toán mới (VNPay, MoMo) hoặc Kênh thông báo mới (SMS, Firebase FCM) trong **$< 2\text{ ngày làm việc}$** mà không sửa đổi mã nguồn nghiệp vụ lõi. | Thử nghiệm cắm thêm một Mock Provider mới. | Must Have |
+
+---
+
+### 5.5 Khả năng sử dụng & Trải nghiệm người dùng (Usability & UX)
+
+| Mã NFR | Tiêu chí chất lượng | Mô tả chi tiết & Tiêu chuẩn giao diện | Phương pháp kiểm chứng (Verification) | Mức ưu tiên |
+|---|---|---|---|---|
+| **NFR-USE-01** | **Giao diện đáp ứng đa thiết bị (Responsive Web Design)** | Ứng dụng Web hoạt động mượt mà, tự động co giãn giao diện tương thích trên: Desktop (Màn hình $1920\times 1080$, $1366\times 768$), Máy tính bảng ($768\text{px}$), và Điện thoại di động (iOS Safari, Android Chrome từ $375\text{px}$ trở lên). | Kiểm thử giao diện trên Chrome DevTools Device Mode và thiết bị thật. | Must Have |
+| **NFR-USE-02** | **Quy trình đặt xe tối giản (3-Step Booking)** | Khách hàng có thể hoàn thành toàn bộ thao tác đặt xe trong tối đa **3 bước** và dưới **60 giây**: (1) Nhập điểm đón/trả $\rightarrow$ (2) Chọn hạng xe $\rightarrow$ (3) Bấm "Đặt xe". | Đo lường thời gian thao tác của người dùng thử nghiệm. | Must Have |
+| **NFR-USE-03** | **Thao tác lái xe an toàn (One-Touch Driver Action)** | Giao diện tài xế được thiết kế với các nút bấm to, rõ ràng, màu sắc tương phản cao; chấp nhận/từ chối cuốc xe hoặc cập nhật mốc trạng thái chỉ bằng **1 chạm (Single Tap)** để không gây xao nhãng khi lái xe. | Đánh giá UX giao diện trên màn hình điện thoại di động. | Must Have |
+| **NFR-USE-04** | **Bản địa hóa ngôn ngữ & Tiền tệ (Localization)** | Giao diện sử dụng 100% tiếng Việt chuẩn, định dạng tiền tệ Việt Nam Đồng (VD: `50.000 VNĐ`), định dạng ngày giờ chuẩn Việt Nam (`DD/MM/YYYY HH:mm:ss`). | Kiểm tra tính nhất quán hiển thị trên toàn bộ màn hình. | Must Have |
+
+---
+
+### 5.6 Khả năng bảo trì, Kiểm toán & Giám sát (Maintainability & Observability)
+
+| Mã NFR | Tiêu chí chất lượng | Mô tả chi tiết & Yêu cầu kỹ thuật | Phương pháp kiểm chứng (Verification) | Mức ưu tiên |
+|---|---|---|---|---|
+| **NFR-MNT-01** | **Nhật ký hệ thống có cấu trúc (Structured Logging)** | Toàn bộ lỗi phát sinh ở Server bắt buộc phải được ghi log dưới định dạng chuẩn JSON qua thư viện `winston` / `morgan`, bao gồm: `timestamp`, `level` (INFO, WARN, ERROR), `requestId`, `endpoint`, `errorMessage`, `stackTrace`. | Kiểm tra file log hoặc console output khi kích hoạt lỗi. | Must Have |
+| **NFR-MNT-02** | **Nhật ký kiểm toán bất biến (Immutable Audit Logging)** | 100% các hành động của quản trị viên (đổi giá cước, khóa tài khoản, duyệt tài xế, can thiệp cuốc) được tự động ghi vào bảng `AuditLogs` dạng Append-Only, phục vụ thanh tra và đối soát nội bộ. | Thực hiện thao tác đổi giá và kiểm tra bản ghi tương ứng trong bảng AuditLogs. | Must Have |
+| **NFR-MNT-03** | **Điểm kiểm tra sức khỏe hệ thống (Health Check Endpoints)** | Cung cấp sẵn các endpoint kiểm tra trạng thái hoạt động: `/api/health` (trả về trạng thái Node.js server) và `/api/health/db` (trả về trạng thái kết nối MongoDB). | Gọi lệnh `curl http://localhost:5000/api/health`. | Must Have |
+| **NFR-MNT-04** | **Tài liệu hóa mã nguồn & API (API Documentation)** | 100% các RESTful API được tài liệu hóa rõ ràng (Swagger / Postman Collection), mô tả đầy đủ: Headers, Request Body, Response Schema, Status Codes và Error Codes. | Kiểm tra file Postman Collection / Swagger UI của dự án. | Should Have |
+
+---
+
+### 5.7 Ma trận Truy xuất NFRs với Business Goals (NFR-BG Traceability Matrix)
+
+Ma trận chứng minh mỗi yêu cầu phi chức năng đều phục vụ trực tiếp cho các Mục tiêu nghiệp vụ (Business Goals) đã đề ra ở Giai đoạn 1:
+
+```mermaid
+flowchart LR
+    subgraph NFRs["Yêu cầu phi chức năng"]
+        NFR_PERF["NFR-PERF\n(Hiệu năng & Độ trễ)"]
+        NFR_SEC["NFR-SEC\n(Bảo mật & RBAC)"]
+        NFR_REL["NFR-REL\n(Sẵn sàng & Dung lỗi)"]
+        NFR_SCL["NFR-SCL\n(Mở rộng & Modular)"]
+        NFR_USE["NFR-USE\n(UX & 3-Step Book)"]
+        NFR_MNT["NFR-MNT\n(Audit & Logging)"]
+    end
+
+    subgraph BusinessGoals["Mục tiêu nghiệp vụ"]
+        BG01["BG-01: Chuyển đổi số"]
+        BG02["BG-02: Mở rộng quy mô"]
+        BG03["BG-03: Kiểm soát tài chính"]
+        BG04["BG-04: Tự động ghép tài xế"]
+        BG05["BG-05: Minh bạch trạng thái"]
+        BG11["BG-11: Kiến trúc linh hoạt"]
+        BG12["BG-12: Bảo mật dữ liệu"]
+        BG13["BG-13: Trải nghiệm người dùng"]
+    end
+
+    NFR_PERF --> BG02
+    NFR_PERF --> BG04
+    NFR_SEC --> BG12
+    NFR_SEC --> BG03
+    NFR_REL --> BG01
+    NFR_REL --> BG11
+    NFR_SCL --> BG02
+    NFR_SCL --> BG11
+    NFR_USE --> BG05
+    NFR_USE --> BG13
+    NFR_MNT --> BG12
+    NFR_MNT --> BG03
+```
+
+| Nhóm Yêu cầu Phi chức năng | Mã NFR cụ thể | Mục tiêu Nghiệp vụ phục vụ (Business Goals) |
+|---|---|---|
+| **Hiệu năng & Độ trễ (Performance)** | `NFR-PERF-01` $\rightarrow$ `NFR-PERF-05` | **BG-02** (Mở rộng quy mô), **BG-04** (Tự động phân công tài xế $< 2\text{ phút}$) |
+| **Bảo mật & Quyền riêng tư (Security)** | `NFR-SEC-01` $\rightarrow$ `NFR-SEC-06` | **BG-12** (Bảo mật dữ liệu & RBAC), **BG-03** (Kiểm soát tài chính) |
+| **Độ tin cậy & Sẵn sàng (Reliability)** | `NFR-REL-01` $\rightarrow$ `NFR-REL-05` | **BG-01** (Chuyển đổi số ổn định), **BG-11** (Kiến trúc linh hoạt, cách ly lỗi) |
+| **Khả năng mở rộng (Scalability)** | `NFR-SCL-01` $\rightarrow$ `NFR-SCL-03` | **BG-02** (Mở rộng phục vụ lớn), **BG-11** (Kiến trúc cắm rút Provider) |
+| **Khả năng sử dụng (Usability)** | `NFR-USE-01` $\rightarrow$ `NFR-USE-04` | **BG-05** (Minh bạch trạng thái), **BG-13** (Trải nghiệm người dùng tối ưu) |
+| **Bảo trì & Giám sát (Maintainability)** | `NFR-MNT-01` $\rightarrow$ `NFR-MNT-04` | **BG-03** (Đối soát tài chính), **BG-12** (Ghi vết kiểm toán thanh tra) |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
-*Phase: Giai đoạn 4 – Mô hình hóa dữ liệu (Data Modeling & Database Design)*
+*Phase: Giai đoạn 5 – Yêu cầu phi chức năng (Non-Functional Requirements - NFRs)*
+
 
 
 
