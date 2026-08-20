@@ -46,6 +46,10 @@
    - 6.2 [Sơ đồ Use Case Tổng thể (System-Level Use Case Diagram)](#62-sơ-đồ-use-case-tổng-thể-system-level-use-case-diagram)
    - 6.3 [Sơ đồ Use Case theo từng Nhóm Tác nhân](#63-sơ-đồ-use-case-theo-từng-nhóm-tác-nhân)
    - 6.4 [Bảng đặc tả chi tiết các Use Case cốt lõi (Use Case Specifications)](#64-bảng-đặc-tả-chi-tiết-các-use-case-cốt-lõi-use-case-specifications)
+7. [Giai đoạn 7 – Tiêu chí chấp nhận (Acceptance Criteria - AC)](#giai-đoạn-7--tiêu-chí-chấp-nhận-acceptance-criteria---ac)
+   - 7.1 [Nguyên tắc & Định dạng Tiêu chí chấp nhận (Given-When-Then & Rule-based AC)](#71-nguyên-tắc--định-dạng-tiêu-chí-chấp-nhận-given-when-then--rule-based-ac)
+   - 7.2 [Bảng tổng hợp Tiêu chí chấp nhận chi tiết theo từng Phân hệ chức năng](#72-bảng-tổng-hợp-tiêu-chí-chấp-nhận-chi-tiết-theo-từng-phân-hệ-chức-năng)
+   - 7.3 [Ma trận đối soát Acceptance Criteria với Functional Requirements (AC-FR Matrix)](#73-ma-trận-đối-soát-acceptance-criteria-với-functional-requirements-ac-fr-matrix)
 
 ---
 
@@ -2466,9 +2470,142 @@ graph LR
 
 ---
 
+## Giai đoạn 7 – Tiêu chí chấp nhận (Acceptance Criteria - AC)
+
+Tiêu chí chấp nhận (Acceptance Criteria - AC) là tập hợp các điều kiện, quy tắc kiểm thử và kết quả kỳ vọng chi tiết mà từng tính năng phần mềm bắt buộc phải đáp ứng thỏa mãn để được xem là **Hoàn thành (Definition of Done - DoD)**. Tài liệu được định dạng kết hợp giữa **Quy tắc kiểm thử (Rule-based)** và **Kịch bản ngữ cảnh (Scenario-based / Given-When-Then - Gherkin BDD)** làm căn cứ trực tiếp cho Developer lập trình và QA/QC viết Test Cases nghiệm thu.
+
+---
+
+### 7.1 Nguyên tắc & Cấu trúc Tiêu chí Chấp nhận
+
+Mỗi tiêu chí chấp nhận được chuẩn hóa theo cấu trúc:
+- **Mã AC**: `AC-[MODULE]-[STT]`
+- **Tên tính năng / User Story liên quan**
+- **Quy tắc chấp nhận bắt buộc (Rule-based Constraints)**
+- **Kịch bản kiểm thử nghiệm thu (Given - When - Then Scenarios)**:
+  - `GIVEN` (Tiền đề): Ngữ cảnh, trạng thái ban đầu của hệ thống và người dùng.
+  - `WHEN` (Hành động): Thao tác cụ thể của tác nhân hoặc sự kiện kích hoạt.
+  - `THEN` (Kết quả kỳ vọng): Phản hồi chính xác của hệ thống và sự biến đổi dữ liệu trong DB.
+
+---
+
+### 7.2 Bảng Tổng hợp Tiêu chí Chấp nhận Chi tiết theo từng Phân hệ
+
+---
+
+#### 📌 AC-01: Đăng ký, Đăng nhập & Xác thực Tài khoản (Authentication)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-AUTH-01** | Đăng ký tài khoản Khách hàng | • **Quy tắc**: Email phải đúng định dạng RFC 5322; SĐT phải gồm 10 chữ số đầu số VN; Mật khẩu $\ge 6$ ký tự; Mật khẩu được mã hóa `bcrypt` trong DB.<br>• **Scenario 1 (Thành công)**:<br>&nbsp;&nbsp;`GIVEN` Người dùng nhập Email `test@gmail.com` và SĐT `0912345678` chưa từng đăng ký.<br>&nbsp;&nbsp;`WHEN` Bấm "Đăng ký".<br>&nbsp;&nbsp;`THEN` Hệ thống tạo tài khoản mới với `role = 'customer'`, `isActive = true`, trả về HTTP 201 Created và gửi email chào mừng.<br>• **Scenario 2 (Trùng Email/SĐT)**:<br>&nbsp;&nbsp;`GIVEN` Email hoặc SĐT đã tồn tại trong cơ sở dữ liệu.<br>&nbsp;&nbsp;`WHEN` Bấm "Đăng ký".<br>&nbsp;&nbsp;`THEN` Hệ thống từ chối tạo tài khoản, trả về HTTP 409 Conflict với thông báo: *"Email hoặc Số điện thoại đã được sử dụng"*. |
+| **AC-AUTH-02** | Đăng nhập & Phát hành Token JWT | • **Quy tắc**: Access Token hết hạn sau 15 phút, Refresh Token hết hạn sau 7 ngày; Payload chứa `userId` và `role`.<br>• **Scenario 1 (Đăng nhập đúng)**:<br>&nbsp;&nbsp;`GIVEN` Tài khoản `customer@cab.com` đang hoạt động (`isActive = true`).<br>&nbsp;&nbsp;`WHEN` Nhập đúng mật khẩu và bấm "Đăng nhập".<br>&nbsp;&nbsp;`THEN` Hệ thống trả về HTTP 200 OK kèm cặp token và thông tin profile; lưu Refresh Token vào DB.<br>• **Scenario 2 (Chống Brute-force `NFR-SEC-06`)**:<br>&nbsp;&nbsp;`GIVEN` Người dùng nhập sai mật khẩu 5 lần liên tiếp trong 1 phút.<br>&nbsp;&nbsp;`WHEN` Gửi lần đăng nhập thứ 6.<br>&nbsp;&nbsp;`THEN` Hệ thống chặn IP, trả về HTTP 429 Too Many Requests: *"Quá nhiều lần thử sai. Vui lòng thử lại sau 15 phút"*. |
+
+---
+
+#### 📌 AC-02: Quản lý Phương tiện & Xét duyệt Hồ sơ Tài xế (Driver Onboarding)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-DRV-01** | Đăng ký thông tin phương tiện & bằng lái | • **Quy tắc**: Biển số xe phải duy nhất; Số GPLX đủ 12 chữ số; Loại xe thuộc danh mục `['sedan', 'suv', 'van']`.<br>• **Scenario 1 (Nộp hồ sơ thành công)**:<br>&nbsp;&nbsp;`GIVEN` Tài xế đã nhập đầy đủ GPLX B2, Biển số `51G-123.45`, loại xe Sedan và upload ảnh bằng lái.<br>&nbsp;&nbsp;`WHEN` Bấm "Hoàn tất đăng ký".<br>&nbsp;&nbsp;`THEN` Hồ sơ lưu vào DB với `isApproved = false`, `status = 'offline'`, tài xế chưa thể bật Online nhận cuốc. |
+| **AC-DRV-02** | Xét duyệt hồ sơ từ Operator | • **Quy tắc**: Chỉ Operator/Admin mới có quyền duyệt; Ghi log kiểm toán thao tác duyệt.<br>• **Scenario 1 (Phê duyệt)**:<br>&nbsp;&nbsp;`GIVEN` Hồ sơ tài xế A đang ở trạng thái `isApproved = false`.<br>&nbsp;&nbsp;`WHEN` Operator bấm nút "Phê duyệt hồ sơ".<br>&nbsp;&nbsp;`THEN` `isApproved` đổi sang `true`, `approvedAt` được ghi nhận, hệ thống gửi email chúc mừng tới tài xế, ghi 1 bản ghi vào `AuditLogs`.<br>• **Scenario 2 (Từ chối)**:<br>&nbsp;&nbsp;`GIVEN` Operator bấm "Từ chối" kèm lý do "Bằng lái hết hạn".<br>&nbsp;&nbsp;`WHEN` Xác nhận từ chối.<br>&nbsp;&nbsp;`THEN` `isApproved` giữ nguyên `false`, gửi email nêu rõ lý do cho tài xế. |
+
+---
+
+#### 📌 AC-03: Trạng thái Trực tuyến & Phát sóng GPS (Online Status & GPS)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-TRK-01** | Bật / Tắt trạng thái Online | • **Quy tắc**: Phải có `isApproved = true` và `isActive = true` mới được bật `available`.<br>• **Scenario 1 (Bật thành công)**:<br>&nbsp;&nbsp;`GIVEN` Tài xế đã được duyệt và có phương tiện active.<br>&nbsp;&nbsp;`WHEN` Gạt thanh gạt sang "Trực tuyến".<br>&nbsp;&nbsp;`THEN` Trạng thái DB chuyển `available`, Client mở kết nối WebSocket thành công.<br>• **Scenario 2 (Bị từ chối do chưa duyệt)**:<br>&nbsp;&nbsp;`GIVEN` Tài xế chưa được duyệt (`isApproved = false`).<br>&nbsp;&nbsp;`WHEN` Bấm bật trực tuyến.<br>&nbsp;&nbsp;`THEN` Hệ thống báo lỗi HTTP 403: *"Hồ sơ của bạn chưa được phê duyệt"*. |
+| **AC-TRK-02** | Truyền phát tọa độ GPS thời gian thực | • **Quy tắc**: Tần suất gửi GPS mỗi 5-10 giây; định dạng GeoJSON Point `[lng, lat]`; độ trễ $< 1.5\text{s}$.<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Tài xế đang trong chuyến đi (`status = 'in_progress'`).<br>&nbsp;&nbsp;`WHEN` Thiết bị tài xế phát sự kiện socket `driver:locationUpdate` kèm `[106.6601, 10.7626]`.<br>&nbsp;&nbsp;`THEN` Máy chủ cập nhật trường `currentLocation` của tài xế và broadcast tức thì tới room socket của khách hàng tương ứng. |
+
+---
+
+#### 📌 AC-04: Tìm địa chỉ, Ước tính cước phí & Đặt xe (Ride Booking)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-BOOK-01** | Ước tính cước phí theo loại xe (`BRULE-01`) | • **Quy tắc**: Công thức $\text{Fare} = \max(\text{BaseFare}, \text{BaseFare} + d \times \text{PriceKm} + t \times \text{PriceMin})$.<br>• **Scenario 1 (Tính giá chính xác)**:<br>&nbsp;&nbsp;`GIVEN` Khách nhập lộ trình cách nhau $10.0\text{ km}$, thời gian chạy dự kiến $20\text{ phút}$, chọn xe Sedan 4 chỗ (Base 15k, 12k/km, 1k/phút).<br>&nbsp;&nbsp;`WHEN` Hệ thống tính giá ước tính.<br>&nbsp;&nbsp;`THEN` Cước hiển thị đúng $15.000 + (10 \times 12.000) + (20 \times 1.000) = 155.000\text{ VNĐ}$. |
+| **AC-BOOK-02** | Tạo yêu cầu đặt xe trực tuyến | • **Quy tắc**: Khách hàng không thể đặt cuốc mới nếu đang có cuốc xe chưa hoàn tất (`requested`, `accepted`, `in_progress`).<br>• **Scenario 1 (Tạo cuốc thành công)**:<br>&nbsp;&nbsp;`GIVEN` Khách hàng không có cuốc xe nào đang chạy.<br>&nbsp;&nbsp;`WHEN` Bấm "Xác nhận đặt xe".<br>&nbsp;&nbsp;`THEN` Bản ghi Ride được tạo với `status = 'searching'`, `retryCount = 0`, kích hoạt tiến trình tìm tài xế. |
+
+---
+
+#### 📌 AC-05: Thuật toán Ghép nối Tài xế & Timeout (Matching Engine)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-MCH-01** | Quét tài xế bán kính 5km & Ưu tiên (`BRULE-02`) | • **Quy tắc**: Chỉ quét tài xế `available`, đúng hạng xe, cự ly $\le 5.0\text{km}$; Ưu tiên gần nhất $\rightarrow$ Rating.<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Có 3 tài xế thỏa điều kiện: Tài xế A (cách 1km, 4.8★), Tài xế B (cách 3km, 5.0★), Tài xế C (cách 6km).<br>&nbsp;&nbsp;`WHEN` Hệ thống phân bổ cuốc xe.<br>&nbsp;&nbsp;`THEN` Tài xế C bị loại (vượt 5km); Yêu cầu được gửi duy nhất tới Tài xế A trước; hiển thị đồng hồ đếm ngược 30 giây trên máy Tài xế A. |
+| **AC-MCH-02** | Xử lý Chấp nhận cuốc xe (`FR-MATCH-04`) | • **Quy tắc**: Sử dụng Atomic Update chống tranh chấp race condition (`EX-08`).<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Tài xế A nhận được thông báo chuyến xe.<br>&nbsp;&nbsp;`WHEN` Tài xế A bấm "Chấp nhận" trong vòng 30 giây.<br>&nbsp;&nbsp;`THEN` Trạng thái Ride đổi sang `accepted`, `driverId = A._id`, Tài xế A chuyển sang `status = 'busy'`, phát socket báo cho khách hàng trong $< 1\text{s}$. |
+| **AC-MCH-03** | Xử lý Timeout 30s & Retry tối đa 5 lần (`BRULE-03` / `EX-02`) | • **Quy tắc**: Quá 30s tự động chuyển tài xế kế tiếp; Hết 5 lần báo `no_driver`.<br>• **Scenario 1 (Chuyển tiếp)**:<br>&nbsp;&nbsp;`GIVEN` Tài xế A không phản hồi sau 30 giây, `retryCount` đang là 0.<br>&nbsp;&nbsp;`WHEN` Bộ đếm 30s hết hạn.<br>&nbsp;&nbsp;`THEN` `retryCount` tăng lên 1, popup trên máy A biến mất, yêu cầu lập tức chuyển sang Tài xế B.<br>• **Scenario 2 (Hết 5 lần retry)**:<br>&nbsp;&nbsp;`GIVEN` Đã thử hết 5 tài xế (`retryCount == 5`).<br>&nbsp;&nbsp;`WHEN` Tài xế thứ 5 từ chối/timeout.<br>&nbsp;&nbsp;`THEN` Trạng thái Ride đổi sang `no_driver`, thông báo xin lỗi khách hàng, kết thúc luồng tìm xe. |
+
+---
+
+#### 📌 AC-06: Vòng đời Chuyến đi & Cập nhật Trạng thái (Trip Lifecycle)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-RIDE-01** | Chuyển đổi trạng thái tuần tự (`BRULE-05`) | • **Quy tắc**: Bắt buộc tuân thủ đúng thứ tự `accepted` $\rightarrow$ `driver_arrived` $\rightarrow$ `in_progress` $\rightarrow$ `completed`.<br>• **Scenario 1 (Đến điểm đón)**:<br>&nbsp;&nbsp;`GIVEN` Chuyến đi đang `accepted`.<br>&nbsp;&nbsp;`WHEN` Tài xế bấm "Đã đến điểm đón".<br>&nbsp;&nbsp;`THEN` Trạng thái đổi sang `driver_arrived`, ghi nhận `arrivedAt`, bắn thông báo cho khách.<br>• **Scenario 2 (Bắt đầu chạy)**:<br>&nbsp;&nbsp;`GIVEN` Chuyến đi đang `driver_arrived`.<br>&nbsp;&nbsp;`WHEN` Tài xế bấm "Bắt đầu chuyến đi".<br>&nbsp;&nbsp;`THEN` Trạng thái đổi sang `in_progress`, ghi nhận `startedAt`.<br>• **Scenario 3 (Hoàn thành)**:<br>&nbsp;&nbsp;`GIVEN` Chuyến đi đang `in_progress`.<br>&nbsp;&nbsp;`WHEN` Tài xế bấm "Hoàn thành chuyến đi".<br>&nbsp;&nbsp;`THEN` Trạng thái đổi sang `completed`, ghi nhận `completedAt`, kích hoạt tính cước. |
+
+---
+
+#### 📌 AC-07: Tính cước & Thanh toán Đa phương thức (Fare & Payment)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-PAY-01** | Thanh toán bằng Tiền mặt (`Cash`) | • **Quy tắc**: Cần tài xế xác nhận thu tiền; Payment ban đầu `PENDING`.<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Cuốc xe vừa hoàn thành cước phí $100.000\text{ VNĐ}$, khách chọn trả tiền mặt.<br>&nbsp;&nbsp;`WHEN` Tài xế nhận tiền và bấm nút "Xác nhận đã nhận tiền mặt".<br>&nbsp;&nbsp;`THEN` Trạng thái Payment đổi sang `COMPLETED`, ghi nhận `paidAt`, giải phóng tài xế về `available`, mở popup đánh giá cho khách. |
+| **AC-PAY-02** | Thanh toán Điện tử qua Mock Gateway | • **Quy tắc**: Tuyệt đối không lưu số thẻ/CVV (`NFR-SEC-04`); Lưu mã `transactionId`.<br>• **Scenario 1 (Thành công)**:<br>&nbsp;&nbsp;`GIVEN` Khách chọn thanh toán qua Thẻ/Ví điện tử.<br>&nbsp;&nbsp;`WHEN` Cổng thanh toán xử lý thành công trả về mã GD `TXN_998877`.<br>&nbsp;&nbsp;`THEN` Payment đổi sang `COMPLETED`, lưu `transactionId = 'TXN_998877'`, gửi hóa đơn qua email khách.<br>• **Scenario 2 (Thất bại `EX-07`)**:<br>&nbsp;&nbsp;`GIVEN` Cổng thanh toán trả về lỗi "Thẻ không đủ số dư".<br>&nbsp;&nbsp;`WHEN` Nhận kết quả thất bại.<br>&nbsp;&nbsp;`THEN` Payment đổi sang `FAILED`, app hiển thị tùy chọn cho khách: Nhập thẻ khác hoặc Đổi sang trả Tiền mặt. |
+
+---
+
+#### 📌 AC-08: Chính sách Hủy Chuyến đi (Cancellation Policy)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-CNC-01** | Khách hàng hủy chuyến (`BRULE-06`) | • **Quy tắc**: Miễn phí khi chưa lên xe (`searching`, `accepted`, `driver_arrived`); Cấm hủy khi đang chạy (`in_progress`).<br>• **Scenario 1 (Hủy hợp lệ)**:<br>&nbsp;&nbsp;`GIVEN` Chuyến đi đang ở trạng thái `accepted` (xe đang tới).<br>&nbsp;&nbsp;`WHEN` Khách bấm "Hủy chuyến" và chọn lý do.<br>&nbsp;&nbsp;`THEN` Ride đổi sang `cancelled_by_customer`, tài xế nhận thông báo hủy và tự động chuyển về `available`.<br>• **Scenario 2 (Chặn hủy khi đang chạy)**:<br>&nbsp;&nbsp;`GIVEN` Chuyến đi đang `in_progress`.<br>&nbsp;&nbsp;`WHEN` Gửi yêu cầu hủy từ app khách.<br>&nbsp;&nbsp;`THEN` Hệ thống từ chối với thông báo HTTP 400: *"Không thể hủy cuốc khi đang di chuyển"*. |
+| **AC-CNC-02** | Tài xế hủy do khách không xuất hiện (`EX-05`) | • **Quy tắc**: Phải chờ tại điểm đón $\ge 5\text{ phút}$ mới được hủy lý do No-Show.<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Tài xế đã bấm `driver_arrived` được 6 phút mà khách không ra.<br>&nbsp;&nbsp;`WHEN` Tài xế bấm "Hủy cuốc do khách không xuất hiện".<br>&nbsp;&nbsp;`THEN` Ride đổi sang `cancelled_by_driver (No-Show)`, tài xế không bị phạt tỷ lệ hủy, chuyển về `available`. |
+
+---
+
+#### 📌 AC-09: Đánh giá Sao & Tính Rating Trung bình (Rating & Review)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-RAT-01** | Gửi đánh giá sau chuyến đi (`BRULE-08`) | • **Quy tắc**: Chỉ đánh giá khi cuốc đã `completed` và thanh toán `COMPLETED`; Điểm từ 1 đến 5 sao; Mỗi cuốc chỉ đánh giá 1 lần duy nhất.<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Chuyến đi hoàn tất thanh toán.<br>&nbsp;&nbsp;`WHEN` Khách chọn 5 sao, nhập nhận xét "Tài xế lái xe an toàn" và bấm Gửi.<br>&nbsp;&nbsp;`THEN` Bản ghi `RatingReviews` được tạo, trường `totalReviews` của tài xế tăng 1, điểm `rating` trung bình $\bar{R}$ được tính lại và cập nhật vào `DriverProfiles`.<br>• **Scenario 2 (Đánh giá trùng lặp)**:<br>&nbsp;&nbsp;`GIVEN` Khách đã gửi đánh giá cho cuốc xe X.<br>&nbsp;&nbsp;`WHEN` Cố tình gửi lại đánh giá lần 2.<br>&nbsp;&nbsp;`THEN` Hệ thống từ chối HTTP 409: *"Cuốc xe này đã được đánh giá trước đó"*. |
+
+---
+
+#### 📌 AC-10: Quản trị Vận hành, Cấu hình Giá & Báo cáo (Admin & Operations)
+
+| Mã AC | Tính năng | Tiêu chí chấp nhận chi tiết (Given - When - Then & Rule-based) |
+|---|---|---|
+| **AC-ADM-01** | Phân quyền RBAC Operator vs Admin (`BRULE-09`) | • **Quy tắc**: Operator không được sửa giá cước, không được phân quyền, không được xóa user.<br>• **Scenario 1 (Operator cố sửa giá)**:<br>&nbsp;&nbsp;`GIVEN` Tài khoản đăng nhập có `role = 'operator'`.<br>&nbsp;&nbsp;`WHEN` Gửi request `PUT /api/admin/pricing`.<br>&nbsp;&nbsp;`THEN` Hệ thống chặn, trả về HTTP 403 Forbidden: *"Bạn không có quyền thực hiện thao tác này"*. |
+| **AC-ADM-02** | Cấu hình Bảng giá Dịch vụ & Ghi Audit Log (`BRULE-10`) | • **Quy tắc**: Giá cước $> 0$; Bắt buộc ghi vết kiểm toán Append-Only.<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Admin đổi giá mở cửa xe Sedan từ 15k thành 18k.<br>&nbsp;&nbsp;`WHEN` Bấm "Lưu biểu phí".<br>&nbsp;&nbsp;`THEN` `PricingConfigs` được cập nhật, bảng `AuditLogs` tự động chèn 1 bản ghi lưu rõ `{ oldPrice: 15000, newPrice: 18000, adminId, timestamp }`. |
+| **AC-ADM-03** | Xuất Báo cáo Thống kê Doanh thu | • **Quy tắc**: Tổng hợp số liệu theo thời gian thực từ DB, hỗ trợ xuất CSV/Excel.<br>• **Scenario 1**:<br>&nbsp;&nbsp;`GIVEN` Admin chọn xem báo cáo "Tháng 08/2026".<br>&nbsp;&nbsp;`WHEN` Bấm "Xem báo cáo".<br>&nbsp;&nbsp;`THEN` Hiển thị biểu đồ doanh thu gom nhóm theo loại xe và phương thức thanh toán, tỷ lệ cuốc thành công vs hủy, thời gian phản hồi $< 800\text{ms}$ (`NFR-PERF-01`). |
+
+---
+
+### 7.3 Ma trận Đối soát Acceptance Criteria với Functional Requirements (AC-FR Matrix)
+
+Ma trận chứng minh toàn bộ 59 Yêu cầu chức năng (FRs) đều có Tiêu chí chấp nhận (AC) tương ứng để kiểm chứng nghiệm thu:
+
+| Nhóm Phân hệ Chức năng (L1) | Dải Yêu cầu Chức năng (FRs) | Mã Tiêu chí Chấp nhận (Acceptance Criteria) |
+|---|---|---|
+| **1.0 Quản lý Xác thực & Tài khoản** | `FR-AUTH-01` $\rightarrow$ `FR-AUTH-06` | `AC-AUTH-01`, `AC-AUTH-02` |
+| **2.0 Quản lý Tài xế & Phương tiện** | `FR-DRV-01` $\rightarrow$ `FR-DRV-06` | `AC-DRV-01`, `AC-DRV-02` |
+| **3.0 Đặt xe & Vòng đời Chuyến đi** | `FR-RIDE-01` $\rightarrow$ `FR-RIDE-09` | `AC-BOOK-01`, `AC-BOOK-02`, `AC-RIDE-01`, `AC-CNC-01` |
+| **4.0 Phân công & Ghép nối Tài xế** | `FR-MATCH-01` $\rightarrow$ `FR-MATCH-06` | `AC-MCH-01`, `AC-MCH-02`, `AC-MCH-03` |
+| **5.0 Tính cước & Thanh toán** | `FR-PAY-01` $\rightarrow$ `FR-PAY-07` | `AC-BOOK-01`, `AC-PAY-01`, `AC-PAY-02` |
+| **6.0 Định vị & Giám sát Real-time** | `FR-TRACK-01` $\rightarrow$ `FR-TRACK-04` | `AC-TRK-01`, `AC-TRK-02` |
+| **7.0 Trung tâm Thông báo Đa kênh** | `FR-NOTIF-01` $\rightarrow$ `FR-NOTIF-05` | `AC-AUTH-01`, `AC-MCH-02`, `AC-RIDE-01`, `AC-PAY-02` |
+| **8.0 Đánh giá & Phản hồi Dịch vụ** | `FR-RATE-01` $\rightarrow$ `FR-RATE-03` | `AC-RAT-01` |
+| **9.0 Quản trị Vận hành & Báo cáo** | `FR-ADM-01` $\rightarrow$ `FR-ADM-08` | `AC-DRV-02`, `AC-ADM-01`, `AC-ADM-02`, `AC-ADM-03` |
+| **10.0 Bảo mật, RBAC & Audit Log** | `FR-SEC-01` $\rightarrow$ `FR-SEC-05` | `AC-AUTH-02`, `AC-ADM-01`, `AC-ADM-02` |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
-*Phase: Giai đoạn 6 – Mô hình hóa Use Case (Use Case Modeling & Diagrams)*
+*Phase: Giai đoạn 7 – Tiêu chí chấp nhận (Acceptance Criteria - AC)*
+
 
 
 
