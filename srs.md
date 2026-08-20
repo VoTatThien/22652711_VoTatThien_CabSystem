@@ -16,9 +16,11 @@
    - 1.1 [Business Context (Ngữ cảnh nghiệp vụ)](#11-business-context-ngữ-cảnh-nghiệp-vụ)
    - 1.2 [Business Problem (Vấn đề nghiệp vụ)](#12-business-problem-vấn-đề-nghiệp-vụ)
    - 1.3 [Stakeholders (Các bên liên quan)](#13-stakeholders-các-bên-liên-quan)
-   - 1.4 [Business Objectives (Mục tiêu nghiệp vụ)](#14-business-objectives-mục-tiêu-nghiệp-vụ)
+   - 1.4 [Business Goals (Mục tiêu nghiệp vụ)](#14-business-goals-mục-tiêu-nghiệp-vụ)
    - 1.5 [Phạm vi hệ thống (Scope)](#15-phạm-vi-hệ-thống-scope)
-   - 1.6 [Các điểm chưa rõ cần xác nhận](#16-các-điểm-chưa-rõ-cần-xác-nhận-với-khách-hàng)
+   - 1.6 [Business Requirements (Yêu cầu nghiệp vụ)](#16-business-requirements-yêu-cầu-nghiệp-vụ)
+   - 1.7 [Business Processes (Quy trình nghiệp vụ)](#17-business-processes-quy-trình-nghiệp-vụ)
+   - 1.8 [Các điểm chưa rõ cần xác nhận](#18-các-điểm-chưa-rõ-cần-xác-nhận-với-khách-hàng)
 
 ---
 
@@ -698,7 +700,279 @@ pie title Phân bổ Business Requirements theo lĩnh vực
 | BR-036 → BR-040 | BG-09 (Công cụ quản trị), BG-10 (Báo cáo vận hành) |
 | BR-041 → BR-045 | BG-11 (Kiến trúc linh hoạt), BG-12 (Bảo mật), BG-02 (Mở rộng quy mô) |
 
-### 1.7 Các điểm chưa rõ cần xác nhận với khách hàng
+### 1.7 Business Processes (Quy trình nghiệp vụ)
+
+Quy trình nghiệp vụ mô tả chi tiết các luồng hoạt động từ đầu đến cuối (End-to-End) của hệ thống CAB, thể hiện sự phối hợp nhịp nhàng giữa **Khách hàng (Customer)**, **Tài xế (Driver)**, **Hệ thống (CAB Platform)**, **Nhân viên vận hành (Operator/Admin)** và **Hệ thống bên ngoài (External Services)**.
+
+---
+
+#### 1.7.1 Sơ đồ Quy trình Tổng thể (End-to-End Business Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Khách hàng
+    participant S as Hệ thống CAB
+    actor D as Tài xế
+    participant P as Cổng thanh toán
+
+    Note over C,D: GIAI ĐOẠN 1: ĐẶT XE & PHÂN CÔNG TÀI XẾ
+    C->>S: Nhập điểm đón, điểm đến, chọn loại xe
+    S-->>C: Tính và hiển thị cước phí ước tính
+    C->>S: Xác nhận đặt xe
+    S->>S: Tìm tài xế Available gần nhất (bán kính ≤ 5km)
+    S->>D: Gửi yêu cầu chuyến (Timeout: 30s)
+    alt Tài xế chấp nhận
+        D->>S: Chấp nhận chuyến
+        S-->>C: Thông báo tài xế nhận chuyến & hiển thị ETA/vị trí
+    else Tài xế từ chối hoặc Timeout (30s)
+        D--xS: Từ chối / Không phản hồi
+        S->>S: Tìm tài xế kế tiếp (tối đa 5 lần)
+    end
+
+    Note over C,D: GIAI ĐOẠN 2: THỰC HIỆN CHUYẾN ĐI
+    D->>S: Cập nhật "Đã đến điểm đón" (driver_arrived)
+    S-->>C: Thông báo tài xế đã đến
+    D->>S: Đón khách & Bắt đầu chuyến (in_progress)
+    loop Cập nhật GPS liên tục (mỗi 5-10s)
+        D->>S: Gửi tọa độ GPS
+        S-->>C: Cập nhật vị trí tài xế trên bản đồ
+    end
+    D->>S: Hoàn thành chuyến đi tại điểm đến (completed)
+
+    Note over C,P: GIAI ĐOẠN 3: TÍNH CƯỚC & THANH TOÁN
+    S->>S: Tính cước thực tế (Base + Km + Thời gian)
+    S-->>C: Hiển thị chi tiết hóa đơn
+    S-->>D: Hiển thị cước thu
+    alt Thanh toán tiền mặt
+        C->>D: Trả tiền mặt trực tiếp
+        D->>S: Xác nhận đã thu tiền mặt
+    else Thanh toán điện tử
+        C->>S: Chọn thanh toán thẻ/ví điện tử
+        S->>P: Gửi yêu cầu thanh toán (Không lưu thẻ)
+        P-->>S: Trả kết quả thành công/thất bại
+        S-->>C: Thông báo kết quả thanh toán
+    end
+
+    Note over C,D: GIAI ĐOẠN 4: ĐÁNH GIÁ & HOÀN TẤT
+    C->>S: Đánh giá tài xế (1-5 sao) & nhận xét
+    S->>S: Cập nhật rating trung bình tài xế
+    S->>D: Chuyển trạng thái sang Available sẵn sàng nhận chuyến mới
+```
+
+---
+
+#### 1.7.2 BP-01: Quy trình Đăng ký & Onboarding Tài khoản
+
+Quy trình quản lý vòng đời tài khoản từ khi đăng ký đến khi sẵn sàng hoạt động.
+
+| Thuộc tính | Chi tiết |
+|------------|----------|
+| **Mục đích** | Cho phép Khách hàng tự đăng ký và Tài xế đăng ký kèm hồ sơ xe để được phê duyệt hoạt động |
+| **Actor** | Khách hàng, Tài xế, Nhân viên vận hành (Operator), Hệ thống CAB |
+| **Tiền điều kiện (Precondition)** | Người dùng chưa có tài khoản trên hệ thống |
+| **Hậu điều kiện (Postcondition)** | Khách hàng có tài khoản kích hoạt ngay; Tài xế có hồ sơ chờ duyệt hoặc đã duyệt |
+
+```mermaid
+flowchart TD
+    Start([Bắt đầu]) --> Choice{Đối tượng đăng ký?}
+    
+    Choice -- Khách hàng --> RegCust[Nhập Tên, Email, SĐT, Mật khẩu]
+    RegCust --> ValidCust{Thông tin hợp lệ?}
+    ValidCust -- Không --> RegCust
+    ValidCust -- Có --> CreateCust[Hệ thống tạo tài khoản Active]
+    CreateCust --> EndCust([Khách hàng đăng nhập & sử dụng])
+
+    Choice -- Tài xế --> RegDrv[Nhập thông tin cá nhân & Giấy phép lái xe]
+    RegDrv --> RegVeh[Khai báo Phương tiện: Biển số, Loại xe, Màu xe]
+    RegVeh --> SubmitDrv[Gửi hồ sơ đăng ký tài xế]
+    SubmitDrv --> Pending[Trạng thái: Pending Approval]
+    
+    Pending --> OpReview{Operator duyệt hồ sơ?}
+    OpReview -- Từ chối --> RejectDrv[Thông báo lý do từ chối qua Email]
+    RejectDrv --> EndReject([Kết thúc])
+    
+    OpReview -- Duyệt --> ApproveDrv[Cập nhật trạng thái: Approved / Active]
+    ApproveDrv --> NotifyDrv[Gửi thông báo duyệt thành công]
+    NotifyDrv --> EndDrv([Tài xế có thể bật Online nhận chuyến])
+```
+
+---
+
+#### 1.7.3 BP-02: Quy trình Đặt xe, Tìm kiếm & Phân công Tài xế (Core Matching)
+
+Quy trình lõi xử lý yêu cầu đặt xe của khách hàng và tự động gán tài xế phù hợp.
+
+| Thuộc tính | Chi tiết |
+|------------|----------|
+| **Mục đích** | Tự động hóa tìm tài xế gần nhất mà không cần tổng đài can thiệp |
+| **Actor** | Khách hàng, Tài xế, Hệ thống CAB (Matching Service) |
+| **Tiền điều kiện** | Khách hàng đã đăng nhập; Có tài xế trong trạng thái `Available` |
+| **Hậu điều kiện** | Chuyến đi được tạo và chuyển sang trạng thái `accepted` hoặc `no_driver` |
+
+```mermaid
+flowchart TD
+    A[Khách hàng nhập Điểm đón & Điểm đến] --> B[Chọn loại xe: Sedan / SUV / Van]
+    B --> C[Hệ thống tính & hiển thị cước ước tính]
+    C --> D[Khách hàng nhấn Đặt xe]
+    D --> E[Tạo Ride: status = searching, RetryCount = 0]
+    
+    E --> F[Truy vấn danh sách tài xế Available trong bán kính 5km]
+    F --> G{Có tài xế phù hợp?}
+    
+    G -- Không --> NoDrv[Thông báo: Hiện không có tài xế nào quanh khu vực]
+    NoDrv --> EndFail([Trạng thái: no_driver])
+    
+    G -- Có --> SortDrv[Sắp xếp theo khoảng cách gần nhất và rating]
+    SortDrv --> SendReq[Gửi yêu cầu chuyến tới Tài xế thứ i - Đếm ngược 30s]
+    
+    SendReq --> WaitResp{Tài xế phản hồi?}
+    
+    WaitResp -- Chấp nhận --> Accept[Cập nhật Ride: status = accepted]
+    Accept --> SetDrvBusy[Chuyển trạng thái Tài xế: Busy]
+    SetDrvBusy --> NotifyMatched[Thông báo cho Khách hàng: Đã tìm thấy xe]
+    NotifyMatched --> EndSuccess([Bắt đầu quy trình đón khách])
+    
+    WaitResp -- Từ chối / Hết 30s --> CheckRetry{RetryCount < 5?}
+    CheckRetry -- Còn tài xế tiếp theo --> NextDrv[Tăng RetryCount + 1, chọn tài xế kế tiếp]
+    NextDrv --> SendReq
+    CheckRetry -- Đã thử hết 5 tài xế --> MaxFail[Thông báo: Các tài xế đều đang bận, vui lòng thử lại sau]
+    MaxFail --> EndFail
+```
+
+---
+
+#### 1.7.4 BP-03: Quy trình Thực hiện Chuyến đi & Giám sát Real-time
+
+Quy trình quản lý toàn bộ vòng đời di chuyển từ khi tài xế nhận chuyến đến khi trả khách an toàn.
+
+| Thuộc tính | Chi tiết |
+|------------|----------|
+| **Mục đích** | Đảm bảo tính minh bạch, hiển thị vị trí liên tục cho khách hàng và lưu vết lộ trình |
+| **Actor** | Tài xế, Khách hàng, Hệ thống CAB (Socket Server) |
+| **Tiền điều kiện** | Chuyến đi đang ở trạng thái `accepted` |
+| **Hậu điều kiện** | Chuyến đi chuyển sang `completed`, sẵn sàng tính cước |
+
+**Các bước thực hiện:**
+1. **Di chuyển đến điểm đón**: Tài xế bấm "Bắt đầu di chuyển tới đón". Hệ thống phát socket tọa độ GPS cho Khách hàng thấy tài xế đang chạy đến.
+2. **Đến điểm đón**: Khi tới nơi, Tài xế bấm **"Đã đến điểm đón"** (`driver_arrived`). Khách hàng nhận thông báo "Tài xế đã có mặt tại điểm hẹn".
+3. **Đón khách & Bắt đầu hành trình**: Khách lên xe, Tài xế bấm **"Bắt đầu chuyến đi"** (`in_progress`). Hệ thống ghi nhận mốc thời gian bắt đầu (`startedAt`).
+4. **Hành trình di chuyển**: GPS phát liên tục mỗi 5-10s. Khách hàng theo dõi đường đi trực tiếp trên bản đồ.
+5. **Đến nơi & Hoàn thành**: Tới điểm đến, Tài xế bấm **"Hoàn thành chuyến"** (`completed`). Hệ thống ghi nhận mốc thời gian kết thúc (`completedAt`) và quãng đường thực tế.
+
+---
+
+#### 1.7.5 BP-04: Quy trình Tính cước & Thanh toán
+
+Quy trình xác định cước phí chính xác và thanh toán đa kênh an toàn.
+
+| Thuộc tính | Chi tiết |
+|------------|----------|
+| **Mục đích** | Tự động tính cước minh bạch và thu tiền an toàn, không lưu dữ liệu thẻ nhạy cảm |
+| **Actor** | Khách hàng, Tài xế, Hệ thống CAB, Cổng thanh toán |
+| **Tiền điều kiện** | Chuyến đi vừa chuyển trạng thái `completed` |
+| **Hậu điều kiện** | Hóa đơn được thanh toán thành công (`payment_status = completed`) |
+
+```mermaid
+flowchart TD
+    A[Chuyến đi Hoàn thành] --> B[Hệ thống tự động tính cước:<br/>BaseFare + Km x Đơn giá + Phút x Đơn giá]
+    B --> C[Tạo bản ghi Payment: status = pending]
+    C --> D[Hiển thị hóa đơn chi tiết cho Khách hàng & Tài xế]
+    
+    D --> E{Phương thức thanh toán?}
+    
+    E -- Tiền mặt --> Cash[Khách hàng trả tiền mặt cho Tài xế]
+    Cash --> CashConfirm[Tài xế bấm 'Xác nhận đã nhận đủ tiền']
+    CashConfirm --> PaySuccess[Payment status = completed]
+    
+    E -- Thanh toán điện tử --> OnlinePay[Khách chọn Thẻ / Ví điện tử]
+    OnlinePay --> GatewayReq[Hệ thống gọi API Cổng thanh toán ngoại]
+    GatewayReq --> GatewayProcess{Kết quả giao dịch?}
+    
+    GatewayProcess -- Thành công --> TokenRes[Nhận mã giao dịch TransactionId]
+    TokenRes --> PaySuccess
+    
+    GatewayProcess -- Thất bại --> PayFail[Thông báo giao dịch không thành công]
+    PayFail --> RetryChoice{Khách chọn hướng xử lý?}
+    RetryChoice -- Thử lại thẻ khác --> OnlinePay
+    RetryChoice -- Chuyển sang Tiền mặt --> Cash
+    
+    PaySuccess --> SendReceipt[Gửi hóa đơn điện tử qua In-app & Email]
+    SendReceipt --> NextStep([Chuyển sang bước Đánh giá])
+```
+
+---
+
+#### 1.7.6 BP-05: Quy trình Đánh giá & Phản hồi sau Chuyến đi
+
+| Thuộc tính | Chi tiết |
+|------------|----------|
+| **Mục đích** | Thu thập đánh giá chất lượng phục vụ và cập nhật uy tín của tài xế |
+| **Actor** | Khách hàng, Hệ thống CAB |
+| **Tiền điều kiện** | Chuyến đi đã thanh toán thành công |
+| **Hậu điều kiện** | Rating trung bình của tài xế được tính toán lại |
+
+1. **Hiển thị Form đánh giá**: Sau khi thanh toán xong, màn hình khách hàng tự động hiển thị giao diện chấm điểm (1 đến 5 sao) và ô nhập nhận xét góp ý.
+2. **Khách gửi đánh giá**: Khách hàng chọn số sao và gửi phản hồi (hoặc có thể bấm "Bỏ qua").
+3. **Tổng hợp Rating**: Hệ thống lưu đánh giá vào cơ sở dữ liệu và tính lại điểm số trung bình của Tài xế:
+   $$\text{Rating Mới} = \frac{\text{Tổng điểm đánh giá}}{\text{Tổng số lượt đánh giá}}$$
+4. **Giải phóng trạng thái**: Hệ thống chuyển trạng thái của Tài xế về `Available` sẵn sàng nhận các cuốc xe tiếp theo.
+
+---
+
+#### 1.7.7 BP-06: Quy trình Hủy chuyến (Cancellation Flow)
+
+Quy trình giải quyết các trường hợp ngoại lệ khi Khách hàng hoặc Tài xế hủy chuyến.
+
+| Thuộc tính | Chi tiết |
+|------------|----------|
+| **Mục đích** | Xử lý hủy chuyến minh bạch, giải phóng tài xế và bảo vệ quyền lợi đôi bên |
+| **Actor** | Khách hàng, Tài xế, Hệ thống CAB |
+| **Quy tắc MVP** | Cho phép hủy miễn phí khi tài xế chưa đến điểm đón |
+
+```mermaid
+flowchart TD
+    A[Yêu cầu Hủy chuyến] --> B{Ai thực hiện hủy?}
+    
+    B -- Khách hàng hủy --> CheckCustPhase{Giai đoạn hủy?}
+    CheckCustPhase -- Khi đang searching --> CancelDirect1[Hủy tức thì, không phạt]
+    CheckCustPhase -- Khi tài xế đang đến --> CancelMatched[Cập nhật status = cancelled_by_customer<br/>Thông báo cho Tài xế]
+    CancelMatched --> FreeDriver1[Chuyển Tài xế về Available]
+    
+    B -- Tài xế hủy --> DriverCancel[Tài xế chọn lý do hủy: Hỏng xe / Sự cố]
+    DriverCancel --> CheckDrvPhase[Cập nhật status = cancelled_by_driver]
+    CheckDrvPhase --> NotifyCust[Thông báo cho Khách hàng: Tài xế gặp sự cố]
+    NotifyCust --> AutoReMatch{Khách muốn tìm xe khác?}
+    AutoReMatch -- Có --> ReSearch[Tự động tìm lại tài xế mới quanh vùng]
+    AutoReMatch -- Không --> EndCancel([Hủy chuyến hoàn tất])
+    
+    CancelDirect1 --> EndCancel
+    FreeDriver1 --> EndCancel
+```
+
+---
+
+#### 1.7.8 BP-07: Quy trình Giám sát Vận hành & Xử lý Sự cố (Operations & Support)
+
+Quy trình dành cho bộ phận vận hành (Operator/Admin) để kiểm soát chất lượng và hỗ trợ người dùng.
+
+| Thuộc tính | Chi tiết |
+|------------|----------|
+| **Mục đích** | Giám sát toàn bộ chuyến đi đang chạy, can thiệp sự cố và xem báo cáo kinh doanh |
+| **Actor** | Nhân viên vận hành (Operator), Quản trị viên (Admin), Hệ thống CAB |
+
+1. **Giám sát thời gian thực**: Nhân viên vận hành theo dõi bản đồ trực quan:
+   - Các xe đang `Available` (màu xanh lá)
+   - Các xe đang `Busy` chở khách (màu vàng)
+   - Các chuyến đi đang ở trạng thái `searching` lâu hơn bình thường
+2. **Can thiệp sự cố**:
+   - Khi có khiếu nại hoặc chuyến bị kẹt (mất kết nối > 5 phút), Operator có thể xem chi tiết chuyến, liên hệ trực tiếp khách hàng/tài xế và thực hiện hủy cưỡng chế hoặc điều phối lại nếu cần.
+3. **Báo cáo định kỳ**:
+   - Admin truy cập trang Báo cáo để xuất số liệu: tổng chuyến đi trong ngày, doanh thu thực thu, tỷ lệ cuốc thành công vs cuốc hủy, và bảng xếp hạng tài xế hiệu quả.
+
+---
+
+### 1.8 Các điểm chưa rõ cần xác nhận với khách hàng
 
 Dựa trên mô tả yêu cầu, doanh nghiệp **chưa chốt** các vấn đề sau. Business Analyst cần làm rõ trước khi phát triển:
 
