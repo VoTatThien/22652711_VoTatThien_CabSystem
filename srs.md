@@ -2347,9 +2347,129 @@ graph LR
 
 ---
 
+#### 📋 UC-05: Đăng ký & Xác thực Tài khoản Người dùng (Register & Authenticate Account)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-05` |
+| **Tên Use Case** | Đăng ký & Xác thực Tài khoản Người dùng |
+| **Tác nhân chính (Primary Actor)** | Khách hàng (Customer), Tài xế (Driver), Operator, Admin |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Dịch vụ Email (Email Service), Hệ thống CAB (JWT Engine) |
+| **Mô tả tóm tắt** | Cho phép người dùng đăng ký tài khoản mới và đăng nhập an toàn vào hệ thống với phân quyền theo vai trò (Role-Based Access Control). |
+| **Tiền điều kiện (Preconditions)** | Người dùng có kết nối mạng và thiết bị truy cập ứng dụng web. |
+| **Hậu điều kiện (Postconditions)** | Người dùng được cấp cặp Token JWT (Access Token 15 phút, Refresh Token 7 ngày) và truy cập vào giao diện tương ứng với vai trò. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Người dùng mở trang Đăng ký/Đăng nhập.<br>2. **Nếu đăng ký**: Khách hàng nhập Họ tên, Email, SĐT, Mật khẩu. Hệ thống kiểm tra trùng lặp email/SĐT, mã hóa mật khẩu bằng `bcrypt` (`NFR-SEC-02`), tạo tài khoản ở trạng thái `Active`.<br>3. **Nếu đăng nhập**: Người dùng nhập Email/SĐT và Mật khẩu.<br>4. Hệ thống so khớp mật khẩu mã hóa trong DB, kiểm tra `isActive == true`.<br>5. Hệ thống sinh cặp Token (Access Token + Refresh Token) chứa `userId` và `role`.<br>6. Hệ thống lưu Refresh Token vào DB và trả về Access Token cho Client lưu trữ an toàn.<br>7. Ứng dụng tự động chuyển hướng người dùng đến giao diện phù hợp (Khách hàng $\rightarrow$ Bản đồ đặt xe; Tài xế $\rightarrow$ Bảng điều khiển lái xe; Admin/Operator $\rightarrow$ Dashboard quản trị). |
+| **Luồng nhánh (Alternative Flows)** | **A1: Tài xế đăng ký tài khoản mới**<br>1. Tài xế chọn "Đăng ký làm đối tác tài xế".<br>2. Nhập thông tin cá nhân + Số GPLX + Hạng bằng + Biển số xe + Dòng xe + Màu xe.<br>3. Hệ thống tạo tài khoản User và DriverProfile ở trạng thái `isApproved = false` (chờ duyệt). |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Sai mật khẩu quá 5 lần liên tiếp (`NFR-SEC-06`)**<br>1. Người dùng nhập sai mật khẩu 5 lần trong vòng 1 phút.<br>2. Hệ thống Rate Limiter kích hoạt, tạm khóa khả năng đăng nhập của địa chỉ IP này trong 15 phút, hiển thị thông báo lỗi.<br><br>**E2: Tài khoản đang bị khóa (`isActive = false`)**<br>1. Người dùng đăng nhập vào tài khoản đã bị vô hiệu hóa.<br>2. Hệ thống từ chối đăng nhập, trả về mã lỗi `403 Forbidden` kèm thông báo: *"Tài khoản của bạn đã bị khóa. Vui lòng liên hệ bộ phận hỗ trợ"*. |
+
+---
+
+#### 📋 UC-06: Quản lý Trạng thái Trực tuyến & Phát sóng GPS (Manage Online Status & Stream GPS)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-06` |
+| **Tên Use Case** | Quản lý Trạng thái Trực tuyến & Phát sóng GPS |
+| **Tác nhân chính (Primary Actor)** | Tài xế (Driver) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Hệ thống CAB (Socket Server, Redis/DB) |
+| **Mô tả tóm tắt** | Tài xế bật trạng thái trực tuyến (Online) để sẵn sàng đón nhận các cuốc xe quanh khu vực và thiết bị tự động phát sóng tọa độ GPS thời gian thực định kỳ về hệ thống. |
+| **Tiền điều kiện (Preconditions)** | 1. Tài xế đã đăng nhập thành công.<br>2. Hồ sơ tài xế đã được phê duyệt (`isApproved = true`) và tài khoản đang kích hoạt (`isActive = true`).<br>3. Thiết bị đã bật dịch vụ định vị GPS (Geolocation Permission Granted). |
+| **Hậu điều kiện (Postconditions)** | 1. Trạng thái tài xế chuyển sang `Available`.<br>2. Tọa độ GPS của tài xế được cập nhật liên tục vào DB/Redis để sẵn sàng tham gia thuật toán tìm xe `BRULE-02`. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Tài xế truy cập ứng dụng, gạt thanh gạt **"Bật trực tuyến"**.<br>2. Hệ thống kiểm tra điều kiện hồ sơ đã duyệt, cập nhật trạng thái `status = 'available'` (`BRULE-04`).<br>3. Ứng dụng tài xế thiết lập kết nối WebSocket (Socket.IO) với máy chủ.<br>4. Thiết bị tự động lấy tọa độ GPS từ chip định vị và gửi gói tin `{ lat, lng, bearing, speed }` lên máy chủ mỗi 5-10 giây (`NFR-PERF-02`).<br>5. Máy chủ cập nhật trường `currentLocation` của tài xế và sẵn sàng điều phối chuyến khi có khách đặt xe quanh bán kính 5km.<br>6. Khi hết ca làm việc, Tài xế gạt thanh gạt **"Tắt trực tuyến"** $\rightarrow$ Hệ thống đổi trạng thái về `status = 'offline'`, ngắt luồng truyền phát GPS. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Tài xế đang chở khách chuyển sang trạng thái bận**<br>1. Khi tài xế bấm nhận cuốc xe, hệ thống tự động gán `status = 'busy'`.<br>2. Tọa độ GPS vẫn tiếp tục phát sóng nhưng chỉ chuyển tiếp riêng cho khách hàng của chuyến đi đó theo dõi (`FR-TRACK-02`). |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Tài xế chưa được phê duyệt cố tình bật Online**<br>1. Tài xế chưa được duyệt hồ sơ bấm bật trực tuyến.<br>2. Hệ thống chặn thao tác, hiển thị thông báo: *"Hồ sơ của bạn đang chờ xét duyệt bởi nhân viên vận hành"*. |
+
+---
+
+#### 📋 UC-07: Hủy Chuyến đi & Xử lý Chính sách Hủy (Cancel a Ride)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-07` |
+| **Tên Use Case** | Hủy Chuyến đi & Xử lý Chính sách Hủy |
+| **Tác nhân chính (Primary Actor)** | Khách hàng (Customer), Tài xế (Driver), Operator |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Hệ thống CAB (Notification Hub) |
+| **Mô tả tóm tắt** | Cho phép Khách hàng hoặc Tài xế hủy chuyến xe trước khi bắt đầu hành trình theo đúng quy tắc chính sách hủy `BRULE-06` và tự động giải phóng phương tiện. |
+| **Tiền điều kiện (Preconditions)** | Chuyến đi đang ở một trong các trạng thái: `requested`, `searching`, `accepted`, `driver_arrived`. |
+| **Hậu điều kiện (Postconditions)** | 1. Cuốc xe chuyển sang trạng thái `cancelled`.<br>2. Tài xế được hoàn nguyên trạng thái về `Available`.<br>3. Gửi thông báo lý do hủy cho bên còn lại. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Người dùng bấm nút **"Hủy chuyến đi"** trên giao diện ứng dụng.<br>2. Hệ thống hiển thị hộp thoại xác nhận kèm danh sách lý do hủy (Thay đổi lịch trình, Đặt nhầm xe, Tài xế đến muộn, Xe hỏng...).<br>3. Người dùng chọn lý do và bấm **"Xác nhận hủy"**.<br>4. Hệ thống kiểm tra điều kiện chính sách hủy (`BRULE-06`):<br>&nbsp;&nbsp;&nbsp;&nbsp;• Nếu hủy khi đang `searching`: Hủy tức thì, không phí.<br>&nbsp;&nbsp;&nbsp;&nbsp;• Nếu hủy khi `accepted` / `driver_arrived`: Hủy cuốc, đổi trạng thái Ride sang `cancelled_by_customer` hoặc `cancelled_by_driver`.<br>5. Hệ thống giải phóng tài xế về trạng thái `Available`.<br>6. Hệ thống bắn thông báo tức thì cho bên còn lại qua Socket In-App.<br>7. Cuốc xe kết thúc an toàn. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Tài xế hủy chuyến do sự cố hỏng xe (`EX-06`)**<br>1. Tài xế bấm hủy kèm lý do "Sự cố phương tiện".<br>2. Hệ thống cập nhật `cancelled_by_driver`, đổi tài xế sang `Offline`.<br>3. Hệ thống hiển thị popup cho khách hàng hỏi: *"Tài xế gặp sự cố, bạn có muốn hệ thống tự động tìm xe khác không?"*.<br>4. Nếu khách chọn Có $\rightarrow$ Hệ thống tự động khởi tạo lại tiến trình quét xe mới. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Cố tình hủy chuyến khi xe đang chạy chở khách (`in_progress`)**<br>1. Khách hàng cố tình gửi lệnh hủy khi đang trên đường đi.<br>2. Hệ thống chặn thao tác, trả về thông báo lỗi: *"Không thể hủy cuốc xe khi hành trình đang diễn ra. Vui lòng yêu cầu tài xế kết thúc cuốc hoặc liên hệ tổng đài"*. |
+
+---
+
+#### 📋 UC-08: Đánh giá & Gửi Phản hồi sau Chuyến đi (Rate & Review Driver)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-08` |
+| **Tên Use Case** | Đánh giá & Gửi Phản hồi sau Chuyến đi |
+| **Tác nhân chính (Primary Actor)** | Khách hàng (Customer) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Hệ thống CAB |
+| **Mô tả tóm tắt** | Sau khi chuyến đi hoàn thành và thanh toán xong, khách hàng chấm điểm số sao (1-5) và gửi nhận xét đánh giá chất lượng phục vụ của tài xế. |
+| **Tiền điều kiện (Preconditions)** | Cuốc xe có trạng thái `completed` và hóa đơn thanh toán có trạng thái `COMPLETED`. |
+| **Hậu điều kiện (Postconditions)** | Bản ghi RatingReview được tạo trong cơ sở dữ liệu và điểm đánh giá trung bình của tài xế được tính toán lại theo `BRULE-08`. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Màn hình tự động hiển thị popup đánh giá sau khi thanh toán hoàn tất.<br>2. Khách hàng chọn số lượng ngôi sao (từ 1 đến 5 sao).<br>3. Khách hàng nhập nội dung nhận xét góp ý (tùy chọn, tối đa 500 ký tự).<br>4. Khách hàng bấm nút **"Gửi đánh giá"**.<br>5. Hệ thống kiểm tra ràng buộc `BRULE-08` (mỗi cuốc chỉ đánh giá 1 lần duy nhất).<br>6. Hệ thống lưu bản ghi vào bảng `RatingReviews`.<br>7. Hệ thống tính toán lại điểm trung bình cộng $\bar{R}$ và cập nhật trường `rating`, `totalReviews` trong hồ sơ `DriverProfiles`.<br>8. Hiển thị thông báo cảm ơn khách hàng và đóng giao diện cuốc xe. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Khách hàng bỏ qua không đánh giá**<br>1. Khách hàng bấm nút "Bỏ qua / Để sau".<br>2. Hệ thống đóng popup đánh giá, giữ nguyên rating hiện tại của tài xế. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Đánh giá trùng lặp trên cùng 1 cuốc xe**<br>1. Khách hàng gửi 2 request đánh giá liên tiếp do bấm đúp nút.<br>2. Hệ thống kiểm tra Unique Index `rideId`, từ chối request thứ 2, đảm bảo dữ liệu không bị sai lệch điểm số. |
+
+---
+
+#### 📋 UC-09: Giám sát Bản đồ Trực tuyến & Can thiệp Chuyến lỗi (Monitor Live Map & Intervene Rides)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-09` |
+| **Tên Use Case** | Giám sát Bản đồ Trực tuyến & Can thiệp Chuyến lỗi |
+| **Tác nhân chính (Primary Actor)** | Nhân viên vận hành (Operator), Quản trị viên (Admin) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Dịch vụ Bản đồ (Map Service), Hệ thống CAB |
+| **Mô tả tóm tắt** | Cho phép nhân viên điều hành theo dõi toàn bộ các phương tiện đang hoạt động trên bản đồ số thời gian thực và thực hiện can thiệp hủy/chuyển cuốc khi phát hiện chuyến xe gặp sự cố. |
+| **Tiền điều kiện (Preconditions)** | Operator/Admin đã đăng nhập vào hệ thống quản trị. |
+| **Hậu điều kiện (Postconditions)** | Sự cố cuốc xe được khắc phục, hành động can thiệp được ghi log kiểm toán đầy đủ. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Operator truy cập trang "Giám sát Bản đồ Thời gian thực".<br>2. Hệ thống tải bản đồ nền và hiển thị toàn bộ xe đang hoạt động với mã màu trực quan: Xanh lá (`Available`), Vàng (`Busy`), Đỏ (`Cảnh báo sự cố`).<br>3. Operator lọc xem danh sách các chuyến đi đang chạy (`in_progress`) hoặc đang tìm xe quá lâu (`searching > 2 phút`).<br>4. Khi nhận cuộc gọi khiếu nại từ khách hàng về cuốc xe bị treo hoặc tài xế không di chuyển, Operator nhấp vào biểu tượng chuyến xe để xem thông tin chi tiết.<br>5. Operator sử dụng công cụ **"Can thiệp chuyến xe"**: chọn bấm **"Hủy cưỡng chế"** hoặc **"Điều phối lại tài xế"**.<br>6. Hệ thống thực hiện lệnh can thiệp, gửi thông báo đẩy đến cả khách hàng và tài xế.<br>7. Hệ thống tự động ghi nhật ký kiểm toán `AuditLogs` (`BRULE-10`). |
+| **Luồng nhánh (Alternative Flows)** | **A1: Operator liên hệ trực tiếp tài xế qua điện thoại**<br>1. Tại bước 4, Operator bấm vào nút "Xem SĐT tài xế" để gọi điện thoại hỗ trợ trực tiếp giải quyết khúc mắc lộ trình. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Mất kết nối Socket đến trung tâm điều hành**<br>1. Mạng tại phòng điều hành bị chập chờn.<br>2. Ứng dụng hiển thị cảnh báo viền đỏ "Mất kết nối thời gian thực - Đang tự động kết nối lại...". Khi mạng phục hồi, bản đồ tự động làm mới vị trí toàn bộ xe. |
+
+---
+
+#### 📋 UC-10: Cấu hình Biểu phí Bảng giá Xe (Configure Pricing Matrix)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-10` |
+| **Tên Use Case** | Cấu hình Biểu phí Bảng giá Xe |
+| **Tác nhân chính (Primary Actor)** | Quản trị viên (Admin) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Hệ thống CAB |
+| **Mô tả tóm tắt** | Quản trị viên điều chỉnh mức giá mở cửa, đơn giá mỗi km và đơn giá mỗi phút cho từng phân khúc xe (Sedan, SUV, Van) để linh hoạt theo chiến lược kinh doanh. |
+| **Tiền điều kiện (Preconditions)** | Người dùng đăng nhập với quyền Quản trị viên (`role == 'admin'`). Nhân viên Operator không có quyền truy cập chức năng này (`BRULE-09`). |
+| **Hậu điều kiện (Postconditions)** | Bảng giá mới có hiệu lực ngay lập tức trong bảng `PricingConfigs` cho các cuốc xe khởi tạo tiếp theo. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Admin truy cập mục "Cài đặt Hệ thống" $\rightarrow$ "Cấu hình Biểu phí".<br>2. Hệ thống hiển thị bảng giá hiện hành của 3 hạng xe: Sedan, SUV, Van.<br>3. Admin chọn một hạng xe cần điều chỉnh (ví dụ: Sedan 4 chỗ).<br>4. Admin chỉnh sửa các tham số: Giá mở cửa (`baseFare`), Đơn giá Km (`pricePerKm`), Đơn giá Phút (`pricePerMin`).<br>5. Admin bấm nút **"Lưu thay đổi biểu phí"**.<br>6. Hệ thống kiểm tra tính hợp lệ dữ liệu (các giá trị phải là số dương $> 0$).<br>7. Hệ thống cập nhật bảng `PricingConfigs`, ghi nhận thời gian `updatedAt`.<br>8. Hệ thống chèn bản ghi kiểm toán vào bảng `AuditLogs` lưu vết chi tiết giá cũ và giá mới (`BRULE-10`).<br>9. Hiển thị thông báo: *"Cập nhật biểu phí thành công! Mức giá mới đã có hiệu lực"*. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Admin hoàn nguyên về bảng giá mặc định**<br>1. Admin bấm nút "Khôi phục giá mặc định".<br>2. Hệ thống điền lại các giá trị chuẩn: Sedan (15k/12k/1k), SUV (20k/15k/1.5k), Van (35k/22k/2.5k) $\rightarrow$ Admin bấm Lưu. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Nhập dữ liệu giá âm hoặc bằng 0**<br>1. Admin nhập số âm vào ô đơn giá.<br>2. Hệ thống báo lỗi Validation màu đỏ ngay dưới ô nhập: *"Giá cước phải là số nguyên dương lớn hơn 0"*, vô hiệu hóa nút Lưu. |
+
+---
+
+#### 📋 UC-11: Báo cáo Thống kê Doanh thu & Hiệu suất Vận hành (View Analytics & Performance Reports)
+
+| Thuộc tính | Nội dung đặc tả chi tiết |
+|---|---|
+| **Mã Use Case** | `UC-11` |
+| **Tên Use Case** | Báo cáo Thống kê Doanh thu & Hiệu suất Vận hành |
+| **Tác nhân chính (Primary Actor)** | Quản trị viên (Admin), Ban giám đốc (Board of Directors) |
+| **Tác nhân hỗ trợ (Supporting Actors)** | Hệ thống CAB (Aggregation Engine) |
+| **Mô tả tóm tắt** | Cung cấp các báo cáo phân tích trực quan về tổng số chuyến đi, doanh thu thực thu, tỷ lệ hoàn thành cuốc, tỷ lệ hủy và bảng xếp hạng hiệu quả hoạt động của tài xế. |
+| **Tiền điều kiện (Preconditions)** | Người dùng đăng nhập với tài khoản Quản trị viên (`role == 'admin'`). |
+| **Hậu điều kiện (Postconditions)** | Dữ liệu báo cáo được tổng hợp, hiển thị dưới dạng biểu đồ và bảng số liệu phân tích. |
+| **Luồng sự kiện chính (Main Success Scenario - Happy Path)** | 1. Admin truy cập mục "Báo cáo & Thống kê".<br>2. Admin chọn khoảng thời gian cần phân tích (Hôm nay, 7 ngày qua, Tháng này, hoặc Tùy chỉnh Từ ngày - Đến ngày).<br>3. Admin chọn loại báo cáo mong muốn:<br>&nbsp;&nbsp;&nbsp;&nbsp;• **Báo cáo Doanh thu**: Biểu đồ doanh thu theo thời gian, theo phân khúc xe (Sedan/SUV/Van) và theo phương thức thanh toán (Tiền mặt vs Điện tử).<br>&nbsp;&nbsp;&nbsp;&nbsp;• **Báo cáo Vận hành**: Tổng số cuốc khởi tạo, số cuốc thành công, tỷ lệ hoàn thành (%), tỷ lệ hủy (%).<br>&nbsp;&nbsp;&nbsp;&nbsp;• **Báo cáo Hiệu suất Tài xế**: Xếp hạng Top tài xế có doanh thu cao nhất, rating cao nhất và tỷ lệ từ chối cuốc thấp nhất.<br>4. Hệ thống thực hiện các truy vấn gom nhóm (`MongoDB Aggregation Pipeline`) tính toán số liệu.<br>5. Hệ thống hiển thị các biểu đồ trực quan (Cột, Đường, Tròn) và bảng chi tiết số liệu.<br>6. Admin có thể bấm nút **"Xuất báo cáo (Export Excel / CSV)"** để tải dữ liệu về máy phục vụ báo cáo Ban giám đốc. |
+| **Luồng nhánh (Alternative Flows)** | **A1: Lọc dữ liệu chuyên sâu theo từng tài xế**<br>1. Admin nhập tên/biển số tài xế vào ô lọc trên báo cáo.<br>2. Hệ thống hiển thị biểu đồ chi tiết lịch sử cuốc xe và thu nhập riêng của tài xế đó. |
+| **Luồng ngoại lệ (Exception Flows)** | **E1: Khoảng thời gian lọc không hợp lệ**<br>1. Admin chọn "Từ ngày" lớn hơn "Đến ngày".<br>2. Hệ thống hiển thị cảnh báo: *"Khoảng thời gian chọn không hợp lệ. Ngày bắt đầu phải nhỏ hơn ngày kết thúc"*. |
+
+---
+
 *Document prepared by: Vo Tat Thien (22652711)*  
 *Last updated: 2026-08-20*  
 *Phase: Giai đoạn 6 – Mô hình hóa Use Case (Use Case Modeling & Diagrams)*
+
 
 
 
