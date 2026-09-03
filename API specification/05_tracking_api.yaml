@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+  title: CAB System - Phân hệ 5: Định vị & Giám sát Real-time (Tracking & Socket.IO)
+  version: 1.0.0
+  description: |
+    Tài liệu đặc tả API và Socket.IO Events cho Phân hệ Định vị GPS và Theo dõi xe trực tuyến.
+    - Phục vụ Yêu cầu chức năng: FR-TRACK-01 đến FR-TRACK-04
+    - Tiêu chí chấp nhận: AC-TRK-01, AC-TRK-02, AC-ADM-03
+    - Tác giả: Võ Tất Thiện (22652711)
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Tracking
+    description: Bản đồ xe trực tuyến cho Operator và các sự kiện truyền phát WebSocket
+paths:
+  /tracking/live:
+    get:
+      summary: Lấy danh sách các tài xế đang trực tuyến cùng tọa độ GPS
+      description: Quyền Admin / Operator. Hiển thị toàn bộ xe đang active trên bản đồ giám sát trung tâm.
+      tags:
+        - Tracking
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy danh sách thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        driverId:
+                          type: string
+                          example: 60b8d295f1d2c72b8c5e6f3d
+                        location:
+                          type: object
+                          properties:
+                            lat:
+                              type: number
+                              example: 10.762622
+                            lng:
+                              type: number
+                              example: 106.660172
+                        status:
+                          type: string
+                          example: available
+                        currentRideId:
+                          type: string
+                          example: null
+                  message:
+                    type: string
+                    example: Lấy danh sách tài xế online thành công
+        "401":
+          description: Chưa xác thực
+        "403":
+          description: Không có quyền truy cập

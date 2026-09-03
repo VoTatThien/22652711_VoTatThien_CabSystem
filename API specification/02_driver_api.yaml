@@ -1,0 +1,204 @@
+openapi: 3.0.0
+info:
+  title: CAB System - Phân hệ 2: Quản lý Tài xế & Phương tiện (Driver Management)
+  version: 1.0.0
+  description: |
+    Tài liệu đặc tả API cho Phân hệ Quản lý Tài xế và Phương tiện xe.
+    - Phục vụ Yêu cầu chức năng: FR-DRV-01 đến FR-DRV-06
+    - Tiêu chí chấp nhận: AC-DRV-01, AC-DRV-02, AC-TRK-01
+    - Tác giả: Võ Tất Thiện (22652711)
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Driver
+    description: Quản lý thông tin xe, trạng thái trực tuyến, xét duyệt hồ sơ tài xế
+paths:
+  /drivers/vehicle:
+    post:
+      summary: Đăng ký thông tin phương tiện mới
+      description: Tài xế khai báo thông tin xe vận chuyển.
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - plateNumber
+                - vehicleType
+              properties:
+                plateNumber:
+                  type: string
+                  example: 51H-123.45
+                vehicleType:
+                  type: string
+                  enum: [sedan, suv, van]
+                  example: suv
+                brand:
+                  type: string
+                  example: Honda
+                model:
+                  type: string
+                  example: CR-V
+                color:
+                  type: string
+                  example: Đen
+                seats:
+                  type: integer
+                  example: 7
+      responses:
+        "201":
+          description: Đăng ký xe thành công
+        "409":
+          description: Biển số xe đã được đăng ký trên hệ thống
+    put:
+      summary: Cập nhật thông tin phương tiện
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Cập nhật thông tin xe thành công
+
+  /drivers/status:
+    put:
+      summary: Bật / Tắt trạng thái trực tuyến
+      description: Chuyển đổi giữa available và offline. Yêu cầu hồ sơ đã được duyệt (isApproved = true).
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [available, offline]
+                  example: available
+      responses:
+        "200":
+          description: Cập nhật trạng thái thành công
+        "403":
+          description: Hồ sơ chưa được phê duyệt bởi Operator
+
+  /drivers/pending:
+    get:
+      summary: Danh sách hồ sơ tài xế chờ xét duyệt
+      description: Phân trang danh sách tài xế mới đăng ký ở trạng thái chờ duyệt.
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Lấy danh sách thành công
+
+  /drivers/{id}/approve:
+    put:
+      summary: Phê duyệt hồ sơ tài xế
+      description: Quyền Operator / Admin. Đổi isApproved thành true và gửi email chúc mừng.
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: User ID của tài xế
+      responses:
+        "200":
+          description: Phê duyệt hồ sơ thành công
+
+  /drivers/{id}/reject:
+    put:
+      summary: Từ chối hồ sơ tài xế
+      description: Quyền Operator / Admin. Từ chối kèm theo lý do cụ thể.
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  example: Ảnh giấy phép lái xe mờ không rõ số
+      responses:
+        "200":
+          description: Từ chối hồ sơ thành công
+
+  /drivers/profile:
+    get:
+      summary: Xem dashboard chỉ số của tài xế
+      description: Lấy thống kê tổng số cuốc xe, rating trung bình và doanh thu tạm tính.
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy dữ liệu thành công
+
+  /drivers/{id}/block:
+    put:
+      summary: Khóa tài khoản tài xế vi phạm
+      description: Quyền Admin. Chuyển isActive thành false và ngắt socket.
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Đã khóa tài khoản tài xế thành công

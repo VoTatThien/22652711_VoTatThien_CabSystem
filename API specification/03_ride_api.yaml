@@ -1,0 +1,266 @@
+openapi: 3.0.0
+info:
+  title: CAB System - Phân hệ 3: Đặt xe & Vòng đời Chuyến đi (Ride Booking & Lifecycle)
+  version: 1.0.0
+  description: |
+    Tài liệu đặc tả API cho Phân hệ Đặt xe, Ước tính cước phí và Vòng đời Chuyến đi.
+    - Phục vụ Yêu cầu chức năng: FR-RIDE-01 đến FR-RIDE-09
+    - Tiêu chí chấp nhận: AC-BOOK-01, AC-BOOK-02, AC-RIDE-01, AC-CNC-01, AC-CNC-02
+    - Tác giả: Võ Tất Thiện (22652711)
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Ride
+    description: Tìm địa chỉ, tính cước ước tính, đặt xe, cập nhật trạng thái chuyến đi
+paths:
+  /rides/geocode:
+    get:
+      summary: Tìm kiếm địa chỉ Geocoding
+      description: Chuyển đổi chuỗi địa chỉ thành danh sách gợi ý kèm tọa độ [lng, lat].
+      tags:
+        - Ride
+      parameters:
+        - in: query
+          name: address
+          required: true
+          schema:
+            type: string
+          example: Dai hoc Cong Nghiep TPHCM
+      responses:
+        "200":
+          description: Lấy danh sách tọa độ thành công
+
+  /rides/estimate:
+    post:
+      summary: Ước tính cước phí chuyến đi
+      description: Áp dụng công thức BRULE-01 để tính cước phí dựa trên khoảng cách và thời gian dự kiến.
+      tags:
+        - Ride
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pickupLocation
+                - dropoffLocation
+                - vehicleType
+              properties:
+                pickupLocation:
+                  type: array
+                  items:
+                    type: number
+                  example: [106.6881, 10.8222]
+                  description: [longitude, latitude]
+                dropoffLocation:
+                  type: array
+                  items:
+                    type: number
+                  example: [106.7009, 10.7769]
+                  description: [longitude, latitude]
+                vehicleType:
+                  type: string
+                  enum: [sedan, suv, van]
+                  example: sedan
+      responses:
+        "200":
+          description: Ước tính cước thành công, trả về chi tiết giá vé
+
+  /rides/book:
+    post:
+      summary: Khởi tạo đặt chuyến xe trực tuyến
+      description: Tạo mới bản ghi Ride với status = searching, bắt đầu thuật toán ghép tài xế 5km.
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pickupAddress
+                - pickupLocation
+                - dropoffAddress
+                - dropoffLocation
+                - vehicleType
+                - paymentMethod
+              properties:
+                pickupAddress:
+                  type: string
+                  example: 12 Nguyễn Văn Bảo, Phường 4, Gò Vấp, TP.HCM
+                pickupLocation:
+                  type: array
+                  items:
+                    type: number
+                  example: [106.6881, 10.8222]
+                dropoffAddress:
+                  type: string
+                  example: Chợ Bến Thành, Quận 1, TP.HCM
+                dropoffLocation:
+                  type: array
+                  items:
+                    type: number
+                  example: [106.7009, 10.7769]
+                vehicleType:
+                  type: string
+                  enum: [sedan, suv, van]
+                  example: sedan
+                paymentMethod:
+                  type: string
+                  enum: [cash, e_payment]
+                  example: cash
+      responses:
+        "201":
+          description: Đặt xe thành công, đang quét tìm tài xế
+
+  /rides/{id}/arrived:
+    put:
+      summary: Cập nhật: Tài xế đã đến điểm đón
+      description: Đổi status = driver_arrived, gửi push notification cho khách hàng.
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cập nhật mốc đến đón thành công
+
+  /rides/{id}/start:
+    put:
+      summary: Cập nhật: Bắt đầu chuyến đi
+      description: Khách lên xe, đổi status = in_progress, ghi nhận startedAt.
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Bắt đầu chuyến đi thành công
+
+  /rides/{id}/complete:
+    put:
+      summary: Cập nhật: Hoàn thành chuyến đi
+      description: Xe tới đích, đổi status = completed, ghi nhận completedAt và kích hoạt tính cước thực tế.
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                actualDistance:
+                  type: number
+                  example: 8.8
+                actualDuration:
+                  type: number
+                  example: 25
+      responses:
+        "200":
+          description: Hoàn thành chuyến đi thành công
+
+  /rides/{id}/cancel:
+    put:
+      summary: Hủy chuyến đi
+      description: Khách hàng hoặc tài xế hủy chuyến theo chính sách BRULE-06.
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reason:
+                  type: string
+                  example: Thay đổi lịch trình cá nhân
+      responses:
+        "200":
+          description: Hủy chuyến thành công
+
+  /rides/history:
+    get:
+      summary: Tra cứu lịch sử chuyến đi
+      description: Lấy danh sách các chuyến đi đã hoàn thành hoặc hủy của user hiện tại.
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [completed, cancelled]
+      responses:
+        "200":
+          description: Lấy lịch sử thành công
+
+  /rides/{id}:
+    get:
+      summary: Xem thông tin chi tiết một chuyến đi
+      description: Xem chi tiết lộ trình, tài xế, phương tiện và cước phí.
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lấy thông tin chuyến đi thành công

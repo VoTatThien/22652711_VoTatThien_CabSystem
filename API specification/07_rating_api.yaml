@@ -1,0 +1,96 @@
+openapi: 3.0.0
+info:
+  title: CAB System - Phân hệ 7: Đánh giá & Phản hồi sau chuyến (Rating & Review)
+  version: 1.0.0
+  description: |
+    Tài liệu đặc tả API cho Phân hệ Đánh giá sao và Nhận xét tài xế.
+    - Phục vụ Yêu cầu chức năng: FR-RATE-01 đến FR-RATE-03
+    - Tiêu chí chấp nhận: AC-RAT-01
+    - Tác giả: Võ Tất Thiện (22652711)
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Rating
+    description: Đánh giá chất lượng dịch vụ sau khi cuốc xe hoàn tất
+paths:
+  /ratings:
+    post:
+      summary: Gửi đánh giá cho chuyến đi
+      description: Quyền Customer. Chấm điểm từ 1 đến 5 sao và để lại nhận xét. Tự động cập nhật rating trung bình tài xế theo BRULE-08.
+      tags:
+        - Rating
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rideId
+                - rating
+              properties:
+                rideId:
+                  type: string
+                  example: 60b8d295f1d2c72b8c5e6f50
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                  example: 5
+                comment:
+                  type: string
+                  example: Tài xế lái xe an toàn, lịch sự và xe sạch sẽ.
+      responses:
+        "201":
+          description: Gửi đánh giá thành công
+        "400":
+          description: Chuyến đi chưa hoàn tất hoặc đã được đánh giá trước đó
+
+  /ratings/driver/{driverId}:
+    get:
+      summary: Xem danh sách đánh giá của tài xế
+      description: Phân trang danh sách các lượt đánh giá và nhận xét của một tài xế.
+      tags:
+        - Rating
+      parameters:
+        - in: path
+          name: driverId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Lấy danh sách đánh giá thành công
+
+  /ratings/my-reviews:
+    get:
+      summary: Tài xế xem đánh giá của chính mình
+      description: Quyền Driver. Lấy các nhận xét từ khách hàng về các cuốc xe mình đã chở.
+      tags:
+        - Rating
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy danh sách phản hồi thành công

@@ -1,0 +1,148 @@
+openapi: 3.0.0
+info:
+  title: CAB System - Phân hệ 4: Tính cước & Thanh toán (Payment & Pricing)
+  version: 1.0.0
+  description: |
+    Tài liệu đặc tả API cho Phân hệ Quản lý Biểu phí, Tính cước thực tế và Thanh toán.
+    - Phục vụ Yêu cầu chức năng: FR-PAY-01 đến FR-PAY-07
+    - Tiêu chí chấp nhận: AC-PAY-01, AC-PAY-02, AC-ADM-02
+    - Tác giả: Võ Tất Thiện (22652711)
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Payment
+    description: Tính cước thực tế, cấu hình biểu phí, thanh toán tiền mặt và ví điện tử
+paths:
+  /payments/{rideId}/calculate:
+    post:
+      summary: Tính toán cước phí thực tế cuối cùng
+      description: Tính cước dựa trên quãng đường và thời gian thực tế ghi nhận từ GPS theo BRULE-01.
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tính cước thành công
+        "404":
+          description: Không tìm thấy chuyến đi
+
+  /payments/pricing:
+    get:
+      summary: Lấy bảng cấu hình giá cước hiện hành
+      description: Trả về danh sách đơn giá cơ sở, đơn giá/km và đơn giá/phút theo từng loại xe.
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy bảng giá thành công
+
+  /payments/pricing/{vehicleType}:
+    put:
+      summary: Cập nhật cấu hình biểu phí xe
+      description: Quyền Admin. Cập nhật baseFare, pricePerKm, pricePerMin cho loại xe tương ứng.
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: vehicleType
+          required: true
+          schema:
+            type: string
+            enum: [sedan, suv, van]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - baseFare
+                - pricePerKm
+                - pricePerMin
+              properties:
+                baseFare:
+                  type: number
+                  example: 16000
+                pricePerKm:
+                  type: number
+                  example: 13000
+                pricePerMin:
+                  type: number
+                  example: 1200
+      responses:
+        "200":
+          description: Cập nhật giá cước thành công
+
+  /payments/{rideId}/cash-confirm:
+    post:
+      summary: Tài xế xác nhận đã thu tiền mặt
+      description: Quyền Driver. Đổi trạng thái giao dịch thành COMPLETED.
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Xác nhận thu tiền mặt thành công
+
+  /payments/{rideId}/e-payment:
+    post:
+      summary: Xử lý thanh toán điện tử
+      description: Khách hàng thanh toán qua cổng thanh toán tích hợp (VNPay/MoMo).
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thanh toán điện tử thành công
+
+  /payments/{rideId}/invoice:
+    get:
+      summary: Xuất hóa đơn / Biên lai điện tử
+      description: Xem chi tiết hóa đơn chuyến đi bao gồm lộ trình, thuế VAT và thông tin tài xế.
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lấy hóa đơn thành công

@@ -1,0 +1,79 @@
+openapi: 3.0.0
+info:
+  title: CAB System - Phân hệ 6: Quản lý Thông báo (Notification)
+  version: 1.0.0
+  description: |
+    Tài liệu đặc tả API cho Phân hệ Thông báo người dùng.
+    - Phục vụ Yêu cầu chức năng: FR-NOTIF-01 đến FR-NOTIF-05
+    - Tiêu chí chấp nhận: AC-AUTH-01
+    - Tác giả: Võ Tất Thiện (22652711)
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Notification
+    description: Hộp thư thông báo trong ứng dụng và trạng thái đã đọc
+paths:
+  /notifications:
+    get:
+      summary: Lấy danh sách thông báo của người dùng hiện tại
+      description: Phân trang danh sách thông báo, hỗ trợ lọc theo trạng thái đã đọc hay chưa.
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+        - in: query
+          name: isRead
+          schema:
+            type: boolean
+          description: Lọc theo đã đọc (true) hoặc chưa đọc (false)
+      responses:
+        "200":
+          description: Lấy danh sách thông báo thành công
+
+  /notifications/{id}/read:
+    put:
+      summary: Đánh dấu một thông báo đã đọc
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Đánh dấu đã đọc thành công
+
+  /notifications/read-all:
+    put:
+      summary: Đánh dấu toàn bộ thông báo là đã đọc
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Đã đánh dấu tất cả là đã đọc

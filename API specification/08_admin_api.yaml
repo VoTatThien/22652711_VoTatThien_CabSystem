@@ -1,0 +1,239 @@
+openapi: 3.0.0
+info:
+  title: CAB System - Phân hệ 8: Quản trị Vận hành & Báo cáo (Admin & Analytics)
+  version: 1.0.0
+  description: |
+    Tài liệu đặc tả API cho Phân hệ Quản trị hệ thống, Báo cáo vận hành, Doanh thu, Audit Log và Phân quyền RBAC.
+    - Phục vụ Yêu cầu chức năng: FR-ADM-01 đến FR-ADM-08, FR-SEC-01 đến FR-SEC-05
+    - Tiêu chí chấp nhận: AC-ADM-01, AC-ADM-02, AC-ADM-03
+    - Tác giả: Võ Tất Thiện (22652711)
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+tags:
+  - name: Admin
+    description: Dashboard tổng quan, can thiệp sự cố, báo cáo tài chính, audit log
+paths:
+  /admin/dashboard:
+    get:
+      summary: Dashboard tổng quan vận hành
+      description: Quyền Admin / Operator. Lấy các chỉ số tổng quan trong ngày (doanh thu, số cuốc, tài xế online).
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy dữ liệu dashboard thành công
+
+  /admin/customers:
+    get:
+      summary: Quản lý danh sách khách hàng
+      description: Tìm kiếm, lọc và phân trang danh sách tài khoản khách hàng.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Lấy danh sách thành công
+
+  /admin/drivers:
+    get:
+      summary: Quản lý danh sách tài xế
+      description: Phân trang danh sách tài xế, hỗ trợ lọc theo trạng thái duyệt và trạng thái online.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [available, busy, offline]
+      responses:
+        "200":
+          description: Lấy danh sách tài xế thành công
+
+  /admin/rides:
+    get:
+      summary: Quản lý toàn bộ chuyến xe
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy danh sách chuyến xe thành công
+
+  /admin/rides/{id}/intervene:
+    put:
+      summary: Operator can thiệp xử lý chuyến xe lỗi
+      description: Quyền Admin / Operator. Hủy cưỡng chế hoặc chuyển cuốc cho tài xế khác khi xảy ra sự cố khẩn cấp (EX-06).
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+                - reason
+              properties:
+                action:
+                  type: string
+                  enum: [cancel, reassign]
+                  example: cancel
+                reason:
+                  type: string
+                  example: Tài xế gặp tai nạn giữa đường
+      responses:
+        "200":
+          description: Can thiệp chuyến xe thành công
+
+  /admin/payments:
+    get:
+      summary: Tra cứu nhật ký giao dịch thanh toán
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy nhật ký giao dịch thành công
+
+  /admin/reports/revenue:
+    get:
+      summary: Báo cáo doanh thu tài chính
+      description: Lọc theo khoảng thời gian và nhóm theo ngày, tuần, tháng.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+          example: "2026-08-01"
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+          example: "2026-08-31"
+        - in: query
+          name: groupBy
+          schema:
+            type: string
+            enum: [day, week, month]
+            default: day
+      responses:
+        "200":
+          description: Lấy báo cáo doanh thu thành công
+
+  /admin/reports/operations:
+    get:
+      summary: Báo cáo vận hành (Tỷ lệ hoàn thành / hủy)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy báo cáo vận hành thành công
+
+  /admin/reports/drivers:
+    get:
+      summary: Báo cáo hiệu suất và xếp hạng tài xế
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy báo cáo hiệu suất thành công
+
+  /admin/audit-logs:
+    get:
+      summary: Tra cứu nhật ký kiểm toán bất biến (Audit Logs)
+      description: Quyền Admin. Kiểm tra các thao tác nhạy cảm (duyệt tài xế, sửa biểu phí) theo BRULE-10.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Lấy nhật ký audit logs thành công
+
+  /admin/users/{id}/role:
+    put:
+      summary: Phân quyền vai trò người dùng (RBAC)
+      description: Quyền Super Admin. Thay đổi vai trò giữa customer, driver, operator, admin.
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum: [customer, driver, operator, admin]
+                  example: operator
+      responses:
+        "200":
+          description: Phân quyền thành công
