@@ -1,0 +1,1472 @@
+openapi: 3.0.0
+info:
+  title: CAB System API
+  version: 1.0.0
+  description: API Documentation for Online Cab Booking Platform - Vo Tat Thien 22652711
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Development Server (v1)
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  /tracking/live:
+    get:
+      summary: Lấy danh sách các tài xế đang trực tuyến cùng vị trí
+      description: Yêu cầu quyền admin hoặc operator. Trả về danh sách vị trí hiện tại
+        của các tài xế đang online.
+      tags:
+        - Tracking
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lấy danh sách thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        driverId:
+                          type: string
+                          example: 60b8d295f1d2c72b8c5e6f3d
+                        location:
+                          type: object
+                          properties:
+                            lat:
+                              type: number
+                              example: 10.762622
+                            lng:
+                              type: number
+                              example: 106.660172
+                        status:
+                          type: string
+                          example: available
+                        currentRideId:
+                          type: string
+                          example: null
+                  message:
+                    type: string
+                    example: Lấy danh sách tài xế online thành công
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden - Không có quyền truy cập
+        "500":
+          description: Internal Server Error
+  /rides/geocode:
+    get:
+      summary: Search address
+      description: Geocode an address to coordinates
+      tags:
+        - Ride
+      parameters:
+        - in: query
+          name: address
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Address details retrieved successfully
+        "400":
+          description: Bad request
+        "500":
+          description: Internal server error
+  /rides/estimate:
+    post:
+      summary: Estimate fare
+      description: Estimate the fare for a trip
+      tags:
+        - Ride
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pickupLocation
+                - dropoffLocation
+                - vehicleType
+              properties:
+                pickupLocation:
+                  type: array
+                  items:
+                    type: number
+                  description:
+                    - longitude
+                    - latitude
+                dropoffLocation:
+                  type: array
+                  items:
+                    type: number
+                  description:
+                    - longitude
+                    - latitude
+                vehicleType:
+                  type: string
+      responses:
+        "200":
+          description: Fare estimated successfully
+        "400":
+          description: Bad request
+        "500":
+          description: Internal server error
+  /rides/book:
+    post:
+      summary: Book a ride
+      description: Create a new ride booking
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - pickupAddress
+                - pickupLocation
+                - dropoffAddress
+                - dropoffLocation
+                - vehicleType
+                - paymentMethod
+              properties:
+                pickupAddress:
+                  type: string
+                pickupLocation:
+                  type: array
+                  items:
+                    type: number
+                dropoffAddress:
+                  type: string
+                dropoffLocation:
+                  type: array
+                  items:
+                    type: number
+                vehicleType:
+                  type: string
+                paymentMethod:
+                  type: string
+      responses:
+        "201":
+          description: Ride booked successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+  "/rides/{id}/arrived":
+    put:
+      summary: Mark arrived at pickup
+      description: Driver marks as arrived at pickup location
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Marked as arrived successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  "/rides/{id}/start":
+    put:
+      summary: Start ride
+      description: Driver starts the ride
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ride started successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  "/rides/{id}/complete":
+    put:
+      summary: Complete ride
+      description: Driver marks ride as completed
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ride completed successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  "/rides/{id}/cancel":
+    put:
+      summary: Cancel ride
+      description: Cancel an ongoing or pending ride
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Ride cancelled successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  /rides/history:
+    get:
+      summary: Ride history
+      description: Get user's ride history
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        "200":
+          description: History retrieved successfully
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+  "/rides/{id}":
+    get:
+      summary: Ride detail
+      description: Get specific ride detail
+      tags:
+        - Ride
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ride detail retrieved successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  /ratings:
+    post:
+      summary: Gửi đánh giá cho chuyến đi
+      description: Yêu cầu quyền customer.
+      tags:
+        - Rating
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - rideId
+                - rating
+              properties:
+                rideId:
+                  type: string
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+      responses:
+        "201":
+          description: Đánh giá thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Lỗi server
+  "/ratings/driver/{driverId}":
+    get:
+      summary: Lấy danh sách đánh giá của một tài xế
+      tags:
+        - Rating
+      parameters:
+        - in: path
+          name: driverId
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+        "404":
+          description: Không tìm thấy tài xế
+        "500":
+          description: Lỗi server
+  /ratings/my-reviews:
+    get:
+      summary: Tài xế xem đánh giá của chính mình
+      description: Yêu cầu quyền driver.
+      tags:
+        - Rating
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Lỗi server
+  "/payments/{rideId}/calculate":
+    post:
+      summary: Calculate actual fare
+      description: Calculate the actual final fare for a completed ride
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Fare calculated successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  /payments/pricing:
+    get:
+      summary: Get pricing config
+      description: Retrieve system pricing configuration
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Pricing config retrieved successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+  "/payments/pricing/{vehicleType}":
+    put:
+      summary: Update pricing
+      description: Update pricing configuration for a vehicle type
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: vehicleType
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - baseFare
+                - pricePerKm
+                - pricePerMin
+              properties:
+                baseFare:
+                  type: number
+                pricePerKm:
+                  type: number
+                pricePerMin:
+                  type: number
+      responses:
+        "200":
+          description: Pricing updated successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+  "/payments/{rideId}/cash-confirm":
+    post:
+      summary: Confirm cash payment
+      description: Driver confirms receipt of cash payment
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cash payment confirmed successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  "/payments/{rideId}/e-payment":
+    post:
+      summary: Process e-payment
+      description: Customer initiates e-payment (MoMo, ZaloPay, etc.)
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: E-payment processed successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  "/payments/{rideId}/invoice":
+    get:
+      summary: Get invoice
+      description: Retrieve digital invoice for a trip
+      tags:
+        - Payment
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: rideId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Invoice retrieved successfully
+        "401":
+          description: Unauthorized
+        "404":
+          description: Ride not found
+        "500":
+          description: Internal server error
+  /notifications:
+    get:
+      summary: Lấy danh sách thông báo của user hiện tại
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: Số trang
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Số thông báo mỗi trang
+        - in: query
+          name: isRead
+          schema:
+            type: boolean
+          description: Lọc theo trạng thái đã đọc
+      responses:
+        "200":
+          description: Lấy danh sách thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        title:
+                          type: string
+                        message:
+                          type: string
+                        isRead:
+                          type: boolean
+                        createdAt:
+                          type: string
+                          format: date-time
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+        "500":
+          description: Lỗi server
+  /notifications/read-all:
+    put:
+      summary: Đánh dấu tất cả thông báo là đã đọc
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+        "500":
+          description: Lỗi server
+  "/notifications/{id}/read":
+    put:
+      summary: Đánh dấu 1 thông báo là đã đọc
+      tags:
+        - Notification
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+        "404":
+          description: Không tìm thấy thông báo
+        "500":
+          description: Lỗi server
+  /drivers/vehicle:
+    post:
+      summary: Register vehicle
+      description: Register a new vehicle for driver
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                plateNumber:
+                  type: string
+                vehicleType:
+                  type: string
+                brand:
+                  type: string
+                model:
+                  type: string
+                color:
+                  type: string
+      responses:
+        "201":
+          description: Vehicle registered successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+    put:
+      summary: Update vehicle
+      description: Update vehicle information
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                color:
+                  type: string
+                vehicleType:
+                  type: string
+      responses:
+        "200":
+          description: Vehicle updated successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+  /drivers/status:
+    put:
+      summary: Toggle online/offline
+      description: Change driver's availability status
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - available
+                    - offline
+      responses:
+        "200":
+          description: Status updated successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+  /drivers/pending:
+    get:
+      summary: List pending approvals
+      description: List all drivers waiting for approval (operator/admin only)
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: List retrieved successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+  "/drivers/{id}/approve":
+    put:
+      summary: Approve driver
+      description: Approve a pending driver account
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Driver approved successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Driver not found
+        "500":
+          description: Internal server error
+  "/drivers/{id}/reject":
+    put:
+      summary: Reject driver
+      description: Reject a pending driver account
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Driver rejected successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Driver not found
+        "500":
+          description: Internal server error
+  /drivers/profile:
+    get:
+      summary: Driver dashboard
+      description: Get driver profile and stats for dashboard
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dashboard data retrieved successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "500":
+          description: Internal server error
+  "/drivers/{id}/block":
+    put:
+      summary: Block driver
+      description: Block a driver account (admin only)
+      tags:
+        - Driver
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Driver blocked successfully
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Driver not found
+        "500":
+          description: Internal server error
+  /auth/register:
+    post:
+      summary: Register customer
+      description: Register a new customer account
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - phone
+                - password
+              properties:
+                fullName:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "201":
+          description: Registered successfully
+        "400":
+          description: Bad request
+        "409":
+          description: Conflict (Email or phone exists)
+        "500":
+          description: Internal server error
+  /auth/register/driver:
+    post:
+      summary: Register driver
+      description: Register a new driver account
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - phone
+                - password
+                - licenseNumber
+                - licenseClass
+                - plateNumber
+                - vehicleType
+                - brand
+                - model
+                - color
+              properties:
+                fullName:
+                  type: string
+                email:
+                  type: string
+                phone:
+                  type: string
+                password:
+                  type: string
+                licenseNumber:
+                  type: string
+                licenseClass:
+                  type: string
+                plateNumber:
+                  type: string
+                vehicleType:
+                  type: string
+                brand:
+                  type: string
+                model:
+                  type: string
+                color:
+                  type: string
+      responses:
+        "201":
+          description: Driver registered successfully
+        "400":
+          description: Bad request
+        "409":
+          description: Conflict
+        "500":
+          description: Internal server error
+  /auth/login:
+    post:
+      summary: Login
+      description: Login for users
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Logged in successfully
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+  /auth/profile:
+    get:
+      summary: Get profile
+      description: Get user profile details
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Profile retrieved successfully
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+    put:
+      summary: Update profile
+      description: Update user profile details
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        "200":
+          description: Profile updated successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+  /auth/change-password:
+    put:
+      summary: Change password
+      description: Change user password
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - currentPassword
+                - newPassword
+              properties:
+                currentPassword:
+                  type: string
+                newPassword:
+                  type: string
+      responses:
+        "200":
+          description: Password changed successfully
+        "400":
+          description: Bad request
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+  /auth/logout:
+    post:
+      summary: Logout
+      description: Logout user
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logged out successfully
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+  /auth/refresh-token:
+    post:
+      summary: Refresh token
+      description: Get new access and refresh tokens
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - refreshToken
+              properties:
+                refreshToken:
+                  type: string
+      responses:
+        "200":
+          description: Tokens refreshed successfully
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+  /admin/dashboard:
+    get:
+      summary: Tổng quan dashboard
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Thành công
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      totalRides:
+                        type: integer
+                      totalRevenue:
+                        type: number
+                      activeDrivers:
+                        type: integer
+                      totalCustomers:
+                        type: integer
+                      recentRides:
+                        type: array
+                        items:
+                          type: object
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+  /admin/customers:
+    get:
+      summary: Danh sách khách hàng
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+  /admin/drivers:
+    get:
+      summary: Danh sách tài xế
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+  /admin/rides:
+    get:
+      summary: Danh sách chuyến đi
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+        - in: query
+          name: status
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thành công
+  "/admin/rides/{id}/intervene":
+    put:
+      summary: Can thiệp chuyến đi (hủy, gán lại)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+                - reason
+              properties:
+                action:
+                  type: string
+                  enum:
+                    - cancel
+                    - reassign
+                reason:
+                  type: string
+      responses:
+        "200":
+          description: Thành công
+  /admin/payments:
+    get:
+      summary: Lịch sử giao dịch
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Thành công
+  /admin/reports/revenue:
+    get:
+      summary: Báo cáo doanh thu
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: groupBy
+          schema:
+            type: string
+            enum:
+              - day
+              - week
+              - month
+      responses:
+        "200":
+          description: Thành công
+  /admin/reports/operations:
+    get:
+      summary: Báo cáo hoạt động
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Thành công
+  /admin/reports/drivers:
+    get:
+      summary: Báo cáo hiệu suất tài xế
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: startDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: endDate
+          schema:
+            type: string
+            format: date
+        - in: query
+          name: limit
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Thành công
+  /admin/audit-logs:
+    get:
+      summary: Lấy nhật ký hệ thống (Audit logs)
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Thành công
+  "/admin/users/{id}/role":
+    put:
+      summary: Thay đổi vai trò người dùng
+      tags:
+        - Admin
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+      responses:
+        "200":
+          description: Thành công
+tags:
+  - name: Tracking
+    description: API theo dõi vị trí tài xế
+  - name: Ride
+    description: Ride booking and management
+  - name: Rating
+    description: API đánh giá chuyến đi
+  - name: Payment
+    description: Payment and pricing operations
+  - name: Notification
+    description: API quản lý thông báo người dùng
+  - name: Driver
+    description: Driver management and operations
+  - name: Auth
+    description: Authentication and authorization
+  - name: Admin
+    description: API quản trị hệ thống
