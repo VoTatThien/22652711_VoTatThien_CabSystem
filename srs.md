@@ -2632,65 +2632,65 @@ $$\text{Mục tiêu nghiệp vụ (BG)} \longrightarrow \text{Yêu cầu nghiệ
 
 | Mã BG | Mã BR | Mã FR | Tên Chức năng / Mô tả tóm tắt | Mã UC | Mã AC | TESTCASE |
 |:---:|:---:|:---:|---|:---:|:---:|:---:|
-| **BG-01, BG-12** | BR-001 | **FR-AUTH-01** | Đăng ký tài khoản Khách hàng | UC-05 | AC-AUTH-01 | TC-AUTH-021, TC-AUTH-022, TC-AUTH-023, TC-AUTH-024, TC-AUTH-025 |
-| **BG-01, BG-07** | BR-002 | **FR-AUTH-02** | Đăng ký tài khoản Đối tác Tài xế | UC-04, UC-05 | AC-DRV-01 | TC-AUTH-026, TC-AUTH-027, TC-AUTH-028 |
-| **BG-12** | BR-003, BR-041 | **FR-AUTH-03** | Đăng nhập hệ thống & Cấp phát JWT | UC-05 | AC-AUTH-02 | TC-AUTH-001, TC-AUTH-002, TC-AUTH-003, TC-AUTH-004, TC-AUTH-005, TC-AUTH-006, TC-AUTH-007, TC-AUTH-008, TC-AUTH-009, TC-AUTH-010, TC-AUTH-011, TC-AUTH-012, TC-AUTH-013, TC-AUTH-014, TC-AUTH-015, TC-AUTH-016, TC-AUTH-017, TC-AUTH-018, TC-AUTH-019, TC-AUTH-020, TC-AUTH-034, TC-AUTH-035 |
-| **BG-13** | BR-004 | **FR-AUTH-04** | Cập nhật thông tin hồ sơ cá nhân | UC-05 | AC-AUTH-01 | TC-AUTH-029, TC-AUTH-030 |
-| **BG-12** | BR-042 | **FR-AUTH-05** | Đổi mật khẩu người dùng | UC-05 | AC-AUTH-02 | TC-AUTH-031, TC-AUTH-032 |
-| **BG-12** | BR-041 | **FR-AUTH-06** | Đăng xuất & Thu hồi phiên làm việc | UC-05 | AC-AUTH-02 | TC-AUTH-033 |
-| **BG-07** | BR-017 | **FR-DRV-01** | Khai báo & Quản lý thông tin phương tiện | UC-04, UC-06 | AC-DRV-01 | TC-DRV-001, TC-DRV-002, TC-DRV-003 |
-| **BG-04, BG-07** | BR-014 | **FR-DRV-02** | Bật / Tắt trạng thái trực tuyến (Online/Offline) | UC-06 | AC-TRK-01 | TC-DRV-004, TC-DRV-005, TC-DRV-006 |
-| **BG-04, BG-07** | BR-014, BR-023 | **FR-DRV-03** | Tự động chuyển trạng thái Bận (Busy) khi có cuốc | UC-02, UC-06 | AC-MCH-02 | TC-DRV-007, TC-DRV-008 |
-| **BG-07, BG-09** | BR-016, BR-036 | **FR-DRV-04** | Xét duyệt / Từ chối hồ sơ tài xế mới | UC-04 | AC-DRV-02 | TC-DRV-009, TC-DRV-010, TC-DRV-011 |
-| **BG-07, BG-13** | BR-013, BR-035 | **FR-DRV-05** | Xem hồ sơ hiệu suất, rating và thu nhập tài xế | UC-06 | AC-RAT-01 | TC-DRV-012 |
-| **BG-09, BG-12** | BR-036, BR-039 | **FR-DRV-06** | Khóa / Tạm đình chỉ tài khoản tài xế vi phạm | UC-04, UC-09 | AC-ADM-01 | TC-DRV-013, TC-DRV-014 |
-| **BG-01, BG-13** | BR-005 | **FR-RIDE-01** | Tìm kiếm địa chỉ đón/trả & Geocoding bản đồ | UC-01 | AC-BOOK-01 | TC-RID-001, TC-RID-002 |
-| **BG-01, BG-06** | BR-005, BR-025 | **FR-RIDE-02** | Tính toán & Hiển thị cước ước tính theo loại xe | UC-01 | AC-BOOK-01 | TC-RID-003, TC-RID-004, TC-RID-005 |
-| **BG-01, BG-04** | BR-005, BR-012 | **FR-RIDE-03** | Khởi tạo yêu cầu đặt chuyến xe trực tuyến | UC-01 | AC-BOOK-02 | TC-RID-006, TC-RID-007 |
-| **BG-05, BG-08** | BR-007, BR-023 | **FR-RIDE-04** | Cập nhật mốc "Tài xế đã đến điểm đón" | UC-02 | AC-RIDE-01 | TC-RID-008, TC-RID-009 |
-| **BG-05, BG-08** | BR-007, BR-023 | **FR-RIDE-05** | Cập nhật mốc "Bắt đầu chuyến đi" | UC-02 | AC-RIDE-01 | TC-RID-010 |
-| **BG-05, BG-06** | BR-007, BR-024 | **FR-RIDE-06** | Cập nhật mốc "Hoàn thành chuyến đi" | UC-02, UC-03 | AC-RIDE-01, AC-PAY-01 | TC-RID-011 |
-| **BG-05, BG-13** | BR-010 | **FR-RIDE-07** | Khách hàng hủy chuyến xe | UC-07 | AC-CNC-01 | TC-RID-012, TC-RID-013 |
-| **BG-05, BG-07** | BR-010, BR-020 | **FR-RIDE-08** | Tài xế hủy chuyến do sự cố phương tiện/No-Show | UC-07 | AC-CNC-02 | TC-RID-014, TC-RID-015 |
-| **BG-01, BG-13** | BR-011 | **FR-RIDE-09** | Tra cứu lịch sử & Chi tiết chuyến đi | UC-01, UC-06 | AC-BOOK-02 | TC-RID-016, TC-RID-017 |
-| **BG-04** | BR-018, BR-019 | **FR-MATCH-01** | Quét tài xế khả dụng quanh bán kính 5km | UC-01 | AC-MCH-01 | TC-MAT-001, TC-MAT-002, TC-MAT-003 |
-| **BG-04** | BR-019 | **FR-MATCH-02** | Thuật toán xếp hạng ưu tiên khoảng cách & rating | UC-01 | AC-MCH-01 | TC-MAT-004, TC-MAT-005 |
-| **BG-04, BG-08** | BR-020, BR-021 | **FR-MATCH-03** | Gửi thông báo chuyến & Đếm ngược 30 giây | UC-01 | AC-MCH-01 | TC-MAT-006 |
-| **BG-04** | BR-007, BR-023 | **FR-MATCH-04** | Xử lý chấp nhận chuyến xe (Atomic Lock) | UC-01 | AC-MCH-02 | TC-MAT-007, TC-MAT-008 |
-| **BG-04** | BR-020, BR-021 | **FR-MATCH-05** | Xoay vòng tài xế kế tiếp khi từ chối/timeout | UC-01 | AC-MCH-03 | TC-MAT-009, TC-MAT-010 |
-| **BG-04, BG-08** | BR-022 | **FR-MATCH-06** | Xử lý kết thúc tìm kiếm khi hết 5 lượt retry | UC-01 | AC-MCH-03 | TC-MAT-011, TC-MAT-012 |
-| **BG-06** | BR-024, BR-026 | **FR-PAY-01** | Tính toán cước phí thực tế tự động (`BRULE-01`) | UC-03 | AC-PAY-01, AC-PAY-02 | TC-PAY-001, TC-PAY-002 |
-| **BG-06, BG-09** | BR-026 | **FR-PAY-02** | Cấu hình biểu phí dịch vụ theo loại xe | UC-10 | AC-ADM-02 | TC-PAY-003, TC-PAY-004, TC-PAY-005 |
-| **BG-03, BG-06** | BR-027, BR-034 | **FR-PAY-03** | Khởi tạo giao dịch thanh toán Tiền mặt | UC-03 | AC-PAY-01 | TC-PAY-006 |
-| **BG-03, BG-06** | BR-027 | **FR-PAY-04** | Tài xế xác nhận đã nhận đủ tiền mặt từ khách | UC-03 | AC-PAY-01 | TC-PAY-007 |
-| **BG-03, BG-12** | BR-028 | **FR-PAY-05** | Xử lý thanh toán Điện tử qua Mock Gateway | UC-03 | AC-PAY-02 | TC-PAY-008 |
-| **BG-03, BG-11** | BR-029 | **FR-PAY-06** | Xử lý sự cố thanh toán điện tử thất bại (`EX-07`) | UC-03 | AC-PAY-02 | TC-PAY-009 |
-| **BG-03, BG-05** | BR-030 | **FR-PAY-07** | Xuất hóa đơn điện tử & Gửi biên lai email | UC-03 | AC-PAY-02 | TC-PAY-010 |
-| **BG-05, BG-07** | BR-015 | **FR-TRACK-01** | Thu nhận & Cập nhật tọa độ GPS định kỳ 5-10s | UC-06 | AC-TRK-02 | TC-TRK-001, TC-TRK-002 |
-| **BG-05, BG-13** | BR-008 | **FR-TRACK-02** | Phát sóng vị trí xe cho khách hàng theo dõi | UC-02 | AC-TRK-02 | TC-TRK-003 |
-| **BG-05, BG-13** | BR-007, BR-008 | **FR-TRACK-03** | Tính toán lại thời gian dự kiến xe đến (ETA) | UC-01, UC-02 | AC-TRK-02 | TC-TRK-004 |
-| **BG-05, BG-09** | BR-037 | **FR-TRACK-04** | Hiển thị toàn cảnh bản đồ xe cho Operator | UC-09 | AC-ADM-03 | TC-TRK-005 |
-| **BG-08** | BR-031, BR-032 | **FR-NOTIF-01** | Bắn thông báo đẩy In-App thời gian thực (Socket) | UC-01, UC-02 | AC-MCH-02, AC-RIDE-01 | TC-NOTIF-001 |
-| **BG-08** | BR-031, BR-033 | **FR-NOTIF-02** | Gửi email thông báo tự động không đồng bộ | UC-03, UC-04 | AC-AUTH-01, AC-PAY-02 | TC-NOTIF-002 |
-| **BG-08, BG-13** | BR-031 | **FR-NOTIF-03** | Hộp thư thông báo trong ứng dụng | UC-01, UC-06 | AC-AUTH-01 | TC-NOTIF-003 |
-| **BG-08, BG-13** | BR-031 | **FR-NOTIF-04** | Đánh dấu đã đọc thông báo | UC-01, UC-06 | AC-AUTH-01 | TC-NOTIF-004, TC-NOTIF-005 |
-| **BG-11** | BR-033, BR-045 | **FR-NOTIF-05** | Kiến trúc mở rộng kênh thông báo (Provider) | UC-01, UC-03 | AC-AUTH-01 | TC-NOTIF-012 |
-| **BG-05, BG-13** | BR-034 | **FR-RATE-01** | Gửi đánh giá sao (1-5★) và nhận xét sau chuyến | UC-08 | AC-RAT-01 | TC-RAT-001, TC-RAT-002, TC-RAT-003 |
-| **BG-05, BG-07** | BR-034 | **FR-RATE-02** | Tự động tính toán lại Rating trung bình tài xế | UC-08 | AC-RAT-01 | TC-RAT-004 |
-| **BG-07, BG-13** | BR-035 | **FR-RATE-03** | Tài xế xem danh sách phản hồi từ khách hàng | UC-06, UC-08 | AC-RAT-01 | TC-RAT-005 |
+| **BG-01, BG-12** | BR-001 | **FR-AUTH-01** | Đăng ký tài khoản Khách hàng | UC-05 | AC-AUTH-01 | TC-AUTH-021, TC-AUTH-022, TC-AUTH-023, TC-AUTH-024, TC-AUTH-025, TC-AUTH-026, TC-AUTH-027, TC-AUTH-028 |
+| **BG-01, BG-07** | BR-002 | **FR-AUTH-02** | Đăng ký tài khoản Đối tác Tài xế | UC-04, UC-05 | AC-DRV-01 | TC-AUTH-029, TC-AUTH-030, TC-AUTH-031 |
+| **BG-12** | BR-003, BR-041 | **FR-AUTH-03** | Đăng nhập hệ thống & Cấp phát JWT | UC-05 | AC-AUTH-02 | TC-AUTH-001, TC-AUTH-002, TC-AUTH-003, TC-AUTH-004, TC-AUTH-005, TC-AUTH-006, TC-AUTH-007, TC-AUTH-008, TC-AUTH-009, TC-AUTH-010, TC-AUTH-011, TC-AUTH-012, TC-AUTH-013, TC-AUTH-014, TC-AUTH-015, TC-AUTH-016, TC-AUTH-017, TC-AUTH-018, TC-AUTH-019, TC-AUTH-020, TC-AUTH-037, TC-AUTH-038 |
+| **BG-13** | BR-004 | **FR-AUTH-04** | Cập nhật thông tin hồ sơ cá nhân | UC-05 | AC-AUTH-01 | TC-AUTH-032, TC-AUTH-033 |
+| **BG-12** | BR-042 | **FR-AUTH-05** | Đổi mật khẩu người dùng | UC-05 | AC-AUTH-02 | TC-AUTH-034, TC-AUTH-035 |
+| **BG-12** | BR-041 | **FR-AUTH-06** | Đăng xuất & Thu hồi phiên làm việc | UC-05 | AC-AUTH-02 | TC-AUTH-036 |
+| **BG-07** | BR-017 | **FR-DRV-01** | Khai báo & Quản lý thông tin phương tiện | UC-04, UC-06 | AC-DRV-01 | TC-DRV-001, TC-DRV-002, TC-DRV-003, TC-DRV-004 |
+| **BG-04, BG-07** | BR-014 | **FR-DRV-02** | Bật / Tắt trạng thái trực tuyến (Online/Offline) | UC-06 | AC-TRK-01 | TC-DRV-005, TC-DRV-006, TC-DRV-007, TC-DRV-008 |
+| **BG-04, BG-07** | BR-014, BR-023 | **FR-DRV-03** | Tự động chuyển trạng thái Bận (Busy) khi có cuốc | UC-02, UC-06 | AC-MCH-02 | TC-DRV-009, TC-DRV-010 |
+| **BG-07, BG-09** | BR-016, BR-036 | **FR-DRV-04** | Xét duyệt / Từ chối hồ sơ tài xế mới | UC-04 | AC-DRV-02 | TC-DRV-011, TC-DRV-012, TC-DRV-013 |
+| **BG-07, BG-13** | BR-013, BR-035 | **FR-DRV-05** | Xem hồ sơ hiệu suất, rating và thu nhập tài xế | UC-06 | AC-RAT-01 | TC-DRV-014 |
+| **BG-09, BG-12** | BR-036, BR-039 | **FR-DRV-06** | Khóa / Tạm đình chỉ tài khoản tài xế vi phạm | UC-04, UC-09 | AC-ADM-01 | TC-DRV-015, TC-DRV-016, TC-DRV-017 |
+| **BG-01, BG-13** | BR-005 | **FR-RIDE-01** | Tìm kiếm địa chỉ đón/trả & Geocoding bản đồ | UC-01 | AC-BOOK-01 | TC-RID-001, TC-RID-002, TC-RID-003 |
+| **BG-01, BG-06** | BR-005, BR-025 | **FR-RIDE-02** | Tính toán & Hiển thị cước ước tính theo loại xe | UC-01 | AC-BOOK-01 | TC-RID-004, TC-RID-005, TC-RID-006, TC-RID-007 |
+| **BG-01, BG-04** | BR-005, BR-012 | **FR-RIDE-03** | Khởi tạo yêu cầu đặt chuyến xe trực tuyến | UC-01 | AC-BOOK-02 | TC-RID-008, TC-RID-009 |
+| **BG-05, BG-08** | BR-007, BR-023 | **FR-RIDE-04** | Cập nhật mốc "Tài xế đã đến điểm đón" | UC-02 | AC-RIDE-01 | TC-RID-010, TC-RID-011 |
+| **BG-05, BG-08** | BR-007, BR-023 | **FR-RIDE-05** | Cập nhật mốc "Bắt đầu chuyến đi" | UC-02 | AC-RIDE-01 | TC-RID-012, TC-RID-013 |
+| **BG-05, BG-06** | BR-007, BR-024 | **FR-RIDE-06** | Cập nhật mốc "Hoàn thành chuyến đi" | UC-02, UC-03 | AC-RIDE-01, AC-PAY-01 | TC-RID-014 |
+| **BG-05, BG-13** | BR-010 | **FR-RIDE-07** | Khách hàng hủy chuyến xe | UC-07 | AC-CNC-01 | TC-RID-015, TC-RID-016, TC-RID-017 |
+| **BG-05, BG-07** | BR-010, BR-020 | **FR-RIDE-08** | Tài xế hủy chuyến do sự cố phương tiện/No-Show | UC-07 | AC-CNC-02 | TC-RID-018, TC-RID-019, TC-RID-020 |
+| **BG-01, BG-13** | BR-011 | **FR-RIDE-09** | Tra cứu lịch sử & Chi tiết chuyến đi | UC-01, UC-06 | AC-BOOK-02 | TC-RID-021, TC-RID-022, TC-RID-023 |
+| **BG-04** | BR-018, BR-019 | **FR-MATCH-01** | Quét tài xế khả dụng quanh bán kính 5km | UC-01 | AC-MCH-01 | TC-MAT-001, TC-MAT-002, TC-MAT-003, TC-MAT-004 |
+| **BG-04** | BR-019 | **FR-MATCH-02** | Thuật toán xếp hạng ưu tiên khoảng cách & rating | UC-01 | AC-MCH-01 | TC-MAT-005, TC-MAT-006 |
+| **BG-04, BG-08** | BR-020, BR-021 | **FR-MATCH-03** | Gửi thông báo chuyến & Đếm ngược 30 giây | UC-01 | AC-MCH-01 | TC-MAT-007 |
+| **BG-04** | BR-007, BR-023 | **FR-MATCH-04** | Xử lý chấp nhận chuyến xe (Atomic Lock) | UC-01 | AC-MCH-02 | TC-MAT-008, TC-MAT-009, TC-MAT-010 |
+| **BG-04** | BR-020, BR-021 | **FR-MATCH-05** | Xoay vòng tài xế kế tiếp khi từ chối/timeout | UC-01 | AC-MCH-03 | TC-MAT-011, TC-MAT-012, TC-MAT-013, TC-MAT-014, TC-MAT-017, TC-MAT-018 |
+| **BG-04, BG-08** | BR-022 | **FR-MATCH-06** | Xử lý kết thúc tìm kiếm khi hết 5 lượt retry | UC-01 | AC-MCH-03 | TC-MAT-015, TC-MAT-016 |
+| **BG-06** | BR-024, BR-026 | **FR-PAY-01** | Tính toán cước phí thực tế tự động (`BRULE-01`) | UC-03 | AC-PAY-01, AC-PAY-02 | TC-PAY-001, TC-PAY-002, TC-PAY-003 |
+| **BG-06, BG-09** | BR-026 | **FR-PAY-02** | Cấu hình biểu phí dịch vụ theo loại xe | UC-10 | AC-ADM-02 | TC-PAY-004, TC-PAY-005, TC-PAY-006 |
+| **BG-03, BG-06** | BR-027, BR-034 | **FR-PAY-03** | Khởi tạo giao dịch thanh toán Tiền mặt | UC-03 | AC-PAY-01 | TC-PAY-007 |
+| **BG-03, BG-06** | BR-027 | **FR-PAY-04** | Tài xế xác nhận đã nhận đủ tiền mặt từ khách | UC-03 | AC-PAY-01 | TC-PAY-008, TC-PAY-009 |
+| **BG-03, BG-12** | BR-028 | **FR-PAY-05** | Xử lý thanh toán Điện tử qua Mock Gateway | UC-03 | AC-PAY-02 | TC-PAY-010, TC-PAY-015 |
+| **BG-03, BG-11** | BR-029 | **FR-PAY-06** | Xử lý sự cố thanh toán điện tử thất bại (`EX-07`) | UC-03 | AC-PAY-02 | TC-PAY-011, TC-PAY-012 |
+| **BG-03, BG-05** | BR-030 | **FR-PAY-07** | Xuất hóa đơn điện tử & Gửi biên lai email | UC-03 | AC-PAY-02 | TC-PAY-013, TC-PAY-014 |
+| **BG-05, BG-07** | BR-015 | **FR-TRACK-01** | Thu nhận & Cập nhật tọa độ GPS định kỳ 5-10s | UC-06 | AC-TRK-02 | TC-TRK-001, TC-TRK-002, TC-TRK-003, TC-TRK-004, TC-TRK-005 |
+| **BG-05, BG-13** | BR-008 | **FR-TRACK-02** | Phát sóng vị trí xe cho khách hàng theo dõi | UC-02 | AC-TRK-02 | TC-TRK-006, TC-TRK-007 |
+| **BG-05, BG-13** | BR-007, BR-008 | **FR-TRACK-03** | Tính toán lại thời gian dự kiến xe đến (ETA) | UC-01, UC-02 | AC-TRK-02 | TC-TRK-008, TC-TRK-009 |
+| **BG-05, BG-09** | BR-037 | **FR-TRACK-04** | Hiển thị toàn cảnh bản đồ xe cho Operator | UC-09 | AC-ADM-03 | TC-TRK-010, TC-TRK-011 |
+| **BG-08** | BR-031, BR-032 | **FR-NOTIF-01** | Bắn thông báo đẩy In-App thời gian thực (Socket) | UC-01, UC-02 | AC-MCH-02, AC-RIDE-01 | TC-NOTIF-001, TC-NOTIF-002 |
+| **BG-08** | BR-031, BR-033 | **FR-NOTIF-02** | Gửi email thông báo tự động không đồng bộ | UC-03, UC-04 | AC-AUTH-01, AC-PAY-02 | TC-NOTIF-003, TC-NOTIF-004 |
+| **BG-08, BG-13** | BR-031 | **FR-NOTIF-03** | Hộp thư thông báo trong ứng dụng | UC-01, UC-06 | AC-AUTH-01 | TC-NOTIF-005, TC-NOTIF-006 |
+| **BG-08, BG-13** | BR-031 | **FR-NOTIF-04** | Đánh dấu đã đọc thông báo | UC-01, UC-06 | AC-AUTH-01 | TC-NOTIF-007, TC-NOTIF-008, TC-NOTIF-009 |
+| **BG-11** | BR-033, BR-045 | **FR-NOTIF-05** | Kiến trúc mở rộng kênh thông báo (Provider) | UC-01, UC-03 | AC-AUTH-01 | TC-NOTIF-010 |
+| **BG-05, BG-13** | BR-034 | **FR-RATE-01** | Gửi đánh giá sao (1-5★) và nhận xét sau chuyến | UC-08 | AC-RAT-01 | TC-RAT-001, TC-RAT-002, TC-RAT-003, TC-RAT-004, TC-RAT-005, TC-RAT-006, TC-RAT-007 |
+| **BG-05, BG-07** | BR-034 | **FR-RATE-02** | Tự động tính toán lại Rating trung bình tài xế | UC-08 | AC-RAT-01 | TC-RAT-008, TC-RAT-009 |
+| **BG-07, BG-13** | BR-035 | **FR-RATE-03** | Tài xế xem danh sách phản hồi từ khách hàng | UC-06, UC-08 | AC-RAT-01 | TC-RAT-010, TC-RAT-011 |
 | **BG-09, BG-10** | BR-036, BR-040 | **FR-ADM-01** | Dashboard tổng quan chỉ số vận hành ngày | UC-09, UC-11 | AC-ADM-03 | TC-ADM-001 |
-| **BG-09** | BR-036 | **FR-ADM-02** | Quản lý danh sách & Hồ sơ Khách hàng | UC-09 | AC-ADM-01 | TC-ADM-002 |
-| **BG-07, BG-09** | BR-016, BR-036 | **FR-ADM-03** | Quản lý danh sách Tài xế & Phương tiện | UC-04, UC-09 | AC-DRV-02 | TC-ADM-006, TC-ADM-007 |
-| **BG-09** | BR-037, BR-043 | **FR-ADM-04** | Giám sát & Can thiệp xử lý chuyến đi lỗi | UC-09 | AC-ADM-01 | TC-ADM-003 |
-| **BG-03, BG-09** | BR-038 | **FR-ADM-05** | Tra cứu nhật ký giao dịch đối soát tài chính | UC-09, UC-11 | AC-ADM-03 | TC-ADM-011, TC-ADM-012, TC-ADM-013 |
-| **BG-03, BG-10** | BR-040 | **FR-ADM-06** | Báo cáo Thống kê Doanh thu theo xe & kênh TT | UC-11 | AC-ADM-03 | TC-ADM-004, TC-ADM-005 |
-| **BG-02, BG-10** | BR-040 | **FR-ADM-07** | Báo cáo Tỷ lệ Hoàn thành & Phân tích cuốc hủy | UC-11 | AC-ADM-03 | TC-ADM-006 |
-| **BG-07, BG-10** | BR-040 | **FR-ADM-08** | Báo cáo Đánh giá Hiệu quả hoạt động Tài xế | UC-11 | AC-ADM-03 | TC-ADM-007 |
-| **BG-12** | BR-039, BR-041 | **FR-SEC-01** | Kiểm tra quyền truy cập theo vai trò (RBAC) | UC-05, UC-09 | AC-ADM-01 | TC-SEC-001, TC-SEC-002 |
-| **BG-09, BG-12** | BR-039 | **FR-SEC-02** | Phân tách quyền nghiêm ngặt Operator vs Admin | UC-09, UC-10 | AC-ADM-01 | TC-SEC-003 |
-| **BG-12** | BR-043 | **FR-SEC-03** | Ghi nhật ký kiểm toán bất biến (Audit Log) | UC-04, UC-10 | AC-ADM-02 | TC-SEC-004, TC-SEC-005 |
-| **BG-12** | BR-042 | **FR-SEC-04** | Mã hóa mật khẩu (`bcrypt`) & Dữ liệu nhạy cảm | UC-05 | AC-AUTH-01 | TC-SEC-006, TC-SEC-007 |
-| **BG-11** | BR-044, BR-045 | **FR-SEC-05** | Cơ chế cách ly lỗi thành phần (Circuit Breaker) | UC-01, UC-03 | AC-PAY-02 | TC-SEC-012, TC-SEC-013 |
+| **BG-09** | BR-036 | **FR-ADM-02** | Quản lý danh sách & Hồ sơ Khách hàng | UC-09 | AC-ADM-01 | TC-ADM-002, TC-ADM-003 |
+| **BG-07, BG-09** | BR-016, BR-036 | **FR-ADM-03** | Quản lý danh sách Tài xế & Phương tiện | UC-04, UC-09 | AC-DRV-02 | TC-ADM-004 |
+| **BG-09** | BR-037, BR-043 | **FR-ADM-04** | Giám sát & Can thiệp xử lý chuyến đi lỗi | UC-09 | AC-ADM-01 | TC-ADM-005, TC-ADM-006, TC-ADM-007 |
+| **BG-03, BG-09** | BR-038 | **FR-ADM-05** | Tra cứu nhật ký giao dịch đối soát tài chính | UC-09, UC-11 | AC-ADM-03 | TC-ADM-008 |
+| **BG-03, BG-10** | BR-040 | **FR-ADM-06** | Báo cáo Thống kê Doanh thu theo xe & kênh TT | UC-11 | AC-ADM-03 | TC-ADM-009, TC-ADM-010, TC-ADM-011 |
+| **BG-02, BG-10** | BR-040 | **FR-ADM-07** | Báo cáo Tỷ lệ Hoàn thành & Phân tích cuốc hủy | UC-11 | AC-ADM-03 | TC-ADM-012 |
+| **BG-07, BG-10** | BR-040 | **FR-ADM-08** | Báo cáo Đánh giá Hiệu quả hoạt động Tài xế | UC-11 | AC-ADM-03 | TC-ADM-013 |
+| **BG-12** | BR-039, BR-041 | **FR-SEC-01** | Kiểm tra quyền truy cập theo vai trò (RBAC) | UC-05, UC-09 | AC-ADM-01 | TC-SEC-001, TC-SEC-002, TC-SEC-003, TC-SEC-011, TC-SEC-012 |
+| **BG-09, BG-12** | BR-039 | **FR-SEC-02** | Phân tách quyền nghiêm ngặt Operator vs Admin | UC-09, UC-10 | AC-ADM-01 | TC-SEC-004, TC-SEC-005 |
+| **BG-12** | BR-043 | **FR-SEC-03** | Ghi nhật ký kiểm toán bất biến (Audit Log) | UC-04, UC-10 | AC-ADM-02 | TC-SEC-006, TC-SEC-007, TC-SEC-008 |
+| **BG-12** | BR-042 | **FR-SEC-04** | Mã hóa mật khẩu (`bcrypt`) & Dữ liệu nhạy cảm | UC-05 | AC-AUTH-01 | TC-SEC-009, TC-SEC-010 |
+| **BG-11** | BR-044, BR-045 | **FR-SEC-05** | Cơ chế cách ly lỗi thành phần (Circuit Breaker) | UC-01, UC-03 | AC-PAY-02 | TC-SEC-013 |
 
 ---
 
