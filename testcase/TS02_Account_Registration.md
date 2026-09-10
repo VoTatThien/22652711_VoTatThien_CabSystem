@@ -1,0 +1,11 @@
+# TEST SCENARIO 02: ĐĂNG KÝ TÀI KHOẢN
+
+| Test Case ID | Test Scenario | Test Case | Preconditions | Test Steps | Test Data | Expected Result | Priority |
+|---|---|---|---|---|---|---|---|
+| TC-REG-001 | Đăng ký tài khoản | Đăng ký khách hàng với thông tin hợp lệ | Email và SĐT chưa từng đăng ký trong hệ thống | 1. Mở màn hình Đăng ký<br>2. Nhập họ tên, email, SĐT, password<br>3. Nhấn Đăng ký | Họ tên: Nguyễn Văn A<br>Email: khach01@gmail.com<br>SĐT: 0912345678<br>Pass: Password@123 | Tạo tài khoản thành công, lưu thông tin vào DB, chuyển về trang Đăng nhập | High |
+| TC-REG-002 | Đăng ký tài khoản | Đăng ký với email đã tồn tại | Email khach01@gmail.com đã tồn tại trong DB | 1. Nhập thông tin với email đã đăng ký<br>2. Nhấn Đăng ký | Email: khach01@gmail.com | Từ chối đăng ký; hiển thị thông báo Email đã được sử dụng | High |
+| TC-REG-003 | Đăng ký tài khoản | Đăng ký với số điện thoại đã tồn tại | SĐT 0912345678 đã có tài khoản | 1. Nhập SĐT đã có trong hệ thống<br>2. Nhấn Đăng ký | SĐT: 0912345678 | Từ chối đăng ký; hiển thị thông báo Số điện thoại đã được đăng ký | High |
+| TC-REG-004 | Đăng ký tài khoản | Đăng ký với số điện thoại không đúng 10 chữ số VN | Đang ở màn hình Đăng ký | 1. Nhập SĐT có 9 chữ số hoặc 11 chữ số<br>2. Nhấn Đăng ký | SĐT: 091234567 (9 số) | Hiển thị lỗi: Số điện thoại phải gồm đúng 10 chữ số | Medium |
+| TC-REG-005 | Đăng ký tài khoản | Đăng ký với mật khẩu dưới 6 ký tự | Đang ở màn hình Đăng ký | 1. Nhập mật khẩu 5 ký tự<br>2. Nhấn Đăng ký | Pass: 12345 | Hiển thị lỗi: Mật khẩu phải chứa ít nhất 6 ký tự | Medium |
+| TC-REG-006 | Đăng ký tài khoản | Đăng ký tài xế kèm giấy tờ và thông tin xe hợp lệ | Số GPLX và Biển số xe chưa có trong hệ thống | 1. Chọn Đăng ký Tài xế<br>2. Nhập thông tin cá nhân, GPLX 12 số, biển số xe<br>3. Nhấn Đăng ký | Tên: Trần Văn B<br>GPLX: 123456789012<br>Biển số: 51H-123.45<br>Loại xe: Sedan | Tạo tài khoản tài xế ở trạng thái Chờ duyệt (Pending_Approval) | High |
+| TC-REG-007 | Đăng ký tài khoản | Đăng ký tài xế với số GPLX không đủ 12 chữ số | Đang ở màn hình Đăng ký tài xế | 1. Nhập GPLX có 10 chữ số<br>2. Nhấn Đăng ký | GPLX: 1234567890 | Báo lỗi: Số GPLX phải gồm đúng 12 chữ số theo quy định | Medium |

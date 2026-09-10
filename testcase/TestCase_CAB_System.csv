@@ -1,324 +1,209 @@
 ﻿"Test Case ID","Test Scenario","Test Case","Preconditions","Test Steps","Test Data","Expected Result","Priority"
-"TC-AUTH-001","Người dùng đăng nhập","Đăng nhập với username và password hợp lệ (Positive)","Tài khoản đã đăng ký và đang Active","1. Mở Login
+"TC-AUTH-001","Người dùng đăng nhập","Đăng nhập với username và password hợp lệ","Tài khoản đã đăng ký và đang Active","1. Mở Login
 2. Nhập username
 3. Nhập password
 4. Nhấn Login","Username: user01
-Password: Password@123","Đăng nhập thành công; tạo phiên/token và chuyển vào hệ thống (HTTP 200)","High"
-"TC-AUTH-002","Người dùng đăng nhập","Đăng nhập với username không tồn tại (Negative)","Hệ thống đang hoạt động","1. Mở Login
+Password: Password@123","Đăng nhập thành công; tạo phiên/token và chuyển vào hệ thống","High"
+"TC-AUTH-002","Người dùng đăng nhập","Đăng nhập với username không tồn tại","Hệ thống đang hoạt động","1. Mở Login
 2. Nhập username
 3. Nhập password
 4. Nhấn Login","Username: unknown01
-Password: Password@123","Đăng nhập thất bại; hiển thị thông báo thông tin đăng nhập không hợp lệ (HTTP 401)","High"
-"TC-AUTH-003","Người dùng đăng nhập","Đăng nhập với password không đúng (Negative)","Username tồn tại và tài khoản Active","1. Mở Login
+Password: Password@123","Đăng nhập thất bại; hiển thị thông báo thông tin đăng nhập không hợp lệ","High"
+"TC-AUTH-003","Người dùng đăng nhập","Đăng nhập với password không đúng","Username tồn tại và tài khoản Active","1. Mở Login
 2. Nhập username đúng
 3. Nhập password sai
 4. Nhấn Login","Username: user01
-Password: Wrong@123","Đăng nhập thất bại; không tạo phiên/token (HTTP 401)","High"
-"TC-AUTH-004","Người dùng đăng nhập","Username để trống (Negative)","Đang ở màn hình Login","1. Để trống username
+Password: Wrong@123","Đăng nhập thất bại; không tạo phiên/token","High"
+"TC-AUTH-004","Người dùng đăng nhập","Username để trống","Đang ở màn hình Login","1. Để trống username
 2. Nhập password
 3. Nhấn Login","Username: empty
-Password: Password@123","Không cho đăng nhập; hiển thị lỗi yêu cầu nhập username (HTTP 400)","High"
-"TC-AUTH-005","Người dùng đăng nhập","Password để trống (Negative)","Đang ở màn hình Login","1. Nhập username
+Password: Password@123","Không cho đăng nhập; hiển thị lỗi yêu cầu nhập username","High"
+"TC-AUTH-005","Người dùng đăng nhập","Password để trống","Đang ở màn hình Login","1. Nhập username
 2. Để trống password
 3. Nhấn Login","Username: user01
-Password: empty","Không cho đăng nhập; hiển thị lỗi yêu cầu nhập password (HTTP 400)","High"
-"TC-AUTH-006","Người dùng đăng nhập","Username và password đều để trống (Negative)","Đang ở màn hình Login","1. Không nhập username
+Password: empty","Không cho đăng nhập; hiển thị lỗi yêu cầu nhập password","High"
+"TC-AUTH-006","Người dùng đăng nhập","Username và password đều để trống","Đang ở màn hình Login","1. Không nhập username
 2. Không nhập password
 3. Nhấn Login","Username: empty
-Password: empty","Không cho đăng nhập; hiển thị lỗi validation tương ứng (HTTP 400)","High"
-"TC-AUTH-007","Người dùng đăng nhập","Username có định dạng không hợp lệ (Negative)","Đang ở màn hình Login","1. Nhập username không hợp lệ
+Password: empty","Không cho đăng nhập; hiển thị lỗi validation tương ứng","High"
+"TC-AUTH-007","Người dùng đăng nhập","Username có định dạng không hợp lệ","Đang ở màn hình Login","1. Nhập username không hợp lệ
 2. Nhập password
 3. Nhấn Login","Username: user@@@
-Password: Password@123","Từ chối dữ liệu và hiển thị lỗi username không hợp lệ (HTTP 400)","Medium"
-"TC-AUTH-008","Người dùng đăng nhập","Password có định dạng không hợp lệ (Negative)","Quy tắc password đã được định nghĩa (tối thiểu 6 ký tự)","1. Nhập username
+Password: Password@123","Từ chối dữ liệu và hiển thị lỗi username không hợp lệ","Medium"
+"TC-AUTH-008","Người dùng đăng nhập","Password có định dạng không hợp lệ","Quy tắc password đã được định nghĩa","1. Nhập username
 2. Nhập password không đáp ứng rule
 3. Nhấn Login","Username: user01
-Password: 123","Từ chối dữ liệu và hiển thị lỗi password không hợp lệ (HTTP 400)","Medium"
-"TC-AUTH-009","Người dùng đăng nhập","Đăng nhập bằng tài khoản bị khóa (Negative)","Tài khoản user01 ở trạng thái Locked (isActive = false)","1. Nhập username
+Password: 123","Từ chối dữ liệu và hiển thị lỗi password không hợp lệ","Medium"
+"TC-AUTH-009","Người dùng đăng nhập","Đăng nhập bằng tài khoản bị khóa","Tài khoản user01 ở trạng thái Locked","1. Nhập username
 2. Nhập password đúng
 3. Nhấn Login","Username: user01
-Password: Password@123","Đăng nhập thất bại; thông báo tài khoản bị khóa (HTTP 403 Forbidden)","High"
-"TC-AUTH-010","Người dùng đăng nhập","Đăng nhập bằng tài khoản Inactive (Negative)","Tài khoản tồn tại nhưng Inactive","1. Nhập username
+Password: Password@123","Đăng nhập thất bại; thông báo tài khoản bị khóa","High"
+"TC-AUTH-010","Người dùng đăng nhập","Đăng nhập bằng tài khoản Inactive","Tài khoản tồn tại nhưng Inactive","1. Nhập username
 2. Nhập password đúng
 3. Nhấn Login","Username: inactive01
-Password: Password@123","Đăng nhập thất bại; thông báo tài khoản không hoạt động (HTTP 403)","High"
-"TC-AUTH-011","Người dùng đăng nhập","Username phân biệt chữ hoa/chữ thường (Positive)","Quy tắc xử lý username case-insensitive (email lowercase)","1. Nhập username khác hoa/thường
+Password: Password@123","Đăng nhập thất bại; thông báo tài khoản không hoạt động","High"
+"TC-AUTH-011","Người dùng đăng nhập","Username phân biệt chữ hoa/chữ thường","Quy tắc xử lý username đã xác định","1. Nhập username khác hoa/thường
 2. Nhập password đúng
-3. Nhấn Login","Username: User01@Mail.Com
-Password: Password@123","Hệ thống tự động lowercase và đăng nhập thành công (HTTP 200)","Medium"
-"TC-AUTH-012","Người dùng đăng nhập","Password phân biệt chữ hoa/chữ thường (Negative)","Tài khoản Active","1. Nhập username đúng
+3. Nhấn Login","Username: User01
+Password: Password@123","Xử lý đúng theo rule case-sensitive/case-insensitive","Medium"
+"TC-AUTH-012","Người dùng đăng nhập","Password phân biệt chữ hoa/chữ thường","Tài khoản Active","1. Nhập username đúng
 2. Nhập password khác hoa/thường
 3. Nhấn Login","Username: user01
-Password: password@123","Đăng nhập thất bại do password phân biệt hoa/thường (HTTP 401)","High"
-"TC-AUTH-013","Người dùng đăng nhập","Nhập password chứa khoảng trắng (Boundary)","Tài khoản Active","1. Nhập username
-2. Nhập password có khoảng trắng đầu/cuối
+Password: password@123","Đăng nhập thất bại nếu password phân biệt hoa/thường","High"
+"TC-AUTH-013","Người dùng đăng nhập","Nhập password chứa khoảng trắng","Tài khoản Active","1. Nhập username
+2. Nhập password có khoảng trắng
 3. Nhấn Login","Username: user01
-Password:  Password@123 ","Xử lý đúng theo rule bảo mật (không tự trim password, báo sai mật khẩu nếu pass gốc không có space)","Medium"
-"TC-AUTH-014","Người dùng đăng nhập","Kiểm tra password không hiển thị plaintext (Positive)","Đang ở màn hình Login","1. Click ô Password
-2. Nhập password","Password: Password@123","Password được che/mask (type='password'), có nút toggle ẩn/hiện","Medium"
-"TC-AUTH-015","Người dùng đăng nhập","Đăng nhập thành công và truy cập chức năng được phép (Positive)","Tài khoản Active và có quyền customer","1. Nhập username hợp lệ
+Password:  Password@123 ","Xử lý khoảng trắng đúng theo Business Rule","Medium"
+"TC-AUTH-014","Người dùng đăng nhập","Kiểm tra password không hiển thị plaintext","Đang ở màn hình Login","1. Click ô Password
+2. Nhập password","Password: Password@123","Password được che/mask","Medium"
+"TC-AUTH-015","Người dùng đăng nhập","Đăng nhập thành công và truy cập chức năng được phép","Tài khoản Active và có quyền","1. Nhập username hợp lệ
 2. Nhập password hợp lệ
 3. Login
 4. Truy cập chức năng yêu cầu authentication","Username: user01
-Password: Password@123","Authentication thành công và truy cập được chức năng được cấp quyền (HTTP 200 kèm Bearer Token)","High"
-"TC-AUTH-016","Người dùng đăng nhập","Đăng nhập nhiều lần với password sai - Chống Brute-force (Exception / Security)","Cơ chế Rate Limit NFR-SEC-06 hoạt động (tối đa 5 lần thử sai)","1. Nhập username đúng
-2. Nhập password sai 5 lần liên tiếp
-3. Gửi lần đăng nhập thứ 6","Username: user01
-Password: Wrong@123 (x5)","Hệ thống chặn tạm thời 15 phút, trả về HTTP 429 Too Many Requests","High"
-"TC-AUTH-017","Người dùng đăng nhập","Request không có username (Negative)","API Login đang hoạt động (POST /api/v1/auth/login)","1. Gửi request Login
-2. Bỏ trường email/username","{ ""password"": ""Password@123"" }","API trả lỗi validation HTTP 400 Bad Request; không xác thực","High"
-"TC-AUTH-018","Người dùng đăng nhập","Request không có password (Negative)","API Login đang hoạt động","1. Gửi request Login
-2. Bỏ trường password","{ ""email"": ""user01@mail.com"" }","API trả lỗi validation HTTP 400 Bad Request; không xác thực","High"
-"TC-AUTH-019","Người dùng đăng nhập","Request với username/password không hợp lệ (Negative)","API Login đang hoạt động","1. Gửi request Login
-2. Nhập dữ liệu không hợp lệ","{ ""email"": ""unknown@mail.com"", ""password"": ""wrongpass"" }","API trả response lỗi HTTP 401 Unauthorized; không tạo token","High"
-"TC-AUTH-020","Người dùng đăng nhập","Response không trả về password hoặc hash (Security)","Đăng nhập thành công","1. Gửi request Login hợp lệ
-2. Kiểm tra response JSON","{ ""email"": ""user01@mail.com"", ""password"": ""Password@123"" }","Response HTTP 200 không chứa passwordHash hoặc thông tin nhạy cảm của người dùng","High"
-"TC-AUTH-021","Đăng ký Khách hàng","Đăng ký tài khoản khách hàng với thông tin hợp lệ (Positive)","Email và SĐT chưa tồn tại trong hệ thống","1. Mở màn hình Đăng ký
-2. Nhập họ tên, email, SĐT, mật khẩu hợp lệ
+Password: Password@123","Authentication thành công và truy cập được chức năng được cấp quyền","High"
+"TC-AUTH-016","Người dùng đăng nhập","Đăng nhập nhiều lần với password sai","Có cơ chế giới hạn số lần đăng nhập sai","1. Nhập username đúng
+2. Nhập password sai
+3. Lặp lại theo số lần quy định","Username: user01
+Password: Wrong@123","Sau số lần sai theo Business Rule, tài khoản bị khóa hoặc áp dụng cơ chế bảo vệ","High"
+"TC-AUTH-017","Người dùng đăng nhập","Request không có username","API Login đang hoạt động","1. Gửi request Login
+2. Bỏ trường username","{ password: Password@123 }","API trả lỗi validation; không authentication","High"
+"TC-AUTH-018","Người dùng đăng nhập","Request không có password","API Login đang hoạt động","1. Gửi request Login
+2. Bỏ trường password","{ username: user01 }","API trả lỗi validation; không authentication","High"
+"TC-AUTH-019","Người dùng đăng nhập","Request với username/password không hợp lệ","API Login đang hoạt động","1. Gửi request Login
+2. Nhập dữ liệu không hợp lệ","Username: unknown
+Password: wrong","API trả response lỗi phù hợp; không tạo token","High"
+"TC-AUTH-020","Người dùng đăng nhập","Response không trả về password","Đăng nhập thành công","1. Gửi request Login hợp lệ
+2. Kiểm tra response","Username: user01
+Password: Password@123","Response không chứa password hoặc thông tin nhạy cảm","High"
+"TC-REG-001","Đăng ký tài khoản","Đăng ký khách hàng với thông tin hợp lệ","Email và SĐT chưa từng đăng ký trong hệ thống","1. Mở màn hình Đăng ký
+2. Nhập họ tên, email, SĐT, password
 3. Nhấn Đăng ký","Họ tên: Nguyễn Văn A
-Email: khach1@gmail.com
+Email: khach01@gmail.com
 SĐT: 0912345678
-Mật khẩu: Password@123","Đăng ký thành công, tạo User role 'customer', isActive=true, trả về HTTP 201 Created","High"
-"TC-AUTH-022","Đăng ký Khách hàng","Đăng ký với email trùng lặp (Negative)","Email khach1@gmail.com đã tồn tại trong DB","1. Nhập thông tin với email đã tồn tại
-2. Nhấn Đăng ký","Email: khach1@gmail.com, SĐT: 0987654321","Hệ thống từ chối, trả về HTTP 409 Conflict: 'Email đã được sử dụng'","High"
-"TC-AUTH-023","Đăng ký Khách hàng","Đăng ký với số điện thoại trùng lặp (Negative)","SĐT 0912345678 đã tồn tại trong DB","1. Nhập email mới nhưng SĐT trùng
-2. Nhấn Đăng ký","Email: khachmoi@gmail.com, SĐT: 0912345678","Hệ thống từ chối, trả về HTTP 409 Conflict: 'Số điện thoại đã được sử dụng'","High"
-"TC-AUTH-024","Đăng ký Khách hàng","Đăng ký với SĐT không đủ 10 chữ số VN (Negative / Boundary)","Đang ở màn hình Đăng ký","1. Nhập SĐT 9 chữ số hoặc 11 chữ số
-2. Nhấn Đăng ký","SĐT: 091234567 (9 số) hoặc 09123456789 (11 số)","Hệ thống báo lỗi validation HTTP 400: 'SĐT phải gồm đúng 10 chữ số'","High"
-"TC-AUTH-025","Đăng ký Khách hàng","Đăng ký với mật khẩu đúng 6 ký tự - Giá trị biên (Boundary)","Đang ở màn hình Đăng ký","1. Nhập mật khẩu đúng 6 ký tự
-2. Nhấn Đăng ký","Password: 'Pass01' (đúng 6 ký tự)","Hợp lệ, hệ thống chấp nhận tạo tài khoản thành công HTTP 201","Medium"
-"TC-AUTH-026","Đăng ký Khách hàng","Đăng ký với mật khẩu 5 ký tự - Dưới ngưỡng biên (Boundary / Negative)","Đang ở màn hình Đăng ký","1. Nhập mật khẩu 5 ký tự
-2. Nhấn Đăng ký","Password: '12345' (5 ký tự)","Từ chối HTTP 400: 'Mật khẩu phải chứa ít nhất 6 ký tự'","Medium"
-"TC-AUTH-027","Đăng ký Khách hàng","Tấn công NoSQL Injection trong trường email đăng ký (Negative / Security)","Hệ thống nhận JSON body","1. Gửi request đăng ký với payload NoSQL","{ ""email"": { ""$gt"": """" }, ""password"": ""Password@123"" }","Hệ thống sanitize dữ liệu, từ chối type không phải string, HTTP 400","High"
-"TC-AUTH-028","Đăng ký Khách hàng","Tấn công XSS trong trường họ tên (Negative / Security)","Đang đăng ký","1. Nhập fullName chứa thẻ script","fullName: '<script>alert(1)</script>'","Hệ thống escape/strip HTML tags, không thực thi mã độc trên giao diện","High"
-"TC-AUTH-029","Đăng ký Đối tác Tài xế","Đăng ký tài xế đầy đủ thông tin GPLX và xe hợp lệ (Positive)","Số GPLX và Biển số xe chưa tồn tại trong hệ thống","1. Chọn Đăng ký Tài xế
-2. Nhập thông tin cá nhân, GPLX 12 số, hạng B2, thông tin xe
-3. Nhấn Đăng ký","Họ tên: Trần Văn Tài
-Email: taixe1@gmail.com
-SĐT: 0977112233
-GPLX: 123456789012 (hạng B2)
-Biển số: 51G-888.88
-Loại xe: sedan","Tạo User role 'driver', DriverProfile với isApproved=false, status='offline', HTTP 201 Created","High"
-"TC-AUTH-030","Đăng ký Đối tác Tài xế","Đăng ký với GPLX không đúng 12 chữ số (Negative / Boundary)","Đang ở màn hình đăng ký tài xế","1. Nhập GPLX có 11 chữ số hoặc 13 chữ số
-2. Nhấn Đăng ký","GPLX: 12345678901 (11 số)","Báo lỗi validation HTTP 400: 'Số GPLX phải đúng 12 chữ số'","High"
-"TC-AUTH-031","Đăng ký Đối tác Tài xế","Đăng ký với GPLX hoặc Biển số xe bị trùng (Negative)","Biển số 51G-888.88 đã đăng ký trong hệ thống","1. Nhập thông tin với biển số đã có
-2. Nhấn Đăng ký","Biển số: 51G-888.88","Hệ thống từ chối HTTP 409 Conflict: 'Biển số xe đã được đăng ký'","High"
-"TC-AUTH-032","Quản lý Hồ sơ","Xem thông tin cá nhân khi đã đăng nhập (Positive)","Đã có Bearer Access Token hợp lệ","1. Gửi request GET /api/v1/auth/profile kèm Header Authorization","Header: Authorization: Bearer <valid_token>","HTTP 200 OK, trả về thông tin họ tên, email, SĐT, role","Medium"
-"TC-AUTH-033","Quản lý Hồ sơ","Cập nhật họ tên và số điện thoại mới hợp lệ (Positive)","Đã đăng nhập","1. Gửi PUT /api/v1/auth/profile với họ tên mới và SĐT mới","{ ""fullName"": ""Nguyễn Văn A (Cập nhật)"", ""phone"": ""0912345699"" }","HTTP 200 OK, dữ liệu profile trong DB được cập nhật","Medium"
-"TC-AUTH-034","Đổi Mật khẩu","Đổi mật khẩu thành công với mật khẩu cũ chính xác (Positive)","Đã đăng nhập, biết mật khẩu hiện tại","1. Nhập mật khẩu cũ đúng
+Pass: Password@123","Tạo tài khoản thành công, lưu thông tin vào DB, chuyển về trang Đăng nhập","High"
+"TC-REG-002","Đăng ký tài khoản","Đăng ký với email đã tồn tại","Email khach01@gmail.com đã tồn tại trong DB","1. Nhập thông tin với email đã đăng ký
+2. Nhấn Đăng ký","Email: khach01@gmail.com","Từ chối đăng ký; hiển thị thông báo Email đã được sử dụng","High"
+"TC-REG-003","Đăng ký tài khoản","Đăng ký với số điện thoại đã tồn tại","SĐT 0912345678 đã có tài khoản","1. Nhập SĐT đã có trong hệ thống
+2. Nhấn Đăng ký","SĐT: 0912345678","Từ chối đăng ký; hiển thị thông báo Số điện thoại đã được đăng ký","High"
+"TC-REG-004","Đăng ký tài khoản","Đăng ký với số điện thoại không đúng 10 chữ số VN","Đang ở màn hình Đăng ký","1. Nhập SĐT có 9 chữ số hoặc 11 chữ số
+2. Nhấn Đăng ký","SĐT: 091234567 (9 số)","Hiển thị lỗi: Số điện thoại phải gồm đúng 10 chữ số","Medium"
+"TC-REG-005","Đăng ký tài khoản","Đăng ký với mật khẩu dưới 6 ký tự","Đang ở màn hình Đăng ký","1. Nhập mật khẩu 5 ký tự
+2. Nhấn Đăng ký","Pass: 12345","Hiển thị lỗi: Mật khẩu phải chứa ít nhất 6 ký tự","Medium"
+"TC-REG-006","Đăng ký tài khoản","Đăng ký tài xế kèm giấy tờ và thông tin xe hợp lệ","Số GPLX và Biển số xe chưa có trong hệ thống","1. Chọn Đăng ký Tài xế
+2. Nhập thông tin cá nhân, GPLX 12 số, biển số xe
+3. Nhấn Đăng ký","Tên: Trần Văn B
+GPLX: 123456789012
+Biển số: 51H-123.45
+Loại xe: Sedan","Tạo tài khoản tài xế ở trạng thái Chờ duyệt (Pending_Approval)","High"
+"TC-REG-007","Đăng ký tài khoản","Đăng ký tài xế với số GPLX không đủ 12 chữ số","Đang ở màn hình Đăng ký tài xế","1. Nhập GPLX có 10 chữ số
+2. Nhấn Đăng ký","GPLX: 1234567890","Báo lỗi: Số GPLX phải gồm đúng 12 chữ số theo quy định","Medium"
+"TC-ACC-001","Quản lý tài khoản & Đổi mật khẩu","Xem thông tin cá nhân khi đã đăng nhập","Người dùng đã đăng nhập","1. Mở trang Thông tin cá nhân","User Token hợp lệ","Hiển thị đúng họ tên, email, số điện thoại và vai trò tài khoản","Medium"
+"TC-ACC-002","Quản lý tài khoản & Đổi mật khẩu","Cập nhật họ tên và số điện thoại mới","Đang ở trang Thông tin cá nhân","1. Nhập họ tên mới
+2. Nhấn Lưu thay đổi","Họ tên: Nguyễn Văn A (Mới)","Cập nhật thành công; dữ liệu mới được hiển thị ngay","Medium"
+"TC-ACC-003","Quản lý tài khoản & Đổi mật khẩu","Đổi mật khẩu thành công khi nhập đúng mật khẩu cũ","Người dùng đã đăng nhập","1. Nhập mật khẩu hiện tại đúng
 2. Nhập mật khẩu mới >= 6 ký tự
-3. Nhấn Đổi mật khẩu","currentPassword: Password@123
-newPassword: NewPassword@456","HTTP 200 OK: 'Đổi mật khẩu thành công', hash bcrypt mới được lưu vào DB","High"
-"TC-AUTH-035","Đổi Mật khẩu","Đổi mật khẩu với mật khẩu cũ không đúng (Negative)","Đang đăng nhập","1. Nhập mật khẩu cũ sai
-2. Nhấn Đổi mật khẩu","currentPassword: WrongOldPassword
-newPassword: NewPassword@456","HTTP 400 Bad Request: 'Mật khẩu hiện tại không đúng'","High"
-"TC-AUTH-036","Đăng xuất & Token","Đăng xuất hệ thống và thu hồi Refresh Token (Positive)","Đang có phiên đăng nhập active","1. Gửi POST /api/v1/auth/logout kèm Bearer Token","Bearer Token hợp lệ","HTTP 200 OK, trường refreshToken trong DB bị xóa thành null","High"
-"TC-AUTH-037","Đăng xuất & Token","Cấp mới Access Token bằng Refresh Token hợp lệ (Positive)","Có Refresh Token còn hạn (<= 7 ngày)","1. Gửi POST /api/v1/auth/refresh-token kèm refreshToken","{ ""refreshToken"": ""<valid_refresh_token>"" }","HTTP 200 OK, trả về cặp accessToken mới (15 phút) và refreshToken mới","High"
-"TC-AUTH-038","Đăng xuất & Token","Cố tình dùng lại Refresh Token đã thu hồi (Negative / Security)","User đã bấm logout","1. Gửi POST /api/v1/auth/refresh-token với token cũ","{ ""refreshToken"": ""<revoked_token>"" }","HTTP 401 Unauthorized: 'Refresh token không hợp lệ hoặc đã hết hạn'","High"
-"TC-DRV-001","Khai báo phương tiện","Khai báo xe mới hợp lệ - Sedan 4 chỗ (Positive)","Tài xế đã đăng nhập, chưa có xe hoạt động","1. Mở màn hình Khai báo xe
-2. Nhập biển số, hãng, mẫu, màu, loại xe sedan, số ghế
-3. Nhấn Lưu","Biển số: 51H-123.45, Loại xe: sedan, Hãng: Toyota, Mẫu: Vios, Số ghế: 4","Tạo bản ghi Vehicle thành công, isActive=true, HTTP 201 Created","High"
-"TC-DRV-002","Khai báo phương tiện","Khai báo xe với loại xe không thuộc danh mục (Negative)","Tài xế đã đăng nhập","1. Nhập loại xe không hợp lệ (ví dụ: 'truck', 'motorbike')
-2. Nhấn Lưu","Biển số: 51H-999.99, Loại xe: truck","Từ chối dữ liệu, HTTP 400: 'Loại xe phải thuộc [sedan, suv, van]'","High"
-"TC-DRV-003","Khai báo phương tiện","Khai báo xe với biển số bị trùng lặp (Negative)","Biển số 51H-123.45 đã được đăng ký bởi tài xế khác","1. Nhập biển số đã tồn tại
-2. Nhấn Lưu","Biển số: 51H-123.45","Báo lỗi HTTP 409 Conflict: 'Biển số xe đã tồn tại trong hệ thống'","High"
-"TC-DRV-004","Khai báo phương tiện","Biển số xe đúng chuẩn định dạng Việt Nam (Boundary)","Màn hình khai báo xe","1. Nhập biển số chuẩn 51G-123.45
-2. Nhấn Lưu","Biển số: 51G-123.45","Regex kiểm tra biển số hợp lệ, lưu DB thành công","Medium"
-"TC-DRV-005","Trạng thái trực tuyến","Tài xế đã duyệt bật Online thành công (Positive)","Tài xế có isApproved=true, isActive=true, xe active","1. Mở app Tài xế
-2. Gạt công tắc sang 'Trực tuyến' (available)","{ ""status"": ""available"" }","Trạng thái DB chuyển 'available', kết nối WebSocket sẵn sàng nhận cuốc, HTTP 200 OK","High"
-"TC-DRV-006","Trạng thái trực tuyến","Tài xế chưa được duyệt cố tình bật Online (Negative)","Tài xế mới đăng ký, isApproved = false","1. Gạt công tắc sang 'Trực tuyến'","{ ""status"": ""available"" }","Hệ thống chặn HTTP 403 Forbidden: 'Hồ sơ chưa được phê duyệt bởi Operator'","High"
-"TC-DRV-007","Trạng thái trực tuyến","Tài xế tắt trực tuyến chuyển về Offline (Positive)","Tài xế đang ở trạng thái available và không có cuốc chạy","1. Gạt công tắc sang 'Ngoại tuyến' (offline)","{ ""status"": ""offline"" }","Trạng thái chuyển 'offline', ngắt khỏi pool tìm kiếm tài xế 5km, HTTP 200 OK","Medium"
-"TC-DRV-008","Trạng thái trực tuyến","Tài xế chưa có phương tiện nào cố tình bật Online (Negative)","Tài xế được duyệt nhưng chưa đăng ký xe","1. Bấm bật trực tuyến","Vehicles = []","Hệ thống báo lỗi HTTP 400: 'Vui lòng đăng ký phương tiện trước khi trực tuyến'","High"
-"TC-DRV-009","Trạng thái Bận","Tự động chuyển trạng thái Bận (busy) khi chấp nhận cuốc (Positive)","Tài xế đang available, có cuốc xe được phân bổ","1. Tài xế bấm 'Chấp nhận cuốc' trong 30 giây","Ride ID: RIDE_001, Driver ID: DRV_01","Trạng thái DriverProfile tự động chuyển sang 'busy', không nhận thêm cuốc xe mới","High"
-"TC-DRV-010","Trạng thái Bận","Tài xế đang busy bị loại khỏi danh sách quét tìm xe (Negative)","Tài xế đang chở khách (status = busy)","1. Khách hàng B đặt chuyến gần vị trí tài xế (< 1km)
-2. Hệ thống quét tìm xe","Khoảng cách: 800m, Driver status: busy","Thuật toán loại trừ tài xế đang busy, không gửi thông báo cuốc mới","High"
-"TC-DRV-011","Xét duyệt hồ sơ","Operator xem danh sách tài xế chờ phê duyệt (Positive)","Đăng nhập với quyền operator/admin","1. Gửi GET /api/v1/drivers/pending?page=1&limit=10","Role: operator, Token hợp lệ","HTTP 200 OK, trả về danh sách hồ sơ có isApproved=false kèm thông tin xe và GPLX","High"
-"TC-DRV-012","Xét duyệt hồ sơ","Operator phê duyệt hồ sơ tài xế hợp lệ (Positive)","Hồ sơ tài xế đang isApproved=false","1. Operator kiểm tra hồ sơ
-2. Bấm nút 'Phê duyệt'
-3. Xác nhận","Driver User ID: 60b8d295f1d2c72b8c5e6f3e","isApproved đổi thành true, approvedAt lưu timestamp, gửi email thông báo chúc mừng, ghi AuditLog","High"
-"TC-DRV-013","Xét duyệt hồ sơ","Operator từ chối hồ sơ kèm theo lý do cụ thể (Negative)","Hồ sơ tài xế có ảnh GPLX mờ không đạt","1. Operator bấm 'Từ chối'
-2. Nhập lý do từ chối
-3. Bấm Xác nhận","{ ""reason"": ""Ảnh giấy phép lái xe mờ, không nhận diện được số GPLX"" }","isApproved giữ false, gửi email thông báo lý do cho tài xế để nộp lại, HTTP 200 OK","High"
-"TC-DRV-014","Dashboard tài xế","Tài xế xem tổng kết cuốc xe, rating và thu nhập (Positive)","Tài xế đã hoàn thành các cuốc xe trong hệ thống","1. Mở tab Hồ sơ / Thu nhập trên app tài xế","Driver Token","HTTP 200 OK, hiển thị đúng tổng số cuốc (totalTrips), điểm rating trung bình, tổng tiền kiếm được","Medium"
-"TC-DRV-015","Khóa tài khoản tài xế","Admin khóa tài khoản tài xế có hành vi gian lận (Positive)","Đăng nhập với quyền Admin","1. Admin tìm kiếm tài xế vi phạm
-2. Bấm 'Khóa tài khoản'
-3. Xác nhận lý do","Driver ID: 60b8d295f1d2c72b8c5e6f3e","isActive đổi thành false, ngắt kết nối socket lập tức, tài xế không thể đăng nhập nhận cuốc","High"
-"TC-DRV-016","Khóa tài khoản tài xế","Operator không có quyền khóa tài khoản tài xế (Negative)","Đăng nhập tài khoản role operator","1. Gửi request PUT /api/v1/drivers/:id/block","Role: operator","Hệ thống chặn HTTP 403 Forbidden: 'Chỉ Admin mới có quyền khóa tài khoản'","High"
-"TC-DRV-017","Khóa tài khoản khi đang chở khách","Admin khóa tài khoản khi tài xế đang trong chuyến đi (Exception EX-09)","Tài xế đang chở khách (status = in_progress)","1. Admin bấm Khóa tài khoản
-2. Hệ thống kiểm tra cuốc xe đang chạy","Driver status: busy, Ride: in_progress","Hệ thống cho phép chuyến đi hoàn thành bình thường, sau khi trả khách tài khoản mới bị khóa hoàn toàn","High"
-"TC-RID-001","Tìm kiếm địa chỉ Geocoding","Tìm kiếm địa chỉ hợp lệ trả về tọa độ GPS (Positive)","Hệ thống Geocoding đang hoạt động","1. Nhập từ khóa địa chỉ vào ô tìm kiếm đón/trả
-2. Chọn từ danh sách gợi ý","address = 'Dai hoc Cong Nghiep TPHCM'","HTTP 200 OK, trả về danh sách gợi ý kèm tọa độ chính xác [106.6881, 10.8222]","High"
-"TC-RID-002","Tìm kiếm địa chỉ Geocoding","Tìm kiếm với địa chỉ để trống (Negative)","Màn hình đặt xe","1. Gửi request tìm kiếm với chuỗi rỗng","address = ''","HTTP 400 Bad Request: 'Vui lòng cung cấp địa chỉ tìm kiếm'","Medium"
-"TC-RID-003","Tìm kiếm địa chỉ Geocoding","Máy chủ bản đồ bên ngoài bị lỗi thời gian chờ (Exception EX-10)","OpenStreetMap API bị timeout > 5s","1. Khách hàng gõ tìm địa chỉ
-2. Hệ thống bắt lỗi timeout","External Map Timeout","Kích hoạt Circuit Breaker, fallback sang danh sách địa danh phổ biến lưu sẵn trong cache, không crash","High"
-"TC-RID-004","Ước tính cước phí","Tính cước ước tính xe Sedan theo khoảng cách và thời gian (Positive / BRULE-01)","Bảng giá Sedan: Base 15k, 12k/km, 1k/phút","1. Nhập điểm đón và điểm đến cách nhau 10km, dự kiến 20 phút
-2. Chọn xe Sedan
-3. Xem cước ước tính","Khoảng cách: 10.0km, Thời gian: 20 phút, Loại xe: sedan","Cước ước tính = 15.000 + (10 * 12.000) + (20 * 1.000) = 155.000 VNĐ, HTTP 200 OK","High"
-"TC-RID-005","Ước tính cước phí","Tính cước lộ trình cực ngắn (< 1km) áp dụng Giá mở cửa (Boundary / BRULE-01)","Bảng giá BaseFare = 15.000 VNĐ","1. Nhập lộ trình 0.3km, chạy 2 phút
-2. Xem cước hiển thị","Khoảng cách: 0.3km, Thời gian: 2 phút","Áp dụng giá tối thiểu BaseFare = 15.000 VNĐ theo BRULE-01","Medium"
-"TC-RID-006","Ước tính cước phí","Ước tính cước lộ trình dài liên tỉnh 100km (Boundary)","Bảng giá Sedan hợp lệ","1. Nhập khoảng cách 100.0km, thời gian 150 phút
-2. Xem cước","d = 100.0km, t = 150 phút","Cước = 15.000 + (100 * 12.000) + (150 * 1.000) = 1.365.000 VNĐ, tính toán chính xác không tràn số","Medium"
-"TC-RID-007","Ước tính cước phí","Ước tính cước với tọa độ điểm đón và điểm trả trùng nhau (Negative)","Màn hình tính giá","1. Chọn điểm đón và điểm trả cùng 1 vị trí (khoảng cách = 0)","pickupLocation = dropoffLocation = [106.6881, 10.8222]","Hệ thống cảnh báo lỗi: 'Điểm đón và điểm trả không được trùng nhau' (HTTP 400)","High"
-"TC-RID-008","Khởi tạo đặt xe","Khách hàng tạo cuốc xe mới khi không có cuốc nào đang chạy (Positive)","Khách hàng đã đăng nhập, không có chuyến xe chưa hoàn thành","1. Chọn điểm đón, điểm trả, loại xe, phương thức thanh toán
-2. Nhấn 'Xác nhận đặt xe'","Pickup: 12 Nguyễn Văn Bảo, Dropoff: Chợ Bến Thành, Xe: sedan, PT: cash","Bản ghi Ride được tạo với status='searching', retryCount=0, kích hoạt tìm xe 5km, HTTP 201","High"
-"TC-RID-009","Khởi tạo đặt xe","Chặn đặt thêm cuốc mới khi đang có chuyến xe chưa hoàn tất (Negative / AC-BOOK-02)","Khách hàng đang có chuyến xe ở trạng thái 'in_progress'","1. Cố tình gửi yêu cầu POST /api/v1/rides/book tạo chuyến xe mới","Khách hàng ID có cuốc active","Hệ thống từ chối HTTP 400: 'Bạn đang có một chuyến xe đang diễn ra, không thể đặt thêm cuốc mới'","High"
-"TC-RID-010","Vòng đời chuyến đi","Tài xế cập nhật trạng thái 'Đã đến điểm đón' (Positive)","Chuyến xe đang ở trạng thái 'accepted'","1. Tài xế di chuyển tới điểm đón
-2. Bấm nút 'Đã đến nơi'","Ride ID hợp lệ, Driver Token","Trạng thái Ride chuyển 'driver_arrived', arrivedAt lưu timestamp, gửi push notification cho khách","High"
-"TC-RID-011","Vòng đời chuyến đi","Chặn cập nhật 'Đã đến nơi' khi cuốc xe chưa được accepted (Negative / BRULE-05)","Chuyến xe đang ở trạng thái 'searching'","1. Gửi request PUT /api/v1/rides/:id/arrived","Ride status: searching","Hệ thống từ chối chuyển trạng thái không hợp lệ, HTTP 400 Bad Request","High"
-"TC-RID-012","Vòng đời chuyến đi","Tài xế bấm 'Bắt đầu chuyến đi' khi khách đã lên xe (Positive)","Chuyến xe đang ở trạng thái 'driver_arrived'","1. Khách lên xe
-2. Tài xế bấm nút 'Bắt đầu di chuyển'","Ride ID hợp lệ","Ride status chuyển 'in_progress', ghi nhận startedAt, bắt đầu tính đồng hồ cước","High"
-"TC-RID-013","Vòng đời chuyến đi","Chặn bắt đầu chuyến khi tài xế chưa bấm 'Đã đến nơi' (Negative / BRULE-05)","Chuyến xe đang ở 'accepted'","1. Gửi request PUT /api/v1/rides/:id/start","Ride status: accepted","Báo lỗi HTTP 400: 'Phải bấm đã đến điểm đón trước khi bắt đầu hành trình'","High"
-"TC-RID-014","Vòng đời chuyến đi","Tài xế bấm 'Hoàn thành chuyến đi' khi tới điểm trả (Positive)","Chuyến xe đang ở trạng thái 'in_progress'","1. Xe dừng tại đích
-2. Tài xế bấm 'Hoàn thành chuyến'
-3. Hệ thống chốt số km và thời gian","actualDistance = 10.2km, actualDuration = 24 phút","Ride status chuyển 'completed', completedAt lưu timestamp, kích hoạt module tính cước thực tế","High"
-"TC-RID-015","Hủy chuyến đi","Khách hàng hủy chuyến miễn phí khi xe đang tìm hoặc đang tới (Positive / BRULE-06)","Chuyến xe đang ở trạng thái 'searching' hoặc 'accepted'","1. Khách hàng bấm nút 'Hủy chuyến'
+3. Nhấn Đổi mật khẩu","Pass cũ: Password@123
+Pass mới: NewPassword@456","Đổi mật khẩu thành công; có thể đăng nhập bằng mật khẩu mới","High"
+"TC-ACC-004","Quản lý tài khoản & Đổi mật khẩu","Đổi mật khẩu thất bại khi nhập sai mật khẩu cũ","Người dùng đã đăng nhập","1. Nhập sai mật khẩu hiện tại
+2. Nhập mật khẩu mới
+3. Nhấn Đổi mật khẩu","Pass cũ: WrongPass
+Pass mới: NewPassword@456","Báo lỗi: Mật khẩu hiện tại không chính xác","High"
+"TC-ACC-005","Quản lý tài khoản & Đổi mật khẩu","Đăng xuất khỏi hệ thống và hủy phiên làm việc","Đang trong phiên đăng nhập","1. Nhấn nút Đăng xuất
+2. Xác nhận","User Token","Xóa phiên/token; chuyển hướng về trang Đăng nhập; không thể truy cập lại chức năng cũ","High"
+"TC-DRV-001","Khai báo xe & Trạng thái hoạt động tài xế","Khai báo thông tin xe hợp lệ (Sedan 4 chỗ)","Tài xế đã đăng nhập","1. Mở trang Đăng ký xe
+2. Nhập biển số, hãng xe, dòng xe, số ghế
+3. Nhấn Lưu","Biển số: 51H-999.88
+Hãng: Toyota Vios
+Loại xe: Sedan
+Ghế: 4","Lưu thông tin xe thành công; trạng thái xe Active","High"
+"TC-DRV-002","Khai báo xe & Trạng thái hoạt động tài xế","Khai báo xe với biển số đã có trong hệ thống","Biển số 51H-999.88 đã được tài xế khác đăng ký","1. Nhập biển số bị trùng
+2. Nhấn Lưu","Biển số: 51H-999.88","Từ chối lưu; thông báo Biển số xe đã được đăng ký","High"
+"TC-DRV-003","Khai báo xe & Trạng thái hoạt động tài xế","Tài xế đã được duyệt bật chế độ Trực tuyến (Online)","Tài xế có trạng thái Approved và xe Active","1. Gạt nút sang 'Trực tuyến'","Trạng thái: Online (Available)","Trạng thái đổi sang Online; sẵn sàng nhận yêu cầu chuyến xe từ khách hàng","High"
+"TC-DRV-004","Khai báo xe & Trạng thái hoạt động tài xế","Tài xế chưa được duyệt cố tình bật Trực tuyến","Hồ sơ tài xế đang ở trạng thái Pending_Approval","1. Gạt nút sang 'Trực tuyến'","Trạng thái: Pending","Hệ thống chặn; thông báo Hồ sơ của bạn chưa được duyệt","High"
+"TC-DRV-005","Khai báo xe & Trạng thái hoạt động tài xế","Tài xế tắt trực tuyến chuyển về Ngoại tuyến (Offline)","Tài xế đang Online và không chạy cuốc","1. Gạt nút sang 'Ngoại tuyến'","Trạng thái: Offline","Chuyển trạng thái Offline; hệ thống ngừng phân bổ cuốc xe","Medium"
+"TC-DRV-006","Khai báo xe & Trạng thái hoạt động tài xế","Tài xế tự động chuyển sang Bận (Busy) khi có cuốc","Tài xế vừa bấm Chấp nhận chuyến xe","1. Kiểm tra trạng thái tài xế trên hệ thống","Event: accept_ride","Trạng thái tài xế tự động chuyển thành Busy; không nhận thêm cuốc xe khác","High"
+"TC-APP-001","Xét duyệt hồ sơ tài xế","Admin/Operator xem danh sách tài xế chờ phê duyệt","Đăng nhập bằng tài khoản Admin hoặc Operator","1. Mở menu Quản lý tài xế
+2. Chọn tab 'Chờ duyệt'","Role: Admin / Operator","Hiển thị danh sách các tài xế mới đăng ký kèm thông tin GPLX và xe","High"
+"TC-APP-002","Xét duyệt hồ sơ tài xế","Phê duyệt hồ sơ tài xế hợp lệ","Đang xem hồ sơ tài xế chờ duyệt","1. Kiểm tra giấy tờ hợp lệ
+2. Nhấn nút 'Phê duyệt'
+3. Xác nhận","Driver ID hợp lệ","Hồ sơ chuyển sang Approved; tài xế nhận thông báo và có thể bật Online","High"
+"TC-APP-003","Xét duyệt hồ sơ tài xế","Từ chối hồ sơ tài xế kèm lý do","Giấy tờ tài xế không đạt yêu cầu","1. Nhấn nút 'Từ chối'
+2. Nhập lý do (GPLX mờ)
+3. Xác nhận","Lý do: 'Ảnh chụp GPLX bị mờ, không rõ số'","Hồ sơ chuyển Rejected; thông báo lý do từ chối gửi về tài xế","High"
+"TC-APP-004","Xét duyệt hồ sơ tài xế","Người dùng thường không có quyền xét duyệt tài xế","Đăng nhập bằng tài khoản Khách hàng (Customer)","1. Thử gửi request duyệt tài xế","Role: Customer","Hệ thống từ chối; báo lỗi không có quyền truy cập (HTTP 403 Forbidden)","High"
+"TC-EST-001","Tìm kiếm địa chỉ & Ước tính cước phí","Tìm kiếm địa chỉ đón/trả trả về gợi ý vị trí","Đang ở màn hình Đặt xe","1. Gõ địa chỉ vào ô tìm kiếm
+2. Chọn từ danh sách gợi ý","Địa chỉ: 'Đại học Công Nghiệp TP.HCM'","Hiển thị địa chỉ chính xác kèm định vị điểm trên bản đồ","High"
+"TC-EST-002","Tìm kiếm địa chỉ & Ước tính cước phí","Tính cước ước tính theo loại xe Sedan và SUV","Đã chọn điểm đón và điểm đến cách nhau 10km","1. Hệ thống tính toán dựa trên khoảng cách và thời gian","Quãng đường: 10km
+Thời gian: 20 phút","Hiển thị rõ giá cước ước tính cho xe Sedan và xe SUV","High"
+"TC-EST-003","Tìm kiếm địa chỉ & Ước tính cước phí","Lộ trình ngắn dưới 1km tính giá mở cửa tối thiểu","Điểm đón và điểm đến cách nhau 300m","1. Chọn lộ trình 300m
+2. Xem cước hiển thị","Quãng đường: 0.3km","Cước hiển thị đúng bằng giá cước mở cửa cơ sở (BaseFare)","Medium"
+"TC-EST-004","Tìm kiếm địa chỉ & Ước tính cước phí","Tìm kiếm với ô địa chỉ để trống","Đang ở ô tìm kiếm","1. Bấm tìm kiếm nhưng không nhập chữ nào","Địa chỉ: rỗng","Hiển thị nhắc nhở: Vui lòng nhập địa chỉ cần tìm","Low"
+"TC-EST-005","Tìm kiếm địa chỉ & Ước tính cước phí","Điểm đón và điểm trả trùng vị trí","Đang ở màn hình Đặt xe","1. Chọn điểm đón và điểm trả cùng một địa chỉ","Điểm đón = Điểm trả","Cảnh báo: Điểm đón và điểm trả không được trùng nhau","Medium"
+"TC-BOOK-001","Khách hàng đặt chuyến xe","Đặt chuyến xe thành công khi nhập đủ thông tin","Khách hàng đã đăng nhập, không có chuyến xe nào đang chạy","1. Chọn điểm đón, điểm trả
+2. Chọn loại xe
+3. Chọn thanh toán Tiền mặt
+4. Nhấn 'Đặt xe'","Đón: ĐH Công Nghiệp
+Trả: Chợ Bến Thành
+Xe: Sedan
+TT: Tiền mặt","Tạo chuyến xe thành công; trạng thái chuyển sang Tìm tài xế (Searching)","High"
+"TC-BOOK-002","Khách hàng đặt chuyến xe","Chặn đặt thêm chuyến khi đang có chuyến chưa hoàn thành","Khách hàng đang có chuyến xe ở trạng thái In_Progress","1. Nhấn nút Đặt xe mới","User đang có cuốc chạy","Báo lỗi: Bạn đang có chuyến xe đang diễn ra, không thể đặt thêm","High"
+"TC-BOOK-003","Khách hàng đặt chuyến xe","Đặt xe nhưng không chọn phương thức thanh toán","Màn hình đặt xe","1. Chọn lộ trình nhưng bỏ qua bước chọn thanh toán
+2. Nhấn Đặt xe","PaymentMethod: null","Nhắc nhở: Vui lòng chọn phương thức thanh toán trước khi đặt xe","Medium"
+"TC-BOOK-004","Khách hàng đặt chuyến xe","Khu vực đặt xe không có tài xế nào trực tuyến","Quanh bán kính 5km không có tài xế nào Online","1. Khách nhấn Đặt xe
+2. Hệ thống quét tìm tài xế","Tài xế online quanh 5km = 0","Sau 15 giây quét, thông báo: Hiện không có tài xế nào quanh khu vực của bạn","High"
+"TC-MCH-001","Điều phối & Tiếp nhận cuốc xe","Ưu tiên gửi cuốc cho tài xế gần nhất trong bán kính 5km","Tài xế A cách 1km, Tài xế B cách 3km cùng online và rảnh","1. Khách đặt xe
+2. Hệ thống quét và phân bổ chuyến","Khoảng cách A: 1km < B: 3km","Cuốc xe được gửi trước tiên đến màn hình của Tài xế A","High"
+"TC-MCH-002","Điều phối & Tiếp nhận cuốc xe","Bỏ qua tài xế cách điểm đón trên 5km","Tài xế C cách điểm đón 6km","1. Hệ thống tìm tài xế trong vùng 5km","Khoảng cách C = 6km (> 5km)","Tài xế C không nhận được yêu cầu chuyến xe","High"
+"TC-MCH-003","Điều phối & Tiếp nhận cuốc xe","Tài xế bấm Chấp nhận cuốc trong vòng 30 giây","Màn hình tài xế hiển thị popup yêu cầu chuyến kèm đếm ngược 30s","1. Tài xế bấm nút 'Chấp nhận' ở giây thứ 10","Thời gian: 10s (< 30s)","Chuyến xe chuyển sang Accepted; màn hình khách hiển thị tài xế đã nhận chuyến","High"
+"TC-MCH-004","Điều phối & Tiếp nhận cuốc xe","Tài xế bấm Từ chối cuốc xe","Tài xế nhận được yêu cầu chuyến","1. Tài xế bấm nút 'Từ chối'","Action: Reject","Đóng popup trên máy tài xế; hệ thống tự động chuyển cuốc cho tài xế kế tiếp","High"
+"TC-MCH-005","Điều phối & Tiếp nhận cuốc xe","Quá 30 giây tài xế không phản hồi (Timeout)","Tài xế nhận được cuốc nhưng không bấm gì","1. Hết 30 giây đếm ngược","Timeout = 30s","Popup tự tắt; hệ thống tự động điều chuyển cuốc cho tài xế tiếp theo","High"
+"TC-MCH-006","Điều phối & Tiếp nhận cuốc xe","Hết 5 lượt xoay vòng không tài xế nào nhận","Đã gửi qua 5 tài xế nhưng đều từ chối hoặc quá giờ","1. Tài xế thứ 5 hết thời gian phản hồi","Số lượt thử = 5","Hủy tìm kiếm; thông báo Rất tiếc không có tài xế nào nhận chuyến, vui lòng thử lại sau","High"
+"TC-RIDE-001","Thực hiện hành trình chuyến đi","Tài xế cập nhật trạng thái 'Đã đến điểm đón'","Chuyến xe đang ở trạng thái Accepted","1. Tài xế lái xe đến điểm hẹn
+2. Nhấn nút 'Đã đến nơi'","Ride status: Accepted","Trạng thái chuyển sang Driver_Arrived; khách nhận thông báo tài xế đã đến","High"
+"TC-RIDE-002","Thực hiện hành trình chuyến đi","Tài xế cập nhật trạng thái 'Bắt đầu chuyến đi'","Chuyến xe đang ở trạng thái Driver_Arrived và khách đã lên xe","1. Nhấn nút 'Bắt đầu di chuyển'","Ride status: Driver_Arrived","Trạng thái chuyển sang In_Progress; bắt đầu tính quãng đường di chuyển","High"
+"TC-RIDE-003","Thực hiện hành trình chuyến đi","Tài xế cập nhật trạng thái 'Hoàn thành chuyến đi'","Chuyến xe đang ở trạng thái In_Progress và đã đến điểm trả","1. Dừng xe tại điểm đến
+2. Nhấn nút 'Hoàn thành chuyến'","Ride status: In_Progress","Trạng thái chuyển sang Completed; màn hình chuyển sang bước Thanh toán cước","High"
+"TC-RIDE-004","Thực hiện hành trình chuyến đi","Chặn bấm Bắt đầu khi chưa bấm Đã đến nơi","Chuyến xe mới ở trạng thái Accepted","1. Cố tình gửi lệnh Bắt đầu chuyến","Ride status: Accepted","Báo lỗi: Phải cập nhật Đã đến nơi trước khi bắt đầu chuyến xe","High"
+"TC-RIDE-005","Thực hiện hành trình chuyến đi","Chặn bấm Hoàn thành khi chưa bấm Bắt đầu chuyến","Chuyến xe đang ở trạng thái Driver_Arrived","1. Cố tình gửi lệnh Hoàn thành chuyến","Ride status: Driver_Arrived","Báo lỗi: Chuyến xe chưa được bắt đầu","High"
+"TC-CNC-001","Hủy chuyến xe","Khách hàng hủy chuyến miễn phí khi xe đang tìm hoặc đang đến","Chuyến xe đang ở trạng thái Searching hoặc Accepted","1. Khách nhấn nút 'Hủy chuyến'
 2. Chọn lý do hủy
-3. Xác nhận","Lý do: 'Thay đổi lịch trình cá nhân'","Ride chuyển 'cancelled_by_customer', tài xế giải phóng về available, không phạt phí hủy","High"
-"TC-RID-016","Hủy chuyến đi","Chặn khách hàng hủy chuyến khi xe đang di chuyển (Negative / BRULE-06)","Chuyến xe đang chạy trên đường (in_progress)","1. Khách bấm hủy chuyến trên app","Ride status: in_progress","Hệ thống từ chối HTTP 400: 'Không thể hủy chuyến xe khi đang trong hành trình'","High"
-"TC-RID-017","Hủy chuyến khi xe đang đến","Khách hủy khi tài xế đang chạy đến đón (Exception EX-04)","Tài xế đang chạy đến đón (status = accepted)","1. Khách bấm Hủy cuốc
-2. Server xử lý thông báo tài xế","Khách bấm Hủy","Tài xế nhận âm thanh báo khách hủy kèm lý do, tự động chuyển về available ngay lập tức","High"
-"TC-RID-018","Khách không xuất hiện No-Show","Tài xế hủy do khách không ra sau đúng 5 phút 01 giây (Positive / Boundary / EX-05)","Tài xế đã bấm driver_arrived được 5 phút 01 giây (>= 5 phút)","1. Bấm 'Hủy cuốc do khách không xuất hiện'
-2. Xác nhận","Thời gian chờ = 301 giây","Ride chuyển 'cancelled_by_driver (No-Show)', tài xế không bị phạt tỷ lệ hủy, chuyển về available","High"
-"TC-RID-019","Khách không xuất hiện No-Show","Tài xế cố hủy No-Show ở mốc 4 phút 59 giây - Dưới ngưỡng (Negative / Boundary / EX-05)","Tài xế bấm driver_arrived được 4 phút 59 giây (< 5 phút)","1. Bấm 'Hủy cuốc do khách không xuất hiện'","Thời gian chờ = 299 giây","Hệ thống từ chối HTTP 400: 'Bạn cần chờ tối thiểu 5 phút (còn 1 giây)'","High"
-"TC-RID-020","Sự cố tai nạn giữa đường","Xe hỏng / va chạm giữa hành trình, tài xế báo sự cố khẩn (Exception EX-06)","Chuyến xe đang ở in_progress","1. Tài xế bấm 'Báo cáo sự cố khẩn cấp'
-2. Chọn 'Xe hỏng hóc giữa đường'","Incident: Vehicle Breakdown","Ride chuyển 'interrupted_by_incident', tính tiền đoạn đã đi, gửi cảnh báo ưu tiên điều xe khác cho khách","High"
-"TC-RID-021","Lịch sử chuyến đi","Khách hàng xem danh sách lịch sử các chuyến xe đã đi (Positive)","Khách hàng đã đăng nhập, đã hoàn thành nhiều chuyến xe","1. Gửi request GET /api/v1/rides/history?page=1&limit=10","Customer Token","HTTP 200 OK, phân trang danh sách các chuyến xe có điểm đón, điểm trả, giá tiền, ngày giờ","Medium"
-"TC-RID-022","Lịch sử chuyến đi","Xem chi tiết một chuyến xe cụ thể của mình (Positive)","Chuyến xe tồn tại trong hệ thống","1. Gửi request GET /api/v1/rides/:id","Ride ID hợp lệ","HTTP 200 OK, trả về chi tiết lộ trình, thông tin tài xế, biển số xe và cước phí","Medium"
-"TC-RID-023","Lịch sử chuyến đi","Khách hàng cố tình xem chi tiết chuyến xe của người khác (Negative / Security)","Khách A đăng nhập, lấy ID cuốc xe của Khách B","1. Khách A gọi GET /api/v1/rides/{rideId_of_Khach_B}","Token Khách A, Ride của Khách B","Hệ thống chặn HTTP 403 Forbidden: 'Bạn không có quyền truy cập thông tin chuyến đi này'","High"
-"TC-MAT-001","Quét tài xế 5km","Tìm thấy tài xế available trong bán kính 5km cùng loại xe (Positive / BRULE-02)","Tài xế A đang available, cách điểm đón 2km, xe sedan","1. Khách đặt xe sedan
-2. Hệ thống thực hiện quét tìm kiếm không gian 2dsphere","Khoảng cách: 2km (<= 5km), Driver status: available, Loại xe: sedan","Tài xế A được đưa vào danh sách ứng viên ghép nối, HTTP 200","High"
-"TC-MAT-002","Quét tài xế 5km","Tài xế ở khoảng cách đúng biên 4.99km (Positive / Boundary)","Tài xế ở cách điểm đón 4.99km (< 5.0km)","1. Hệ thống quét 2dsphere","Distance = 4.99km","Hợp lệ, tài xế được đưa vào pool phân bổ cuốc","High"
-"TC-MAT-003","Quét tài xế 5km","Loại bỏ tài xế ở khoảng cách 5.01km ngoài bán kính (Negative / Boundary)","Tài xế cách 5.01km (> 5.0km)","1. Hệ thống quét 2dsphere","Distance = 5.01km","Bị loại trừ, không nhận được thông báo cuốc xe","High"
-"TC-MAT-004","Quét tài xế 5km","Loại bỏ tài xế khác loại xe yêu cầu (Negative)","Khách đặt xe SUV 7 chỗ, Tài xế C cách 1km nhưng chạy xe Sedan 4 chỗ","1. Hệ thống lọc danh sách tài xế theo loại xe","Khách yêu cầu: SUV, Xe tài xế: Sedan","Tài xế C bị loại, không nhận được thông báo cuốc","High"
-"TC-MAT-005","Xếp hạng ưu tiên","Ưu tiên gửi cuốc cho tài xế có khoảng cách gần nhất (Positive / BRULE-02)","Tài xế A cách 1.2km (4.8★), Tài xế B cách 3.0km (5.0★)","1. Hệ thống tính điểm xếp hạng theo khoảng cách
-2. Phân bổ cuốc","Khoảng cách A: 1.2km < B: 3.0km","Cuốc xe được gửi duy nhất tới máy Tài xế A trước","High"
-"TC-MAT-006","Xếp hạng ưu tiên","Khi khoảng cách bằng nhau, ưu tiên tài xế có rating cao hơn (Boundary / BRULE-02)","Tài xế A cách 2.0km (4.5★), Tài xế B cách 2.0km (4.9★)","1. So sánh khoảng cách (bằng nhau)
-2. So sánh Rating","Distance A = B = 2.0km; Rating B (4.9) > A (4.5)","Tài xế B được chọn gửi yêu cầu trước Tài xế A","Medium"
-"TC-MAT-007","Đếm ngược 30 giây","Hiển thị popup nhận cuốc kèm đồng hồ đếm ngược 30s trên app tài xế (Positive)","Cuốc xe được phân bổ cho tài xế","1. Server phát sự kiện socket tới tài xế
-2. App tài xế hiển thị popup","Thời gian đếm ngược: 30 giây","Popup rung chuông, đếm ngược từ 30 về 0, hiển thị điểm đón và giá cước","High"
-"TC-MAT-008","Chấp nhận cuốc (Atomic Lock)","Tài xế chấp nhận cuốc xe thành công trong vòng 30 giây (Positive / EX-08)","Đồng hồ đang đếm ở giây thứ 15","1. Tài xế bấm nút 'Chấp nhận'","Thời gian phản hồi: 15s (< 30s)","Ride status='accepted', driverId được gán, tài xế chuyển status='busy', thông báo cho khách trong < 1s","High"
-"TC-MAT-009","Chấp nhận cuốc (Atomic Lock)","Tài xế bấm nhận ở giây thứ 29.9 - Sát ngưỡng biên (Positive / Boundary)","Đồng hồ đếm ngược còn 0.1 giây","1. Tài xế bấm Chấp nhận","Thời gian = 29.9 giây","Yêu cầu đến trước khi timer server đóng, nhận cuốc thành công","Medium"
-"TC-MAT-010","Chấp nhận cuốc (Atomic Lock)","Chống tranh chấp cuốc xe đồng thời - Race Condition (Negative / Concurrency / EX-08)","Hai tài xế bấm nhận cùng 1 mili-giây","1. Sử dụng Atomic Update FindOneAndUpdate có điều kiện status='searching'","Concurrent requests","Chỉ duy nhất 1 tài xế nhận thành công, tài xế còn lại nhận thông báo 'Cuốc xe đã được tài xế khác tiếp nhận'","High"
-"TC-MAT-011","Timeout & Xoay vòng","Tài xế chủ động bấm từ chối cuốc xe (Positive)","Tài xế 1 bấm 'Từ chối'","1. Tài xế 1 bấm từ chối
-2. Hệ thống ghi nhận và xoay vòng","Tài xế 1: Bấm Từ chối, retryCount tăng 1","Popup trên máy 1 đóng lại, yêu cầu chuyển ngay sang Tài xế 2 trong danh sách","High"
-"TC-MAT-012","Timeout & Xoay vòng","Tài xế không phản hồi sau 30 giây - Timeout (Exception EX-02)","Tài xế không bấm gì, đồng hồ đếm về 0","1. Hết 30 giây timeout","Timeout = 30s","Hệ thống tự động hủy lượt trên máy tài xế đó, retryCount tăng 1, gửi sang tài xế tiếp theo","High"
-"TC-MAT-013","Timeout & Xoay vòng","Tài xế bấm nhận ở giây thứ 31 sau khi đã timeout (Negative / Boundary)","Đã quá 30 giây trên server","1. Tài xế bấm Chấp nhận muộn","Thời gian = 31 giây","Server từ chối HTTP 400: 'Đã hết thời gian chấp nhận cuốc xe này'","High"
-"TC-MAT-014","Số lần thử lại","Hệ thống xoay vòng ở lượt thử thứ 4 (Boundary / BRULE-03)","Đã có 3 tài xế từ chối (retryCount = 3)","1. Xoay vòng tiếp","retryCount = 4 (< 5)","Tiếp tục gửi yêu cầu cho tài xế thứ 4 trong khu vực","Medium"
-"TC-MAT-015","Hết lượt tìm kiếm","Kết thúc tìm kiếm và báo không có tài xế sau 5 lượt thử thất bại (Positive / Exception EX-01 / EX-02)","Đã thử qua 5 tài xế (retryCount = 5) đều từ chối hoặc timeout","1. Tài xế thứ 5 timeout
-2. Hệ thống kiểm tra retryCount >= 5","retryCount = 5","Ride status chuyển 'no_driver', gửi thông báo xin lỗi khách hàng, dừng tiến trình tìm xe","High"
-"TC-MAT-016","Không có tài xế ban đầu","Khu vực đặt xe không có tài xế nào trực tuyến trong 5km (Positive / Exception EX-01)","Không có tài xế nào online trong bán kính 5km","1. Khách xác nhận đặt xe
-2. Hệ thống quét 2dsphere","Số tài xế tìm thấy = 0","Sau thời gian chờ quét 15s, chuyển status 'no_driver', thông báo: 'Hiện không có xe gần bạn'","High"
-"TC-MAT-017","Thuật toán ghép xe","Tài xế đã từ chối không bị gửi lại cuốc trong cùng 1 phiên tìm kiếm (Negative)","Tài xế A vừa bấm từ chối cuốc RIDE_01","1. Hệ thống tiếp tục xoay vòng","ExcludedDrivers: [Driver_A]","Tài xế A nằm trong danh sách loại trừ của cuốc RIDE_01, không bị spam lại","Medium"
-"TC-MAT-018","Thuật toán ghép xe","Tài xế mất sóng mạng đột ngột khi cuốc xe vừa gửi tới (Exception EX-03)","Socket tài xế disconnect ngay lúc nhận cuốc","1. Socket emit error / disconnect","Socket disconnected","Server nhận diện ngắt kết nối trong 3s, lập tức chuyển sang tài xế kế tiếp","High"
-"TC-PAY-001","Tính cước thực tế","Tính cước thực tế theo quãng đường và thời gian di chuyển GPS (Positive / BRULE-01)","Chuyến xe vừa hoàn thành, Sedan (Base 15k, 12k/km, 1k/min)","1. Hệ thống chốt số liệu GPS thực tế: 8.5km và 22 phút
-2. Áp dụng công thức BRULE-01","d = 8.5km, t = 22 phút, xe: sedan","Cước = 15.000 + (8.5 * 12.000) + (22 * 1.000) = 139.000 VNĐ, lưu vào actualFare của Ride","High"
-"TC-PAY-002","Tính cước thực tế","Tính cước thực tế cuốc xe tắc đường - thời gian di chuyển dài (Positive)","Lộ trình ngắn 3km nhưng kẹt xe mất 45 phút","1. Tính cước xe Sedan","d = 3.0km, t = 45 phút","Cước = 15.000 + (3 * 12.000) + (45 * 1.000) = 96.000 VNĐ, tính đủ phí thời gian chờ kẹt xe","Medium"
-"TC-PAY-003","Tính cước thực tế","Cước thực tế quãng đường siêu ngắn làm tròn lên giá BaseFare (Boundary / BRULE-01)","Khách đi 200m thì xuống xe, thời gian 1 phút","1. Tính cước","d = 0.2km, t = 1 phút","Cước tính toán < 15.000 -> Tự động làm tròn lên đúng BaseFare = 15.000 VNĐ","Medium"
-"TC-PAY-004","Cấu hình giá cước","Admin cập nhật biểu phí xe SUV thành công (Positive)","Đăng nhập tài khoản role Admin","1. Vào Quản trị Giá cước
-2. Nhập biểu phí mới cho SUV
-3. Nhấn Lưu","{ ""baseFare"": 20000, ""pricePerKm"": 15000, ""pricePerMin"": 1500 }","Bảng PricingConfigs được cập nhật, ghi 1 bản ghi vào AuditLogs (BRULE-10), HTTP 200 OK","High"
-"TC-PAY-005","Cấu hình giá cước","Chặn cập nhật giá cước với số tiền âm hoặc bằng 0 (Negative / Boundary)","Đăng nhập Admin","1. Nhập baseFare = -5000
-2. Nhấn Lưu","baseFare = -5000","Báo lỗi validation HTTP 400: 'Giá cước cơ sở phải lớn hơn 0'","High"
-"TC-PAY-006","Cấu hình giá cước","Operator cố tình sửa giá cước bị chặn phân quyền (Negative / Security / BRULE-09)","Đăng nhập tài khoản role Operator","1. Gửi request PUT /api/v1/payments/pricing/sedan","Role: operator","Hệ thống chặn HTTP 403 Forbidden: 'Chỉ Admin mới có quyền cập nhật biểu phí'","High"
-"TC-PAY-007","Thanh toán Tiền mặt","Tài xế xác nhận đã nhận đủ tiền mặt từ khách (Positive / BRULE-07)","Cuốc xe hoàn thành cước phí 100.000 VNĐ, phương thức tiền mặt","1. Khách trả tiền mặt cho tài xế
-2. Tài xế bấm nút 'Xác nhận đã nhận tiền'","Ride ID hợp lệ, Driver Token","Payment status chuyển 'COMPLETED', ghi nhận paidAt, tài xế chuyển về available, mở màn hình đánh giá","High"
-"TC-PAY-008","Thanh toán Tiền mặt","Tài xế cố xác nhận tiền mặt cho cuốc thanh toán điện tử (Negative)","Cuốc xe cấu hình thanh toán thẻ","1. Tài xế gửi API cash-confirm","Ride paymentMethod = 'e_payment'","Từ chối HTTP 400: 'Cuốc xe này được thanh toán qua thẻ/ví điện tử'","High"
-"TC-PAY-009","Thanh toán Tiền mặt","Chặn xác nhận tiền mặt 2 lần trên cùng 1 cuốc xe (Negative)","Giao dịch đã ở trạng thái COMPLETED","1. Tài xế bấm lại nút xác nhận tiền mặt","Payment status: COMPLETED","Hệ thống từ chối HTTP 400: 'Giao dịch này đã được thanh toán hoàn tất'","Medium"
-"TC-PAY-010","Thanh toán Điện tử","Khách hàng thanh toán qua Cổng thanh toán điện tử thành công (Positive)","Khách chọn thanh toán qua Thẻ/Ví, cuốc xe completed","1. Nhấn nút 'Thanh toán ngay'
-2. Cổng thanh toán xử lý thành công","Số tiền: 139.000 VNĐ, Cổng trả về transactionId: TXN_20260910_01","Payment status chuyển 'COMPLETED', lưu transactionId, gửi email biên lai, HTTP 200 OK","High"
-"TC-PAY-011","Sự cố Thanh toán","Xử lý thanh toán điện tử thất bại do tài khoản không đủ số dư (Exception EX-07)","Thẻ khách hàng không đủ tiền thanh toán","1. Cổng thanh toán trả về lỗi 'Insufficient Balance'","Mã lỗi cổng: ERR_BALANCE","Payment status chuyển 'FAILED', app hiển thị lựa chọn cho khách: 'Nhập thẻ khác' hoặc 'Đổi sang Tiền mặt'","High"
-"TC-PAY-012","Sự cố Thanh toán","Chuyển sang tiền mặt khi thanh toán thẻ thất bại (Positive / Exception EX-07)","Payment vừa FAILED ở bước thanh toán thẻ","1. Khách bấm 'Chuyển sang trả Tiền mặt'
-2. Tài xế nhận tiền và bấm xác nhận","Chuyển method: cash","Payment cập nhật method sang 'cash', chuyển COMPLETED khi tài xế xác nhận thu tiền","High"
-"TC-PAY-013","Hóa đơn điện tử","Xuất hóa đơn điện tử cho chuyến đi đã thanh toán (Positive)","Chuyến đi đã hoàn thành và thanh toán COMPLETED","1. Gửi request GET /api/v1/payments/:rideId/invoice","Ride ID hợp lệ","HTTP 200 OK, trả về chi tiết hóa đơn gồm tiền cước, thuế VAT 10%, mã giao dịch, thông tin xe","Medium"
-"TC-PAY-014","Hóa đơn điện tử","Yêu cầu xuất hóa đơn cho cuốc xe chưa hoàn thành (Negative)","Cuốc xe đang in_progress","1. Gửi request lấy hóa đơn","Ride status: in_progress","Từ chối HTTP 400: 'Chuyến xe chưa hoàn thành và chưa thanh toán, không thể xuất hóa đơn'","Medium"
-"TC-PAY-015","Bảo mật thanh toán","Kiểm tra hệ thống không lưu số thẻ và CVV (Security / NFR-SEC-04)","Giao dịch thanh toán thẻ vừa hoàn tất","1. Truy vấn trực tiếp bản ghi Payment trong MongoDB","Payment Record","Chỉ lưu transactionId, amount, method, status. Hoàn toàn không có card_number, cvv","High"
-"TC-TRK-001","Cập nhật GPS","Tài xế gửi tọa độ GPS định kỳ 5-10s hợp lệ (Positive)","Tài xế đang online hoặc đang trong cuốc xe","1. Thiết bị tài xế phát sự kiện socket 'driver:locationUpdate'","{ ""lat"": 10.762622, ""lng"": 106.660172, ""bearing"": 90, ""speed"": 35 }","currentLocation trong DriverProfile được cập nhật dạng GeoJSON Point, độ trễ < 1.5s","High"
-"TC-TRK-002","Cập nhật GPS","Chặn cập nhật GPS với tọa độ ngoài giới hạn địa lý (Negative / Boundary)","Tài xế phát socket","1. Gửi tọa độ lat > 90 hoặc lng > 180","{ ""lat"": 195.0, ""lng"": 250.0 }","Hệ thống từ chối cập nhật tọa độ không hợp lệ, ngắt packet rác","Medium"
-"TC-TRK-003","Cập nhật GPS","Tọa độ GPS tại các mốc biên cực hạn địa cầu (Boundary)","Tọa độ hợp lệ ở cận biên","1. Gửi tọa độ lat = 90.0 (Bắc Cực), lng = 180.0","{ ""lat"": 90.0, ""lng"": 180.0 }","Dữ liệu hợp lệ theo chuẩn GeoJSON WGS84, lưu DB không lỗi","Low"
-"TC-TRK-004","Mất sóng GPS","Mất tín hiệu GPS / Mạng trong 3 phút, client đệm tọa độ (Exception EX-03)","Tài xế đi vào hầm đường bộ mất mạng 3 phút","1. Mất mạng 3 phút (< 5 phút grace period)
-2. Xe ra khỏi hầm có mạng trở lại
-3. Client gửi sync bù tọa độ","Offline duration: 3 phút","Hệ thống nhận gói tin bù, vẽ lại lộ trình liên tục, cuốc xe không bị gián đoạn","High"
-"TC-TRK-005","Mất sóng GPS","Mất tín hiệu GPS quá 5 phút, cảnh báo trên Operator Dashboard (Exception EX-03)","Không có tín hiệu GPS từ tài xế trong suốt 5 phút 30 giây","1. Server kiểm tra lastLocationUpdate > 5 phút","Last ping: 330 giây trước","Cuốc xe được gắn cờ cảnh báo đỏ trên Dashboard Operator để nhân viên gọi điện hỗ trợ","High"
-"TC-TRK-006","Theo dõi xe trực tuyến","Khách hàng nhận tọa độ xe di chuyển real-time trên bản đồ (Positive / AC-TRK-02)","Khách hàng tham gia room socket 'ride_{rideId}'","1. Tài xế phát locationUpdate
-2. Server broadcast tới room chuyến xe","Room: ride_60b8d295f1d2c72b8c5e6f50","App khách hàng nhận sự kiện và biểu tượng xe di chuyển mượt mà trên bản đồ","High"
-"TC-TRK-007","Theo dõi xe trực tuyến","Khách hàng cố tình nghe trộm room socket cuốc xe của người khác (Negative / Security)","Khách A kết nối socket","1. Khách A emit 'customer:trackDriver' với rideId của Khách B","Token Khách A, Ride Khách B","Server kiểm tra quyền sở hữu chuyến đi, từ chối cho join room","High"
-"TC-TRK-008","Tính lại ETA","Tự động tính lại thời gian dự kiến đến (ETA) theo vị trí mới (Positive)","Tài xế đang di chuyển tới điểm đón khách","1. Vị trí xe cập nhật tiến gần điểm đón từ 3km còn 1km
-2. Hệ thống tính lại ETA","Khoảng cách còn lại: 1.0km","ETA cập nhật giảm từ 8 phút xuống còn 3 phút trên app khách hàng","Medium"
-"TC-TRK-009","Tính lại ETA","ETA tăng do tài xế đi lạc hoặc gặp tắc đường (Positive)","Tài xế đi lệch khỏi lộ trình đề xuất","1. Xe đi xa điểm đón hơn
-2. Tính lại ETA","Distance tăng từ 1km lên 2km","ETA tự động tăng và hiển thị cảnh báo tài xế đang đi đường vòng","Low"
-"TC-TRK-010","Bản đồ Operator","Operator xem toàn bộ xe online trên bản đồ giám sát trung tâm (Positive / AC-ADM-03)","Đăng nhập tài khoản role Operator/Admin","1. Gửi GET /api/v1/tracking/live","Role: operator","HTTP 200 OK, trả về danh sách tất cả tài xế online kèm tọa độ GPS và trạng thái (available/busy)","High"
-"TC-TRK-011","Bản đồ Operator","Người dùng thường cố tình gọi API theo dõi toàn cảnh xe (Negative / Security)","Đăng nhập tài khoản role Customer","1. Gửi GET /api/v1/tracking/live","Role: customer","Hệ thống chặn HTTP 403 Forbidden: 'Chỉ Operator hoặc Admin mới có quyền xem bản đồ trực tuyến'","High"
-"TC-NOTIF-001","Thông báo In-App","Bắn thông báo đẩy In-app khi tài xế chấp nhận cuốc (Positive)","Tài xế vừa bấm nhận cuốc xe","1. Server kích hoạt sự kiện thông báo
-2. App khách hàng nhận socket","Tiêu đề: 'Đã tìm thấy tài xế!'","Khách hàng nhận popup thông báo tên tài xế, biển số xe và thời gian đến dự kiến","High"
-"TC-NOTIF-002","Thông báo In-App","Bắn thông báo khi tài xế đến điểm đón và khi cuốc hoàn thành (Positive)","Cuốc xe đổi trạng thái","1. Đổi status sang driver_arrived và completed","Event: ride_update","Khách nhận push notification tương ứng từng mốc sự kiện","Medium"
-"TC-NOTIF-003","Thông báo Email","Gửi email hóa đơn tự động sau khi thanh toán thành công (Positive)","Cuốc xe thanh toán hoàn tất","1. Hệ thống tạo hóa đơn
-2. Kích hoạt hàng đợi gửi email nền","Email nhận: customer@example.com","Khách hàng nhận được email chứa chi tiết biên lai cước phí trong vòng 30 giây","Medium"
-"TC-NOTIF-004","Thông báo Email","Máy chủ gửi Email SMTP bị gián đoạn hoạt động (Exception EX-10)","SMTP mail server bị lỗi kết nối","1. Thanh toán cuốc xe xong
-2. Hệ thống gửi email nhưng SMTP báo lỗi","SMTP error","Hệ thống ghi log lỗi ngầm, quy trình thanh toán vẫn hoàn tất 100%, không báo lỗi cho người dùng","High"
-"TC-NOTIF-005","Hộp thư thông báo","Người dùng xem danh sách thông báo cá nhân (Positive)","Đã đăng nhập","1. Mở màn hình Chuông thông báo (GET /api/v1/notifications)","User Token","HTTP 200 OK, trả về danh sách thông báo phân trang, hiển thị rõ tin chưa đọc (isRead=false)","Medium"
-"TC-NOTIF-006","Hộp thư thông báo","Phân trang thông báo ở trang không có dữ liệu (Boundary)","Tổng cộng có 15 thông báo, mỗi trang 10 tin","1. Gọi GET /api/v1/notifications?page=99&limit=10","page = 99","HTTP 200 OK, trả về mảng rỗng data: [], không bị crash lỗi server","Low"
-"TC-NOTIF-007","Đánh dấu đã đọc","Đánh dấu 1 thông báo cụ thể là đã đọc (Positive)","Có thông báo chưa đọc","1. Bấm vào thông báo để xem chi tiết","PUT /api/v1/notifications/:id/read","isRead chuyển sang true, số lượng badge thông báo chưa đọc giảm 1, HTTP 200 OK","Low"
-"TC-NOTIF-008","Đánh dấu đã đọc","Đánh dấu tất cả thông báo là đã đọc (Positive)","Có nhiều thông báo chưa đọc","1. Nhấn nút 'Đánh dấu đã đọc tất cả'","PUT /api/v1/notifications/read-all","Toàn bộ thông báo của user chuyển isRead=true, badge về 0, HTTP 200 OK","Low"
-"TC-NOTIF-009","Đánh dấu đã đọc","Cố tình đánh dấu đã đọc thông báo của người khác (Negative / Security)","User A đăng nhập, gửi request đọc thông báo của User B","1. Gửi PUT /api/v1/notifications/{id_cua_user_B}/read","Token User A, Notif ID của User B","Hệ thống từ chối HTTP 403 / 404: 'Không tìm thấy thông báo thuộc về bạn'","High"
-"TC-NOTIF-010","Kênh thông báo mở rộng","Kiểm tra kiến trúc kênh thông báo hỗ trợ gắn Provider mới (Positive)","Hệ thống Notification Service","1. Kiểm tra cấu trúc module notification hỗ trợ adapter (Socket, Email, SMS)","Type: system","Module điều phối đúng kênh thông báo theo cấu hình","Low"
-"TC-RAT-001","Đánh giá chuyến đi","Khách hàng gửi đánh giá 5 sao kèm nhận xét hợp lệ (Positive / BRULE-08)","Cuốc xe đã completed và thanh toán COMPLETED","1. Mở màn hình Đánh giá
-2. Chọn 5 sao
-3. Nhập nhận xét
-4. Bấm Gửi","rating = 5, comment = 'Tài xế lái xe an toàn, lịch sự'","Tạo bản ghi RatingReview, cập nhật rating trung bình tài xế, HTTP 201 Created","High"
-"TC-RAT-002","Đánh giá chuyến đi","Khách hàng đánh giá 1 sao - Mức thấp nhất hợp lệ (Positive / Boundary)","Cuốc xe đã hoàn thành","1. Chọn 1 sao
-2. Nhập nhận xét phản ánh
-3. Bấm Gửi","rating = 1, comment = 'Tài xế hút thuốc trên xe'","Hệ thống ghi nhận 1 sao, kéo giảm điểm trung bình tài xế, HTTP 201","High"
-"TC-RAT-003","Đánh giá chuyến đi","Chặn gửi đánh giá với số sao bằng 0 hoặc 6 (Negative / Boundary)","Cuốc xe đã hoàn thành","1. Gửi request rating = 6 sao hoặc rating = 0 sao","rating = 6 (hoặc 0)","Báo lỗi validation HTTP 400: 'Điểm đánh giá phải là số nguyên từ 1 đến 5 sao'","High"
-"TC-RAT-004","Đánh giá chuyến đi","Độ dài nhận xét đúng 500 ký tự - Cận trên biên (Positive / Boundary)","Màn hình đánh giá","1. Nhập nhận xét đúng 500 ký tự
-2. Bấm Gửi","comment: chuỗi 500 ký tự","Hợp lệ, lưu trọn vẹn nhận xét vào DB, HTTP 201","Medium"
-"TC-RAT-005","Đánh giá chuyến đi","Nhận xét vượt quá 500 ký tự (Negative / Boundary)","Màn hình đánh giá","1. Nhập nhận xét 501 ký tự
-2. Bấm Gửi","comment: chuỗi 501 ký tự","Báo lỗi validation HTTP 400: 'Nhận xét không được vượt quá 500 ký tự'","Medium"
-"TC-RAT-006","Đánh giá chuyến đi","Chặn đánh giá 2 lần trên cùng 1 chuyến xe (Negative / BRULE-08 / EX-09)","Khách hàng đã đánh giá chuyến xe này trước đó","1. Cố tình gửi lại đánh giá lần thứ 2 cho cùng rideId","rideId đã có đánh giá","Hệ thống từ chối HTTP 409 Conflict: 'Chuyến đi này đã được đánh giá'","High"
-"TC-RAT-007","Đánh giá chuyến đi","Chặn gửi đánh giá khi cuốc xe chưa hoàn thành hoặc chưa thanh toán (Negative)","Cuốc xe đang in_progress","1. Gửi request POST /api/v1/ratings","Ride status: in_progress","Từ chối HTTP 400: 'Chỉ được đánh giá sau khi chuyến đi đã hoàn thành và thanh toán'","High"
-"TC-RAT-008","Tính lại Rating tài xế","Tự động tính lại điểm trung bình tài xế theo công thức tích lũy (Positive / BRULE-08)","Tài xế đang có 4 lượt đánh giá, điểm TB 4.0. Lượt thứ 5 khách chấm 5 sao.","1. Khách gửi đánh giá 5 sao","oldAvg = 4.0, totalReviews = 4, newScore = 5","newAvg = (4.0 * 4 + 5) / 5 = 4.2★, totalReviews tăng lên 5 trong DriverProfile","High"
-"TC-RAT-009","Tính lại Rating tài xế","Lượt đánh giá đầu tiên của tài xế mới (Boundary / BRULE-08)","Tài xế mới tinh, totalReviews = 0, rating = 0","1. Khách đầu tiên đánh giá 5 sao","totalReviews = 0, newScore = 5","rating = 5.0★, totalReviews = 1, cập nhật chính xác không bị lỗi chia cho 0","High"
-"TC-RAT-010","Xem nhận xét","Tài xế xem danh sách phản hồi và nhận xét của khách hàng (Positive)","Tài xế đã đăng nhập","1. Gửi GET /api/v1/ratings/my-reviews","Driver Token","HTTP 200 OK, trả về danh sách số sao và lời nhận xét của khách hàng","Medium"
-"TC-RAT-011","Xem nhận xét","Khách hàng xem điểm rating công khai của tài xế trước khi lên xe (Positive)","Cuốc xe đã accepted","1. Gửi GET /api/v1/ratings/driver/:driverId","driverId hợp lệ","HTTP 200 OK, hiển thị rating 4.8★ và số cuốc đã phục vụ để tạo sự tin tưởng","Low"
-"TC-ADM-001","Dashboard vận hành","Admin/Operator xem dashboard chỉ số vận hành ngày (Positive / AC-ADM-03)","Đăng nhập quyền Admin hoặc Operator","1. Truy cập trang chủ Dashboard (GET /api/v1/admin/dashboard)","Admin Token","HTTP 200 OK, hiển thị đúng tổng doanh thu ngày, số cuốc thành công, số tài xế online","High"
-"TC-ADM-002","Quản lý Khách hàng","Tìm kiếm khách hàng theo tên hoặc số điện thoại (Positive)","Trang Quản lý người dùng","1. Nhập từ khóa tìm kiếm '0912345678'
-2. Bấm Tìm kiếm","search = '0912345678'","HTTP 200 OK, trả về danh sách khách hàng khớp thông tin","Medium"
-"TC-ADM-003","Quản lý Khách hàng","Tìm kiếm với payload SQL/NoSQL Injection độc hại (Negative / Security)","Trang tìm kiếm khách hàng","1. Nhập payload injection vào ô search","search = ""' OR '1'='1"" hoặc { ""$regex"": "".*"" }","Hệ thống sanitize input, xử lý an toàn dưới dạng chuỗi thuần túy, không để lộ dữ liệu","High"
-"TC-ADM-004","Quản lý Tài xế","Lọc tài xế theo trạng thái hoạt động available/busy/offline (Positive)","Trang Quản lý tài xế","1. Chọn bộ lọc status = 'available'
-2. Bấm Lọc","GET /api/v1/admin/drivers?status=available","HTTP 200 OK, chỉ hiển thị danh sách các tài xế đang trực tuyến sẵn sàng","Medium"
-"TC-ADM-005","Can thiệp chuyến đi","Operator can thiệp hủy chuyến xe lỗi khi tài xế gặp tai nạn (Positive / Exception EX-06)","Cuốc xe đang in_progress nhưng tài xế gặp sự cố xe hỏng","1. Operator mở chi tiết cuốc xe
-2. Chọn 'Can thiệp: Hủy cưỡng chế'
+3. Xác nhận","Lý do: 'Thay đổi kế hoạch'","Chuyến xe chuyển sang Cancelled; tài xế được giải phóng về trạng thái Online","High"
+"TC-CNC-002","Hủy chuyến xe","Chặn khách hàng hủy chuyến khi xe đang chạy trên đường","Chuyến xe đang ở trạng thái In_Progress","1. Khách thử nhấn nút Hủy chuyến","Ride status: In_Progress","Hệ thống từ chối: Không thể hủy chuyến xe khi đang trong hành trình","High"
+"TC-CNC-003","Hủy chuyến xe","Tài xế hủy do khách không ra sau 5 phút chờ (No-Show)","Tài xế đã bấm Đã đến nơi quá 5 phút mà không thấy khách","1. Tài xế nhấn 'Hủy chuyến do khách không xuất hiện'
+2. Xác nhận","Thời gian chờ: 6 phút (> 5 phút)","Hủy chuyến thành công; tài xế không bị tính lỗi hủy chuyến","High"
+"TC-CNC-004","Hủy chuyến xe","Tài xế hủy No-Show khi chưa chờ đủ 5 phút","Tài xế mới bấm Đã đến nơi được 2 phút","1. Tài xế bấm Hủy do khách không xuất hiện","Thời gian chờ: 2 phút (< 5 phút)","Báo lỗi: Bạn cần chờ tại điểm đón tối thiểu 5 phút","Medium"
+"TC-CNC-005","Hủy chuyến xe","Hủy chuyến nhưng không chọn lý do","Màn hình xác nhận hủy chuyến","1. Không chọn lý do hủy
+2. Bấm Xác nhận hủy","Lý do: để trống","Yêu cầu: Vui lòng chọn lý do hủy chuyến","Low"
+"TC-PAY-001","Thanh toán cước phí","Tính toán cước thực tế khi hoàn thành chuyến","Chuyến xe vừa kết thúc với 8km di chuyển trong 18 phút","1. Hệ thống tự động tính cước theo công thức","Khoảng cách: 8km
+Thời gian: 18 phút
+Xe: Sedan","Hiển thị đúng số tiền cước thực tế cần thanh toán trên cả máy tài xế và khách","High"
+"TC-PAY-002","Thanh toán cước phí","Tài xế xác nhận đã nhận đủ tiền mặt từ khách","Khách trả tiền mặt cho tài xế","1. Tài xế nhấn nút 'Xác nhận đã nhận tiền mặt'","Phương thức: Tiền mặt
+Số tiền: 120.000 VNĐ","Trạng thái thanh toán đổi sang Hoàn thành (Completed); chuyến xe kết thúc","High"
+"TC-PAY-003","Thanh toán cước phí","Thanh toán trực tuyến qua Thẻ / Ví điện tử thành công","Khách hàng chọn thanh toán qua Thẻ","1. Nhấn nút 'Thanh toán ngay'
+2. Hệ thống trừ tiền thành công","Phương thức: Thẻ ngân hàng","Giao dịch thành công; nhận mã giao dịch; cập nhật trạng thái Completed","High"
+"TC-PAY-004","Thanh toán cước phí","Thanh toán thẻ thất bại do tài khoản không đủ số dư","Thẻ ngân hàng của khách không đủ tiền","1. Thực hiện thanh toán thẻ","Thẻ không đủ số dư","Báo lỗi thanh toán thất bại; hiển thị tùy chọn Chuyển sang trả Tiền mặt","High"
+"TC-PAY-005","Thanh toán cước phí","Chặn xác nhận tiền mặt 2 lần trên cùng một chuyến","Chuyến xe đã được tài xế xác nhận thu tiền xong","1. Thử bấm lại nút xác nhận tiền mặt","Giao dịch đã Completed","Hệ thống từ chối: Chuyến xe này đã được thanh toán hoàn tất","Medium"
+"TC-PAY-006","Thanh toán cước phí","Xem chi tiết hóa đơn cước phí sau khi thanh toán","Chuyến xe đã thanh toán xong","1. Mở xem chi tiết chuyến xe","Ride ID hợp lệ","Hiển thị đầy đủ biên lai gồm: tiền cước, quãng đường, thời gian và phương thức thanh toán","Medium"
+"TC-TRK-001","Theo dõi vị trí xe thời gian thực","Tài xế cập nhật tọa độ GPS định kỳ 5-10 giây","Tài xế đang trong chuyến đi","1. Ứng dụng tự động gửi tọa độ GPS về máy chủ","Tọa độ: lat: 10.762622, lng: 106.660172","Vị trí của tài xế được cập nhật liên tục trên hệ thống","High"
+"TC-TRK-002","Theo dõi vị trí xe thời gian thực","Khách hàng theo dõi vị trí xe di chuyển trên bản đồ","Tài xế đã nhận cuốc và đang di chuyển","1. Mở màn hình theo dõi trên ứng dụng khách","Màn hình bản đồ theo dõi","Biểu tượng xe của tài xế di chuyển mượt mà trên bản đồ của khách","High"
+"TC-TRK-003","Theo dõi vị trí xe thời gian thực","Tự động tính lại thời gian dự kiến xe đến (ETA)","Xe tài xế đang tiến dần về điểm đón","1. Vị trí xe cập nhật gần hơn từ 3km còn 1km","Khoảng cách còn lại: 1km","Thời gian xe đến giảm từ 8 phút xuống còn 3 phút trên app khách","Medium"
+"TC-TRK-004","Theo dõi vị trí xe thời gian thực","Tọa độ gửi lên không hợp lệ ngoài phạm vi địa lý","Thiết bị gửi tọa độ rác","1. Gửi tọa độ lat > 90 hoặc lng > 180","lat = 200.0, lng = 300.0","Hệ thống loại bỏ gói tin sai; không cập nhật vị trí rác","Low"
+"TC-RAT-001","Đánh giá & Phản hồi chuyến đi","Khách hàng gửi đánh giá 5 sao kèm nhận xét sau chuyến","Chuyến xe đã hoàn thành và thanh toán xong","1. Chọn 5 sao
+2. Nhập nhận xét: 'Tài xế lái xe an toàn'
+3. Bấm Gửi","Rating: 5 sao
+Comment: 'Lái xe rất an toàn, nhiệt tình'","Gửi đánh giá thành công; lưu nhận xét vào hồ sơ tài xế","High"
+"TC-RAT-002","Đánh giá & Phản hồi chuyến đi","Chặn gửi đánh giá với số sao bằng 0 hoặc lớn hơn 5","Đang ở màn hình đánh giá","1. Thử gửi đánh giá 0 sao hoặc 6 sao","Rating: 0 sao hoặc 6 sao","Báo lỗi: Điểm đánh giá phải từ 1 đến 5 sao","Medium"
+"TC-RAT-003","Đánh giá & Phản hồi chuyến đi","Chặn đánh giá 2 lần trên cùng một chuyến xe","Khách hàng đã đánh giá chuyến xe này","1. Thử gửi lại đánh giá lần thứ 2","Ride ID đã có đánh giá","Từ chối: Chuyến xe này đã được đánh giá trước đó","High"
+"TC-RAT-004","Đánh giá & Phản hồi chuyến đi","Tự động cập nhật điểm sao trung bình của tài xế","Tài xế có sẵn 4 lượt đánh giá (TB 4.0). Lượt này khách chấm 5 sao.","1. Khách gửi đánh giá 5 sao","Old rating: 4.0
+New review: 5 sao","Điểm trung bình mới của tài xế được tính lại chính xác thành 4.2 sao","High"
+"TC-RAT-005","Đánh giá & Phản hồi chuyến đi","Chặn gửi đánh giá khi chuyến xe chưa hoàn thành","Chuyến xe đang ở trạng thái In_Progress","1. Cố tình gửi yêu cầu đánh giá","Ride status: In_Progress","Báo lỗi: Chỉ có thể đánh giá sau khi chuyến đi đã hoàn thành","Medium"
+"TC-ADM-001","Quản trị hệ thống & Xem báo cáo","Admin/Operator xem Dashboard tổng quan các chuyến trong ngày","Đăng nhập với tài khoản Admin hoặc Operator","1. Mở trang Dashboard","Role: Admin / Operator","Hiển thị tổng số chuyến trong ngày, doanh thu, số tài xế đang online","High"
+"TC-ADM-002","Quản trị hệ thống & Xem báo cáo","Tìm kiếm người dùng theo tên hoặc số điện thoại","Trang Quản lý người dùng","1. Nhập từ khóa '0912345678'
+2. Nhấn Tìm kiếm","Từ khóa: 0912345678","Hiển thị chính xác thông tin tài khoản của người dùng tương ứng","Medium"
+"TC-ADM-003","Quản trị hệ thống & Xem báo cáo","Xem báo cáo thống kê doanh thu theo ngày và theo loại xe","Màn hình Báo cáo tài chính","1. Chọn khoảng ngày xem báo cáo
+2. Nhấn Xem báo cáo","Từ ngày: 01/08/2026 Đến ngày: 31/08/2026","Hiển thị bảng tổng hợp doanh thu theo từng ngày và phân loại xe","High"
+"TC-ADM-004","Quản trị hệ thống & Xem báo cáo","Chặn người dùng thông thường truy cập trang quản trị Admin","Đăng nhập bằng tài khoản Khách hàng","1. Thử mở URL trang quản trị Admin","Role: Customer","Chặn truy cập; hiển thị lỗi 403 Bạn không có quyền truy cập trang này","High"
+"TC-ADM-005","Quản trị hệ thống & Xem báo cáo","Operator can thiệp hỗ trợ hủy chuyến xe khi tài xế gặp sự cố","Chuyến xe bị sự cố tài xế hỏng xe giữa đường","1. Operator mở chi tiết chuyến xe
+2. Chọn 'Can thiệp hủy chuyến'
 3. Nhập lý do
-4. Xác nhận","{ ""action"": ""cancel"", ""reason"": ""Tài xế gặp sự cố va chạm giao thông"" }","Ride status chuyển 'cancelled', giải phóng khách hàng đặt xe khác, ghi log AuditLog","High"
-"TC-ADM-006","Can thiệp chuyến đi","Can thiệp cuốc xe nhưng không nhập lý do bắt buộc (Negative)","Màn hình can thiệp cuốc","1. Chọn Hủy cưỡng chế
-2. Bỏ trống ô lý do
-3. Bấm Xác nhận","{ ""action"": ""cancel"", ""reason"": """" }","Báo lỗi HTTP 400: 'Lý do can thiệp là bắt buộc để lưu kiểm toán'","High"
-"TC-ADM-007","Can thiệp chuyến đi","Operator điều phối chuyển cuốc xe sang tài xế khác (Positive / Exception EX-06)","Cuốc xe bị kẹt do tài xế cũ không di chuyển","1. Operator chọn 'Điều phối lại cuốc xe'
-2. Chọn tài xế mới gần đó","{ ""action"": ""reassign"", ""newDriverId"": ""DRV_99"" }","Chuyển driverId sang tài xế mới, thông báo lại cho khách hàng, ghi AuditLog","High"
-"TC-ADM-008","Tra cứu giao dịch","Tra cứu đối soát giao dịch thanh toán thành công (Positive)","Có giao dịch trong tháng","1. Lọc theo status = 'COMPLETED'
-2. Bấm Tra cứu","GET /api/v1/admin/payments?status=COMPLETED","HTTP 200 OK, trả về bảng đối soát tài chính chi tiết từng mã thanh toán","Medium"
-"TC-ADM-009","Báo cáo Doanh thu","Xuất báo cáo doanh thu tài chính theo khoảng thời gian và loại xe (Positive / AC-ADM-03)","Có dữ liệu chuyến xe đã thanh toán trong tháng 08/2026","1. Chọn Từ ngày 2026-08-01 đến 2026-08-31
-2. Nhóm theo Ngày
-3. Bấm 'Xem báo cáo'","startDate=2026-08-01, endDate=2026-08-31, groupBy=day","HTTP 200 OK, trả về biểu đồ và bảng tổng hợp doanh thu theo từng ngày và phân loại xe","High"
-"TC-ADM-010","Báo cáo Doanh thu","Lọc báo cáo với khoảng ngày bắt đầu đúng bằng ngày kết thúc (Positive / Boundary)","Màn hình Báo cáo","1. Chọn startDate = endDate = '2026-08-15'","startDate = '2026-08-15', endDate = '2026-08-15'","Hệ thống tổng hợp chuẩn xác doanh thu riêng trong đúng 1 ngày đó, HTTP 200 OK","Medium"
-"TC-ADM-011","Báo cáo Doanh thu","Chặn lọc báo cáo với khoảng thời gian không hợp lệ (Negative)","Màn hình Báo cáo","1. Chọn startDate = '2026-08-31', endDate = '2026-08-01'
-2. Bấm Xem","startDate > endDate","Hệ thống cảnh báo: 'Ngày bắt đầu phải nhỏ hơn ngày kết thúc' (HTTP 400)","Medium"
-"TC-ADM-012","Báo cáo Vận hành","Xem tỷ lệ hoàn thành cuốc và phân tích lý do hủy cuốc (Positive)","Màn hình Báo cáo vận hành","1. Gửi GET /api/v1/admin/reports/operations","Admin Token","HTTP 200 OK, trả về tỷ lệ hoàn thành %, tỷ lệ hủy bởi khách vs tài xế","High"
-"TC-ADM-013","Hiệu suất tài xế","Xem bảng xếp hạng Top 10 tài xế có doanh thu cao nhất (Positive / Boundary)","Màn hình Báo cáo tài xế","1. Gửi GET /api/v1/admin/reports/drivers?limit=10","limit = 10 (cận biên)","HTTP 200 OK, trả về danh sách 10 tài xế có tổng tiền cước cao nhất","Medium"
-"TC-SEC-001","Phân quyền RBAC","Admin truy cập endpoint quản trị cấp cao thành công (Positive / BRULE-09)","Tài khoản có role = 'admin'","1. Gửi GET /api/v1/admin/audit-logs","Token Admin","HTTP 200 OK, truy cập thành công nhật ký kiểm toán","High"
-"TC-SEC-002","Phân quyền RBAC","Khách hàng cố tình gọi API Admin bị chặn 403 Forbidden (Negative / Security)","Tài khoản có role = 'customer'","1. Khách gửi request GET /api/v1/admin/dashboard","Token Customer","Hệ thống từ chối HTTP 403 Forbidden: 'Bạn không có quyền truy cập chức năng này'","High"
-"TC-SEC-003","Phân quyền RBAC","Tài xế cố tình gọi API duyệt tài xế khác (Negative / Security)","Tài khoản có role = 'driver'","1. Gọi PUT /api/v1/drivers/{id}/approve","Token Driver","Hệ thống chặn HTTP 403 Forbidden: 'Không đủ thẩm quyền phê duyệt'","High"
-"TC-SEC-004","Phân tách quyền","Phân tách quyền nghiêm ngặt giữa Operator và Admin (Negative / BRULE-09)","Tài khoản có role = 'operator'","1. Operator cố tình gọi PUT /api/v1/admin/users/:id/role để đổi quyền","Token Operator","Hệ thống chặn HTTP 403 Forbidden: 'Chỉ Super Admin mới có quyền phân quyền người dùng'","High"
-"TC-SEC-005","Phân tách quyền","Operator cố tình xem báo cáo doanh thu tài chính mật (Negative / BRULE-09)","Tài khoản role Operator","1. Gọi GET /api/v1/admin/reports/revenue","Token Operator","Hệ thống chặn HTTP 403 Forbidden: 'Chỉ Admin mới có quyền xem báo cáo tài chính'","High"
-"TC-SEC-006","Audit Log bất biến","Tự động ghi vết Audit Log khi duyệt hồ sơ tài xế (Positive / BRULE-10)","Operator bấm duyệt tài xế A","1. Hoàn tất duyệt tài xế
-2. Kiểm tra collection AuditLogs trong DB","action: 'APPROVE_DRIVER', entity: 'DriverProfile'","1 bản ghi mới được tạo trong AuditLogs chứa operatorId, timestamp, dữ liệu cũ và mới","High"
-"TC-SEC-007","Audit Log bất biến","Tự động ghi vết Audit Log khi Admin cập nhật giá cước (Positive / BRULE-10)","Admin thay đổi biểu phí","1. Lưu biểu phí mới
-2. Kiểm tra AuditLog","action: 'UPDATE_PRICING', entity: 'PricingConfig'","Ghi nhận 1 bản ghi mới lưu rõ oldPrice, newPrice, adminId, timestamp","High"
-"TC-SEC-008","Audit Log bất biến","Đảm bảo Audit Log không thể bị xóa hoặc sửa - Append-Only (Negative / Security / BRULE-10)","Cơ sở dữ liệu MongoDB","1. Cố tình gọi hàm delete/update trên model AuditLog","AuditLog.deleteOne()","Model hoặc API chặn thao tác, không cho phép chỉnh sửa nhật ký đã ghi","High"
-"TC-SEC-009","Mã hóa bảo mật","Mật khẩu người dùng bắt buộc được mã hóa bằng bcrypt trước khi lưu (Positive / Security)","Đăng ký tài khoản mới","1. Đăng ký với pass 'Password@123'
-2. Mở trực tiếp MongoDB kiểm tra trường passwordHash","Password gốc: Password@123","Trường passwordHash là chuỗi mã hóa $2a$10$... không thể dịch ngược thành plaintext","High"
-"TC-SEC-010","Mã hóa bảo mật","Tuyệt đối không lưu trữ thông tin số thẻ tín dụng hoặc mã CVV (Positive / Security / NFR-SEC-04)","Khách hàng thanh toán online","1. Nhập thông tin thẻ trên Mock Gateway
-2. Kiểm tra DB Payment","Card Number, CVV","Database chỉ lưu transactionId của cổng, không có bất kỳ trường nào lưu số thẻ hoặc CVV","High"
-"TC-SEC-011","Bảo mật Token","Gọi API với Access Token hết hạn sau 15 phút 01 giây (Negative / Boundary)","Token được cấp cách đây 15 phút 01 giây (> 15m)","1. Gửi request kèm token hết hạn","Expired Access Token","Hệ thống từ chối HTTP 401 Unauthorized: 'Token expired'","High"
-"TC-SEC-012","Bảo mật Token","Gọi API với Token bị giả mạo chữ ký (Negative / Security)","Token bị sửa payload hoặc ký bằng secret key khác","1. Gửi request kèm token giả mạo","Tampered JWT","Hệ thống phát hiện chữ ký không khớp, từ chối HTTP 401: 'Invalid token signature'","High"
-"TC-SEC-013","Cách ly lỗi thành phần","Cơ chế Circuit Breaker cách ly lỗi cổng thanh toán bên ngoài (Exception EX-10)","Cổng thanh toán bị sập liên tục 5 request","1. Hệ thống phát hiện lỗi liên tiếp
-2. Trip Circuit Breaker sang OPEN","Gateway Outage","Circuit chuyển OPEN, tự động trả lỗi nhanh và ép khách chọn tiền mặt, không làm treo server","High"
+4. Xác nhận","Lý do: 'Xe tài xế gặp sự cố kỹ thuật'","Chuyến xe được hủy an toàn; giải phóng khách hàng để đặt cuốc khác","High"
