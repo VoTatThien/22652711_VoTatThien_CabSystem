@@ -1,267 +1,41 @@
-# Test Cases Module 1: Authentication
+# BẢNG TEST CASES - PHÂN HỆ 1: XÁC THỰC & NGƯỜI DÙNG (AUTHENTICATION)
 
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-001 |
-| **Tên Test Case** | Đăng ký khách hàng thành công |
-| **Mã Yêu cầu** | FR-AUTH-01 |
-| **Loại kiểm thử** | Positive |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Hệ thống hoạt động bình thường, email và số điện thoại chưa tồn tại |
-| **Các bước thực hiện** | 1. Nhập thông tin hợp lệ<br>2. Nhấn nút Đăng ký |
-| **Dữ liệu kiểm thử** | Email: kh1@mail.com, SĐT: 0901234567, Pass: 123456 |
-| **Kết quả kỳ vọng** | HTTP 201 Created, DB thêm bản ghi Customer |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
+> Bao phủ: FR-AUTH-01 đến FR-AUTH-06 | AC-AUTH-01, AC-AUTH-02 | Quy chuẩn: 8 cột ngang chuẩn Excel
 
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-002 |
-| **Tên Test Case** | Đăng ký với email sai định dạng RFC5322 |
-| **Mã Yêu cầu** | FR-AUTH-01 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Trung bình |
-| **Điều kiện tiên quyết** | Như TC-AUTH-001 |
-| **Các bước thực hiện** | 1. Nhập email sai định dạng<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | Email: kh1@mail, SĐT: 0901234567, Pass: 123456 |
-| **Kết quả kỳ vọng** | HTTP 400 Bad Request, message lỗi định dạng email |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-003 |
-| **Tên Test Case** | Đăng ký với SĐT không đủ 10 số |
-| **Mã Yêu cầu** | FR-AUTH-01 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Như TC-AUTH-001 |
-| **Các bước thực hiện** | 1. Nhập SĐT 9 số<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | Email: kh2@mail.com, SĐT: 090123456, Pass: 123456 |
-| **Kết quả kỳ vọng** | HTTP 400 Bad Request, message lỗi SĐT phải là 10 số VN |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-004 |
-| **Tên Test Case** | Đăng ký với mật khẩu ngắn hơn 6 ký tự |
-| **Mã Yêu cầu** | FR-AUTH-01 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Trung bình |
-| **Điều kiện tiên quyết** | Như TC-AUTH-001 |
-| **Các bước thực hiện** | 1. Nhập password < 6 ký tự<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | Email: kh3@mail.com, SĐT: 0901234568, Pass: 12345 |
-| **Kết quả kỳ vọng** | HTTP 400 Bad Request, message lỗi mật khẩu tối thiểu 6 ký tự |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-005 |
-| **Tên Test Case** | Đăng ký trùng Email |
-| **Mã Yêu cầu** | FR-AUTH-01 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Email kh1@mail.com đã tồn tại |
-| **Các bước thực hiện** | 1. Nhập lại email đã tồn tại<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | Email: kh1@mail.com, SĐT: 0988888888, Pass: 123456 |
-| **Kết quả kỳ vọng** | HTTP 409 Conflict, message email đã tồn tại |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-006 |
-| **Tên Test Case** | Đăng ký trùng Số điện thoại |
-| **Mã Yêu cầu** | FR-AUTH-01 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | SĐT 0901234567 đã tồn tại |
-| **Các bước thực hiện** | 1. Nhập lại SĐT đã tồn tại<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | Email: kh4@mail.com, SĐT: 0901234567, Pass: 123456 |
-| **Kết quả kỳ vọng** | HTTP 409 Conflict, message SĐT đã tồn tại |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-007 |
-| **Tên Test Case** | Đăng ký tài xế thành công |
-| **Mã Yêu cầu** | FR-AUTH-02 |
-| **Loại kiểm thử** | Positive |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Hệ thống bình thường |
-| **Các bước thực hiện** | 1. Nhập thông tin tài xế và phương tiện<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | Email: tx1@mail.com, GPLX: 123456789012, Biển số: 51H-12345 |
-| **Kết quả kỳ vọng** | HTTP 201 Created, DB thêm bản ghi Driver và Vehicle |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-008 |
-| **Tên Test Case** | Đăng ký tài xế trùng GPLX |
-| **Mã Yêu cầu** | FR-AUTH-02 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | GPLX đã tồn tại trong DB |
-| **Các bước thực hiện** | 1. Nhập GPLX đã tồn tại<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | GPLX: 123456789012 |
-| **Kết quả kỳ vọng** | HTTP 409 Conflict, message GPLX đã tồn tại |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-009 |
-| **Tên Test Case** | Đăng ký tài xế trùng Biển số xe |
-| **Mã Yêu cầu** | FR-AUTH-02 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Biển số đã được đăng ký |
-| **Các bước thực hiện** | 1. Nhập Biển số đã tồn tại<br>2. Nhấn Đăng ký |
-| **Dữ liệu kiểm thử** | Biển số: 51H-12345 |
-| **Kết quả kỳ vọng** | HTTP 409 Conflict, message Biển số đã được đăng ký |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-010 |
-| **Tên Test Case** | Đăng nhập thành công |
-| **Mã Yêu cầu** | FR-AUTH-03 |
-| **Loại kiểm thử** | Positive |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Tài khoản tồn tại và đang active |
-| **Các bước thực hiện** | 1. Nhập đúng thông tin<br>2. Nhấn Đăng nhập |
-| **Dữ liệu kiểm thử** | Email: kh1@mail.com, Pass: 123456 |
-| **Kết quả kỳ vọng** | HTTP 200 OK, trả về JWT 15m và Refresh token 7d |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-011 |
-| **Tên Test Case** | Đăng nhập sai mật khẩu |
-| **Mã Yêu cầu** | FR-AUTH-03 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Tài khoản tồn tại |
-| **Các bước thực hiện** | 1. Nhập sai mật khẩu<br>2. Nhấn Đăng nhập |
-| **Dữ liệu kiểm thử** | Email: kh1@mail.com, Pass: wrongpass |
-| **Kết quả kỳ vọng** | HTTP 401 Unauthorized, message sai thông tin đăng nhập |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-012 |
-| **Tên Test Case** | Đăng nhập tài khoản bị khóa |
-| **Mã Yêu cầu** | FR-AUTH-03 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Tài khoản có isActive=false |
-| **Các bước thực hiện** | 1. Đăng nhập tài khoản bị khóa<br>2. Nhấn Đăng nhập |
-| **Dữ liệu kiểm thử** | Email: blocked@mail.com, Pass: 123456 |
-| **Kết quả kỳ vọng** | HTTP 403 Forbidden, message tài khoản bị khóa |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-013 |
-| **Tên Test Case** | Brute-force login - 429 Rate Limit |
-| **Mã Yêu cầu** | FR-AUTH-03, NFR-SEC-06 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Tài khoản tồn tại |
-| **Các bước thực hiện** | 1. Nhập sai MK 5 lần liên tiếp<br>2. Nhấn Đăng nhập lần 6 |
-| **Dữ liệu kiểm thử** | Email: kh1@mail.com, Pass: wrong |
-| **Kết quả kỳ vọng** | HTTP 429 Too Many Requests, khóa tạm thời 15 phút |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-014 |
-| **Tên Test Case** | Xem và cập nhật Profile thành công |
-| **Mã Yêu cầu** | FR-AUTH-04 |
-| **Loại kiểm thử** | Positive |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Đã đăng nhập, có JWT hợp lệ |
-| **Các bước thực hiện** | 1. Gọi API cập nhật profile |
-| **Dữ liệu kiểm thử** | Name: Nguyen Van A, Phone: 0911111111 |
-| **Kết quả kỳ vọng** | HTTP 200 OK, DB cập nhật Name và Phone |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-015 |
-| **Tên Test Case** | Cập nhật Profile - Không có Token |
-| **Mã Yêu cầu** | FR-AUTH-04 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Chưa đăng nhập |
-| **Các bước thực hiện** | 1. Gọi API không kèm Authorization header |
-| **Dữ liệu kiểm thử** | Name: Nguyen B |
-| **Kết quả kỳ vọng** | HTTP 401 Unauthorized |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-016 |
-| **Tên Test Case** | Cập nhật Profile - Token hết hạn |
-| **Mã Yêu cầu** | FR-AUTH-04 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | JWT đã quá 15 phút |
-| **Các bước thực hiện** | 1. Gọi API với token hết hạn |
-| **Dữ liệu kiểm thử** | Name: Nguyen C |
-| **Kết quả kỳ vọng** | HTTP 401 Unauthorized, message Token Expired |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-017 |
-| **Tên Test Case** | Đổi mật khẩu thành công |
-| **Mã Yêu cầu** | FR-AUTH-05 |
-| **Loại kiểm thử** | Positive |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Đã đăng nhập |
-| **Các bước thực hiện** | 1. Nhập MK cũ và MK mới<br>2. Đổi mật khẩu |
-| **Dữ liệu kiểm thử** | Old: 123456, New: 654321 |
-| **Kết quả kỳ vọng** | HTTP 200 OK, mật khẩu được cập nhật trong DB |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-018 |
-| **Tên Test Case** | Đổi mật khẩu - MK mới giống MK cũ |
-| **Mã Yêu cầu** | FR-AUTH-05 |
-| **Loại kiểm thử** | Negative |
-| **Độ ưu tiên** | Thấp |
-| **Điều kiện tiên quyết** | Đã đăng nhập |
-| **Các bước thực hiện** | 1. Nhập MK mới giống MK cũ |
-| **Dữ liệu kiểm thử** | Old: 123456, New: 123456 |
-| **Kết quả kỳ vọng** | HTTP 400 Bad Request, message MK mới phải khác MK cũ |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
-
-| Trường | Nội dung |
-|---|---|
-| **Mã Test Case** | TC-AUTH-019 |
-| **Tên Test Case** | Logout và thu hồi Refresh Token |
-| **Mã Yêu cầu** | FR-AUTH-06 |
-| **Loại kiểm thử** | Positive |
-| **Độ ưu tiên** | Cao |
-| **Điều kiện tiên quyết** | Đã đăng nhập |
-| **Các bước thực hiện** | 1. Gọi API Logout kèm Refresh Token |
-| **Dữ liệu kiểm thử** | RefreshToken: xxx |
-| **Kết quả kỳ vọng** | HTTP 200 OK, DB đánh dấu token đã thu hồi (revoked) |
-| **Kết quả thực tế** | *(Chưa thực hiện)* |
-| **Trạng thái** | ⬜ Chưa thực hiện |
+| Test Case ID | Test Scenario | Test Case | Preconditions | Test Steps | Test Data | Expected Result | Priority |
+|---|---|---|---|---|---|---|---|
+| TC-AUTH-001 | Người dùng đăng nhập | Đăng nhập với username và password hợp lệ | Tài khoản đã đăng ký và đang Active | 1. Mở Login<br>2. Nhập username<br>3. Nhập password<br>4. Nhấn Login | Username: user01<br>Password: Password@123 | Đăng nhập thành công; tạo phiên/token và chuyển vào hệ thống (HTTP 200) | High |
+| TC-AUTH-002 | Người dùng đăng nhập | Đăng nhập với username không tồn tại | Hệ thống đang hoạt động | 1. Mở Login<br>2. Nhập username<br>3. Nhập password<br>4. Nhấn Login | Username: unknown01<br>Password: Password@123 | Đăng nhập thất bại; hiển thị thông báo thông tin đăng nhập không hợp lệ (HTTP 401) | High |
+| TC-AUTH-003 | Người dùng đăng nhập | Đăng nhập với password không đúng | Username tồn tại và tài khoản Active | 1. Mở Login<br>2. Nhập username đúng<br>3. Nhập password sai<br>4. Nhấn Login | Username: user01<br>Password: Wrong@123 | Đăng nhập thất bại; không tạo phiên/token (HTTP 401) | High |
+| TC-AUTH-004 | Người dùng đăng nhập | Username để trống | Đang ở màn hình Login | 1. Để trống username<br>2. Nhập password<br>3. Nhấn Login | Username: empty<br>Password: Password@123 | Không cho đăng nhập; hiển thị lỗi yêu cầu nhập username (HTTP 400) | High |
+| TC-AUTH-005 | Người dùng đăng nhập | Password để trống | Đang ở màn hình Login | 1. Nhập username<br>2. Để trống password<br>3. Nhấn Login | Username: user01<br>Password: empty | Không cho đăng nhập; hiển thị lỗi yêu cầu nhập password (HTTP 400) | High |
+| TC-AUTH-006 | Người dùng đăng nhập | Username và password đều để trống | Đang ở màn hình Login | 1. Không nhập username<br>2. Không nhập password<br>3. Nhấn Login | Username: empty<br>Password: empty | Không cho đăng nhập; hiển thị lỗi validation tương ứng (HTTP 400) | High |
+| TC-AUTH-007 | Người dùng đăng nhập | Username có định dạng không hợp lệ | Đang ở màn hình Login | 1. Nhập username không hợp lệ<br>2. Nhập password<br>3. Nhấn Login | Username: user@@@<br>Password: Password@123 | Từ chối dữ liệu và hiển thị lỗi username không hợp lệ (HTTP 400) | Medium |
+| TC-AUTH-008 | Người dùng đăng nhập | Password có định dạng không hợp lệ | Quy tắc password đã được định nghĩa (tối thiểu 6 ký tự) | 1. Nhập username<br>2. Nhập password không đáp ứng rule<br>3. Nhấn Login | Username: user01<br>Password: 123 | Từ chối dữ liệu và hiển thị lỗi password không hợp lệ (HTTP 400) | Medium |
+| TC-AUTH-009 | Người dùng đăng nhập | Đăng nhập bằng tài khoản bị khóa | Tài khoản user01 ở trạng thái Locked (isActive = false) | 1. Nhập username<br>2. Nhập password đúng<br>3. Nhấn Login | Username: user01<br>Password: Password@123 | Đăng nhập thất bại; thông báo tài khoản bị khóa (HTTP 403 Forbidden) | High |
+| TC-AUTH-010 | Người dùng đăng nhập | Đăng nhập bằng tài khoản Inactive | Tài khoản tồn tại nhưng Inactive | 1. Nhập username<br>2. Nhập password đúng<br>3. Nhấn Login | Username: inactive01<br>Password: Password@123 | Đăng nhập thất bại; thông báo tài khoản không hoạt động (HTTP 403) | High |
+| TC-AUTH-011 | Người dùng đăng nhập | Username phân biệt chữ hoa/chữ thường | Quy tắc xử lý username case-insensitive (email lowercase) | 1. Nhập username khác hoa/thường<br>2. Nhập password đúng<br>3. Nhấn Login | Username: User01@Mail.Com<br>Password: Password@123 | Hệ thống tự động lowercase và đăng nhập thành công (HTTP 200) | Medium |
+| TC-AUTH-012 | Người dùng đăng nhập | Password phân biệt chữ hoa/chữ thường | Tài khoản Active | 1. Nhập username đúng<br>2. Nhập password khác hoa/thường<br>3. Nhấn Login | Username: user01<br>Password: password@123 | Đăng nhập thất bại do password phân biệt hoa/thường (HTTP 401) | High |
+| TC-AUTH-013 | Người dùng đăng nhập | Nhập password chứa khoảng trắng | Tài khoản Active | 1. Nhập username<br>2. Nhập password có khoảng trắng đầu/cuối<br>3. Nhấn Login | Username: user01<br>Password:  Password@123  | Xử lý đúng theo rule bảo mật (không tự trim password, báo sai mật khẩu nếu pass gốc không có space) | Medium |
+| TC-AUTH-014 | Người dùng đăng nhập | Kiểm tra password không hiển thị plaintext | Đang ở màn hình Login | 1. Click ô Password<br>2. Nhập password | Password: Password@123 | Password được che/mask (type='password'), có nút toggle ẩn/hiện | Medium |
+| TC-AUTH-015 | Người dùng đăng nhập | Đăng nhập thành công và truy cập chức năng được phép | Tài khoản Active và có quyền customer | 1. Nhập username hợp lệ<br>2. Nhập password hợp lệ<br>3. Login<br>4. Truy cập chức năng yêu cầu authentication | Username: user01<br>Password: Password@123 | Authentication thành công và truy cập được chức năng được cấp quyền (HTTP 200 kèm Bearer Token) | High |
+| TC-AUTH-016 | Người dùng đăng nhập | Đăng nhập nhiều lần với password sai (Chống Brute-force) | Cơ chế Rate Limit NFR-SEC-06 hoạt động (tối đa 5 lần thử sai) | 1. Nhập username đúng<br>2. Nhập password sai 5 lần liên tiếp<br>3. Gửi lần đăng nhập thứ 6 | Username: user01<br>Password: Wrong@123 (x5) | Hệ thống chặn tạm thời 15 phút, trả về HTTP 429 Too Many Requests | High |
+| TC-AUTH-017 | Người dùng đăng nhập | Request không có username | API Login đang hoạt động (POST /api/v1/auth/login) | 1. Gửi request Login<br>2. Bỏ trường email/username | { "password": "Password@123" } | API trả lỗi validation HTTP 400 Bad Request; không xác thực | High |
+| TC-AUTH-018 | Người dùng đăng nhập | Request không có password | API Login đang hoạt động | 1. Gửi request Login<br>2. Bỏ trường password | { "email": "user01@mail.com" } | API trả lỗi validation HTTP 400 Bad Request; không xác thực | High |
+| TC-AUTH-019 | Người dùng đăng nhập | Request với username/password không hợp lệ | API Login đang hoạt động | 1. Gửi request Login<br>2. Nhập dữ liệu không hợp lệ | { "email": "unknown@mail.com", "password": "wrongpass" } | API trả response lỗi HTTP 401 Unauthorized; không tạo token | High |
+| TC-AUTH-020 | Người dùng đăng nhập | Response không trả về password hoặc hash | Đăng nhập thành công | 1. Gửi request Login hợp lệ<br>2. Kiểm tra response JSON | { "email": "user01@mail.com", "password": "Password@123" } | Response HTTP 200 không chứa passwordHash hoặc thông tin nhạy cảm của người dùng | High |
+| TC-AUTH-021 | Đăng ký Khách hàng | Đăng ký tài khoản khách hàng với thông tin hợp lệ | Email và SĐT chưa tồn tại trong hệ thống | 1. Mở màn hình Đăng ký<br>2. Nhập họ tên, email, SĐT, mật khẩu hợp lệ<br>3. Nhấn Đăng ký | Họ tên: Nguyễn Văn A<br>Email: khach1@gmail.com<br>SĐT: 0912345678<br>Mật khẩu: Password@123 | Đăng ký thành công, tạo User role 'customer', isActive=true, trả về HTTP 201 Created | High |
+| TC-AUTH-022 | Đăng ký Khách hàng | Đăng ký với email trùng lặp | Email khach1@gmail.com đã tồn tại trong DB | 1. Nhập thông tin với email đã tồn tại<br>2. Nhấn Đăng ký | Email: khach1@gmail.com, SĐT: 0987654321 | Hệ thống từ chối, trả về HTTP 409 Conflict: 'Email đã được sử dụng' | High |
+| TC-AUTH-023 | Đăng ký Khách hàng | Đăng ký với số điện thoại trùng lặp | SĐT 0912345678 đã tồn tại trong DB | 1. Nhập email mới nhưng SĐT trùng<br>2. Nhấn Đăng ký | Email: khachmoi@gmail.com, SĐT: 0912345678 | Hệ thống từ chối, trả về HTTP 409 Conflict: 'Số điện thoại đã được sử dụng' | High |
+| TC-AUTH-024 | Đăng ký Khách hàng | Đăng ký với SĐT không đủ 10 chữ số VN | Đang ở màn hình Đăng ký | 1. Nhập SĐT 9 chữ số hoặc 11 chữ số<br>2. Nhấn Đăng ký | SĐT: 091234567 (9 số) hoặc 09123456789 (11 số) | Hệ thống báo lỗi validation HTTP 400: 'SĐT phải gồm đúng 10 chữ số' | High |
+| TC-AUTH-025 | Đăng ký Khách hàng | Đăng ký với mật khẩu ngắn hơn 6 ký tự | Đang ở màn hình Đăng ký | 1. Nhập mật khẩu 5 ký tự<br>2. Nhấn Đăng ký | Password: 12345 | Báo lỗi HTTP 400: 'Mật khẩu phải chứa ít nhất 6 ký tự' | Medium |
+| TC-AUTH-026 | Đăng ký Đối tác Tài xế | Đăng ký tài xế đầy đủ thông tin GPLX và xe hợp lệ | Số GPLX và Biển số xe chưa tồn tại trong hệ thống | 1. Chọn Đăng ký Tài xế<br>2. Nhập thông tin cá nhân, GPLX 12 số, hạng B2, thông tin xe<br>3. Nhấn Đăng ký | Họ tên: Trần Văn Tài<br>Email: taixe1@gmail.com<br>SĐT: 0977112233<br>GPLX: 123456789012 (hạng B2)<br>Biển số: 51G-888.88<br>Loại xe: sedan | Tạo User role 'driver', DriverProfile với isApproved=false, status='offline', HTTP 201 Created | High |
+| TC-AUTH-027 | Đăng ký Đối tác Tài xế | Đăng ký với GPLX không đúng 12 chữ số | Đang ở màn hình đăng ký tài xế | 1. Nhập GPLX có 10 chữ số<br>2. Nhấn Đăng ký | GPLX: 1234567890 | Báo lỗi validation HTTP 400: 'Số GPLX phải đúng 12 chữ số' | High |
+| TC-AUTH-028 | Đăng ký Đối tác Tài xế | Đăng ký với GPLX hoặc Biển số xe bị trùng | Biển số 51G-888.88 đã đăng ký trong hệ thống | 1. Nhập thông tin với biển số đã có<br>2. Nhấn Đăng ký | Biển số: 51G-888.88 | Hệ thống từ chối HTTP 409 Conflict: 'Biển số xe đã được đăng ký' | High |
+| TC-AUTH-029 | Quản lý Hồ sơ | Xem thông tin cá nhân khi đã đăng nhập | Đã có Bearer Access Token hợp lệ | 1. Gửi request GET /api/v1/auth/profile kèm Header Authorization | Header: Authorization: Bearer <valid_token> | HTTP 200 OK, trả về thông tin họ tên, email, SĐT, role | Medium |
+| TC-AUTH-030 | Quản lý Hồ sơ | Cập nhật họ tên và số điện thoại mới hợp lệ | Đã đăng nhập | 1. Gửi PUT /api/v1/auth/profile với họ tên mới và SĐT mới | { "fullName": "Nguyễn Văn A (Cập nhật)", "phone": "0912345699" } | HTTP 200 OK, dữ liệu profile trong DB được cập nhật | Medium |
+| TC-AUTH-031 | Đổi Mật khẩu | Đổi mật khẩu thành công với mật khẩu cũ chính xác | Đã đăng nhập, biết mật khẩu hiện tại | 1. Nhập mật khẩu cũ đúng<br>2. Nhập mật khẩu mới >= 6 ký tự<br>3. Nhấn Đổi mật khẩu | currentPassword: Password@123<br>newPassword: NewPassword@456 | HTTP 200 OK: 'Đổi mật khẩu thành công', hash bcrypt mới được lưu vào DB | High |
+| TC-AUTH-032 | Đổi Mật khẩu | Đổi mật khẩu với mật khẩu cũ không đúng | Đang đăng nhập | 1. Nhập mật khẩu cũ sai<br>2. Nhấn Đổi mật khẩu | currentPassword: WrongOldPassword<br>newPassword: NewPassword@456 | HTTP 400 Bad Request: 'Mật khẩu hiện tại không đúng' | High |
+| TC-AUTH-033 | Đăng xuất & Token | Đăng xuất hệ thống và thu hồi Refresh Token | Đang có phiên đăng nhập active | 1. Gửi POST /api/v1/auth/logout kèm Bearer Token | Bearer Token hợp lệ | HTTP 200 OK, trường refreshToken trong DB bị xóa thành null | High |
+| TC-AUTH-034 | Đăng xuất & Token | Cấp mới Access Token bằng Refresh Token hợp lệ | Có Refresh Token còn hạn (<= 7 ngày) | 1. Gửi POST /api/v1/auth/refresh-token kèm refreshToken | { "refreshToken": "<valid_refresh_token>" } | HTTP 200 OK, trả về cặp accessToken mới (15 phút) và refreshToken mới | High |
+| TC-AUTH-035 | Đăng xuất & Token | Cố tình dùng lại Refresh Token đã thu hồi | User đã bấm logout | 1. Gửi POST /api/v1/auth/refresh-token với token cũ | { "refreshToken": "<revoked_token>" } | HTTP 401 Unauthorized: 'Refresh token không hợp lệ hoặc đã hết hạn' | High |
