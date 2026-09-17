@@ -1,7 +1,7 @@
 # BÁO CÁO THIẾT KẾ KIẾN TRÚC MICROSERVICES (BUỔI 4)
 ## HỆ THỐNG ĐẶT XE TRỰC TUYẾN (CAB SYSTEM)
 
-- **Sinh viên thực hiện:** Võ Tất Thiện
+- **Sinh viên thực hiện:** Võ Tất Thiên
 - **Mã số sinh viên (MSSV):** 22652711
 - **Học phần:** Lập trình Hướng Dịch vụ (LTHDV)
 - **Phương pháp tiếp cận:** Domain-Driven Design (DDD) & Event-Driven Microservices Architecture
