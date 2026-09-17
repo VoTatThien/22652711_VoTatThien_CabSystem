@@ -326,10 +326,3 @@ Mỗi Microservice sở hữu hoàn toàn cơ sở dữ liệu riêng, đảm b�
 
 ---
 
-## 9. Tổng kết & Cam kết Kiến trúc Microservices Độc lập
-
-Hệ thống CAB System sau khi thiết kế theo kiến trúc này hoàn toàn giải quyết được các tiêu chí khắt khe của học phần LTHDV:
-1. **Tính độc lập dữ liệu (Database-per-Service):** 11 database riêng biệt, không có bất kỳ câu lệnh SQL/Mongo JOIN xuyên service.
-2. **Giao tiếp lỏng lẻo (Loose Coupling):** Giao tiếp 90% thông qua Message Broker và Domain Events bất đồng bộ.
-3. **Khả năng chịu lỗi cao (Fault Isolation):** Sự cố tại Payment Gateway hay Email Service không gây tắc nghẽn quá trình đặt xe hoặc di chuyển của hành khách.
-4. **Khả năng mở rộng độc lập (Independent Scalability):** `dispatch-service` và `tracking-service` (đòi hỏi xử lý cao điểm theo thời gian thực) có thể scale ngang (horizontal scale) lên hàng chục container mà không ảnh hưởng tới `auth-service` hay `admin-service`.
